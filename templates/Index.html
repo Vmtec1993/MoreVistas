@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geetai Villa | Luxury Stay</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; text-align: center; background-color: #f4f4f4; }
+        .header { background: #2c3e50; color: white; padding: 20px; }
+        .gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 20px; }
+        .photo-card { background: white; padding: 10px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .photo-card img { width: 100%; max-width: 300px; height: 200px; object-fit: cover; border-radius: 5px; }
+        .btn-whatsapp { background: #25d366; color: white; padding: 15px 30px; text-decoration: none; border-radius: 50px; display: inline-block; margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Welcome to Geetai Villa</h1>
+    <p>Experience Luxury & Comfort in Lonavala</p>
+</div>
+
+<section>
+    <h2>Gallery</h2>
+    <div class="gallery">
+        <div class="photo-card">
+            <img src="{{ url_for('static', filename='villa1.jpg') }}" alt="Villa View 1">
+        </div>
+        <div class="photo-card">
+            <img src="{{ url_for('static', filename='villa2.jpg') }}" alt="Villa View 2">
+        </div>
+        <div class="photo-card">
+            <img src="{{ url_for('static', filename='villa3.jpg') }}" alt="Villa View 3">
+        </div>
+        <div class="photo-card">
+            <img src="{{ url_for('static', filename='villa4.jpg') }}" alt="Villa View 4">
+        </div>
+    </div>
+</section>
+
+<a href="https://wa.me/918830024994?text=Hi, I want to book Geetai Villa" class="btn-whatsapp">
+    Book via WhatsApp
+</a>
+
+<p style="margin-top: 50px; color: #7f8c8d;">© 2026 Geetai Villa Lonavala</p>
+
+</body>
+</html>
