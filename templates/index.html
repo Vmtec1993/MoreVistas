@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geetai Villa | Lonavala</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; text-align: center; }
+        .hero { background: #2c3e50; color: white; padding: 40px 20px; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: auto; }
+        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .whatsapp-btn { background: #25d366; color: white; padding: 15px 30px; text-decoration: none; border-radius: 50px; display: inline-block; margin: 30px 0; font-size: 18px; font-weight: bold; transition: 0.3s; }
+        .whatsapp-btn:hover { background: #128c7e; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <h1>Geetai Villa Lonavala</h1>
+        <p>Luxury 4BHK Villa with Private Pool</p>
+    </div>
+
+    <h2>Our Gallery</h2>
+    <div class="gallery">
+        <div class="card"><img src="{{ url_for('static', filename='villa1.jpg') }}" alt="Villa View 1"></div>
+        <div class="card"><img src="{{ url_for('static', filename='villa2.jpg') }}" alt="Villa View 2"></div>
+        <div class="card"><img src="{{ url_for('static', filename='villa3.jpg') }}" alt="Villa View 3"></div>
+        <div class="card"><img src="{{ url_for('static', filename='villa4.jpg') }}" alt="Villa View 4"></div>
+    </div>
+
+    <a href="https://wa.me/918830024994?text=I'm interested in booking Geetai Villa" class="whatsapp-btn">
+        Book Now on WhatsApp
+    </a>
+
+    <footer style="padding: 20px; color: #7f8c8d;">
+        <p>© 2026 Geetai Villa. Built for Comfort.</p>
+    </footer>
+
+</body>
+</html>
