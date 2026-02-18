@@ -1,59 +1,45 @@
 import os
+import json
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 from flask import Flask, render_template
 
 app = Flask(__name__)
-app.debug = True
-app = app 
-# पक्का करें कि पूरे कोड में @app.route('/') सिर्फ एक ही बार हो
-@app.route('/')
-def home():  # हमने नाम बदलकर 'home' कर दिया है ताकि कोई टकराव न हो
-    return render_template('index.html')
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-
-    # Create Villas table
-    cursor.execute('''CREATE TABLE IF NOT EXISTS villas 
-                      (id INTEGER PRIMARY KEY, name TEXT, price REAL, description TEXT)''')
-    # Create Bookings table
-    cursor.execute('''CREATE TABLE IF NOT EXISTS bookings 
-                      (id INTEGER PRIMARY KEY, villa_id INTEGER, guest_name TEXT, date TEXT)''')
+def get_villas():
+    # सुरक्षा के लिए हम Environment Variable का इस्तेमाल करेंगे
+    # अगर फाइल नहीं मिलती तो यह Vercel की सेटिंग्स से डेटा उठाएगा
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     
-    # Add dummy data if empty
-    cursor.execute("SELECT COUNT(*) FROM villas")
-    if cursor.fetchone()[0] == 0:
-        cursor.execute("INSERT INTO villas (name, price, description) VALUES (?, ?, ?)", 
-                       ("Ocean View Paradise", 250.0, "A stunning 3-bedroom villa by the sea."))
-        cursor.execute("INSERT INTO villas (name, price, description) VALUES (?, ?, ?)", 
-                       ("Mountain Retreat", 180.0, "Cozy cabin style villa in the heart of the woods."))
-    conn.commit()
-    conn.close()
+    # यह हिस्सा GitHub/Vercel के लिए है
+    creds_json = os.environ.get('GOOGLE_CREDS')
+    if creds_json:
+        creds_dict = json.loads(creds_json)
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    else:
+        # यह आपके लोकल कंप्यूटर पर टेस्टिंग के लिए है
+        creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+    
+    client = gspread.authorize(creds)
+    sheet = client.open("Geetai_Villa_Admin").sheet1
+    return sheet.get_all_records()
 
 @app.route('/')
 def index():
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM villas")
-    villas = cursor.fetchall()
-    conn.close()
-    return render_template('index.html', villas=villas)
+    try:
+        villas = get_villas()
+        return render_template('index.html', villas=villas)
+    except Exception as e:
+        return f"Error: {e}"
 
-@app.route('/book/<int:villa_id>', methods=['GET', 'POST'])
-def book(villa_id):
-    if request.method == 'POST':
-        guest_name = request.form['guest_name']
-        date = request.form['date']
-        conn = sqlite3.connect('database.db')
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO bookings (villa_id, guest_name, date) VALUES (?, ?, ?)", 
-                       (villa_id, guest_name, date))
-        conn.commit()
-        conn.close()
-        return redirect('/')
-    
-    return render_template('book.html', villa_id=villa_id)
+@app.route('/villa/<villa_id>')
+def villa_details(villa_id):
+    all_villas = get_villas()
+    villa = next((v for v in all_villas if str(v['Villa_ID']) == villa_id), None)
+    if villa:
+        return render_template('villa_details.html', villa=villa)
+    return "Villa not found!", 404
 
-if __name__ == '__main__':
-    init_db()
+if __name__ == "__main__":
     app.run(debug=True)
+    
