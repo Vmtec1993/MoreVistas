@@ -4,33 +4,113 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ villa.Name }} | Details</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #D4AF37; --dark: #050505; }
-        body { margin: 0; background: var(--dark); color: #fff; font-family: 'Montserrat', sans-serif; }
-        .nav { padding: 20px; border-bottom: 1px solid #333; }
+        :root { --gold: #D4AF37; --dark: #0a0a0a; --green: #25d366; }
+        body { margin: 0; background: var(--dark); color: #fff; font-family: 'Montserrat', sans-serif; line-height: 1.6; }
+        
+        /* Navigation */
+        .nav { padding: 20px; background: #111; border-bottom: 1px solid #333; }
         .nav a { color: var(--gold); text-decoration: none; font-weight: bold; }
+
+        .container { max-width: 1000px; margin: auto; padding: 20px; }
         
-        .container { padding: 30px 5%; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .gallery img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; cursor: pointer; transition: 0.3s; }
-        .gallery img:hover { filter: brightness(1.2); }
+        /* Gallery */
+        .main-img { width: 100%; height: 400px; object-fit: cover; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
+        .sub-images { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .sub-images img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; border: 1px solid #333; }
+
+        /* Villa Info */
+        .info-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 20px; }
+        .villa-title { color: var(--gold); margin: 0; font-size: 2rem; }
+        .price-tag { font-size: 1.5rem; font-weight: bold; color: #fff; }
         
-        .content-box { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
-        .description h1 { font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 2.5rem; }
+        .description { margin: 30px 0; color: #ccc; font-size: 1.1rem; }
         
-        .booking-card { background: #111; padding: 25px; border-radius: 20px; border: 1px solid var(--gold); position: sticky; top: 20px; text-align: center; }
-        .wa-btn { display: block; background: #25d366; color: #fff; padding: 15px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 1.1rem; margin-top: 20px; }
-        
-        @media (max-width: 768px) { .content-box { grid-template-columns: 1fr; } }
+        /* Features Table */
+        .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 40px; }
+        .feature-item { background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #222; }
+
+        /* Booking Section */
+        .booking-card { 
+            background: #151515; 
+            padding: 30px; 
+            border-radius: 20px; 
+            border: 2px solid var(--gold); 
+            text-align: center;
+            margin-top: 50px;
+        }
+        .status-badge { 
+            display: inline-block; 
+            padding: 5px 15px; 
+            border-radius: 20px; 
+            font-weight: bold; 
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        .wa-button { 
+            display: block; 
+            background: var(--green); 
+            color: #fff; 
+            padding: 18px; 
+            text-decoration: none; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+        .wa-button:hover { transform: scale(1.02); filter: brightness(1.1); }
+
+        @media (max-width: 768px) {
+            .villa-title { font-size: 1.5rem; }
+            .info-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
     </style>
 </head>
 <body>
+
     <div class="nav"><a href="/">← Back to All Villas</a></div>
 
     <div class="container">
-        <div class="gallery">
-            <img src="{{ villa.Image_Main }}" style="grid-column: span 2; height: 415px;">
-            <img src="{{ villa.Image_2 }}">
-            <img src="{{ villa.Image_3 }}">
+        <img src="{{ villa.Image_Main }}" class="main-img" alt="{{ villa.Name }}">
+        <div class="sub-images">
+            <img src="{{ villa.Image_2 }}" alt="Interior 1">
+            <img src="{{ villa.Image_3 }}" alt="Interior 2">
         </div>
+
+        <div class="info-header">
+            <h1 class="villa-title">{{ villa.Name }}</h1>
+            <div class="price-tag">₹{{ villa.Price }} <small style="font-size: 0.8rem; opacity: 0.6;">/night</small></div>
+        </div>
+
+        <div class="description">
+            <h3>About this Villa</h3>
+            <p>{{ villa.Description }}</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-item">🛏️ {{ villa.BHK }}</div>
+            <div class="feature-item">🏊 Private Pool</div>
+            <div class="feature-item">❄️ Fully Air Conditioned</div>
+            <div class="feature-item">👨‍🍳 Kitchen Available</div>
+        </div>
+
+        <div class="booking-card">
+            <div class="status-badge" style="background: {{ '#1b5e20' if villa.Status == 'Available' else '#b71c1c' }}">
+                {{ villa.Status }}
+            </div>
+            
+            {% if villa.Status == 'Available' %}
+                <p>इस विला को बुक करने के लिए नीचे दिए गए बटन पर क्लिक करें:</p>
+                <a href="https://wa.me/918830024994?text=Hi, I want to book {{ villa.Name }} (ID: {{ villa.Villa_ID }})" class="wa-button">
+                    Book Now via WhatsApp
+                </a>
+            {% else %}
+                <p style="color: #ff4444; font-size: 1.2rem; font-weight: bold;">माफ़ करें, यह विला अभी बुक हो चुका है।</p>
+                <a href="/" style="color: var(--gold); text-decoration: none;">Explore Other Villas →</a>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>
