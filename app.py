@@ -9,15 +9,15 @@ app = Flask(__name__)
 
 # 1. Google Sheets Connection Function
 def get_gspread_client():
+    # सिर्फ Render के Environment Variable से डेटा उठाएगा
     creds_json = os.environ.get('GOOGLE_CREDS')
     
     if not creds_json:
-        # अगर Render पर नहीं है, तो लोकल फाइल देखेगा
-        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        return gspread.authorize(ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope))
+        print("ERROR: GOOGLE_CREDS variable not found in Render settings!")
+        return None
     
     try:
-        # JSON डेटा को साफ़ करके लोड करना
+        # डेटा को साफ़ करके लोड करना
         creds_dict = json.loads(creds_json.strip())
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
@@ -25,6 +25,7 @@ def get_gspread_client():
     except Exception as e:
         print(f"Auth Error: {e}")
         return None
+
 
 # 2. Main Page Route (यह गायब था, इसलिए Not Found आ रहा था)
 @app.route('/')
