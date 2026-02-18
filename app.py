@@ -58,18 +58,30 @@ def villa_details(villa_id):
 @app.route('/submit_inquiry', methods=['POST'])
 def submit_inquiry():
     try:
+        # फॉर्म से डेटा लेना
         name = request.form.get('name')
         phone = request.form.get('phone')
         message = request.form.get('message')
+        villa_name = request.form.get('villa_name', 'General Inquiry')
         today = str(datetime.date.today())
 
+        # 1. Google Sheet में डेटा सेव करना
         client = get_gspread_client()
+        # पक्का करें कि आपकी शीट में 'Inquiries' नाम का टैब (Sheet) है
         inquiry_sheet = client.open("Geetai_Villa_Admin").worksheet("Inquiries")
-        inquiry_sheet.append_row([name, phone, message, today])
+        inquiry_sheet.append_row([today, name, phone, villa_name, message])
 
-        return "<h1>Success!</h1><script>setTimeout(function(){ window.location.href='/'; }, 2000);</script>"
+        # 2. WhatsApp का मैसेज तैयार करना
+        whatsapp_msg = f"Hello, I am interested in {villa_name}. Name: {name}, Message: {message}"
+        # अपना WhatsApp नंबर यहाँ डालें (बिना + के)
+        whatsapp_url = f"https://wa.me/918830024994?text={whatsapp_msg}"
+
+        # 3. डेटा सेव होने के बाद WhatsApp पर भेज देना
+        return f"<script>window.location.href='{whatsapp_url}';</script>"
+
     except Exception as e:
-        return f"Form Error: {str(e)}"
+        return f"Error: {str(e)}"
+
 
 if __name__ == "__main__":
     # रेंडर के लिए पोर्ट सेटिंग
