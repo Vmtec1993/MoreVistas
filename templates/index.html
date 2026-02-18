@@ -3,63 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geetai Villa - Luxury Stay</title>
+    <title>Geetai Villa | Premium Holiday Rentals</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #C5A059; --text: #2c2c2c; --light-bg: #f8f9fa; }
-        body { margin: 0; font-family: 'Poppins', sans-serif; color: var(--text); background: #fff; }
-        
+        :root { --gold: #C5A059; --dark: #1a1a1a; --text: #333; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; color: var(--text); background: #fff; scroll-behavior: smooth; }
+
+        /* Navigation */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; background: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--dark); text-decoration: none; font-weight: bold; }
+        .nav-links a { margin-left: 25px; text-decoration: none; color: var(--text); font-size: 0.9rem; font-weight: 500; transition: 0.3s; }
+        .nav-links a:hover { color: var(--gold); }
+
         /* Hero Section */
         .hero { 
-            height: 60vh; 
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1350&q=80');
+            height: 70vh; 
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1350&q=80');
             background-size: cover; background-position: center;
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white;
         }
-        .hero h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; margin: 0; }
-        .hero p { font-size: 1.2rem; font-weight: 300; letter-spacing: 2px; }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 4rem; margin: 0; }
+        
+        /* Search Bar */
+        .search-container { background: white; padding: 30px; border-radius: 10px; display: flex; gap: 15px; width: 80%; max-width: 900px; margin-top: -50px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .search-container input { flex: 2; padding: 12px; border: 1px solid #ddd; border-radius: 5px; outline: none; }
+        .search-container button { flex: 1; background: var(--dark); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; }
 
-        .container { max-width: 1200px; margin: -50px auto 50px; padding: 0 20px; position: relative; }
+        .section-title { text-align: center; font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 80px 0 40px; }
 
         /* Villa Cards */
-        .villa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
-        .villa-card { 
-            background: white; border-radius: 15px; overflow: hidden; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); transition: 0.3s;
-            text-decoration: none; color: inherit;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .villa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 80px; }
+        .villa-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-decoration: none; color: inherit; transition: 0.3s; }
         .villa-card:hover { transform: translateY(-10px); }
-        .villa-img { width: 100%; height: 250px; object-fit: cover; }
-        
+        .villa-img { width: 100%; height: 260px; object-fit: cover; }
         .villa-info { padding: 25px; }
-        .villa-name { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin: 0 0 10px; color: var(--text); }
-        .villa-tagline { font-size: 0.9rem; color: #777; margin-bottom: 15px; }
-        
-        .villa-meta { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 15px; }
-        .price { font-weight: 600; color: var(--gold); font-size: 1.2rem; }
-        .view-btn { background: var(--gold); color: white; padding: 8px 20px; border-radius: 5px; font-size: 0.9rem; }
+        .villa-name { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin: 0; }
+        .price { color: var(--gold); font-weight: 600; font-size: 1.1rem; }
 
-        @media (max-width: 768px) { .hero h1 { font-size: 2.5rem; } .villa-grid { grid-template-columns: 1fr; } }
+        /* About Section */
+        #about { background: #fdfaf5; padding: 80px 20px; text-align: center; }
+        .about-content { max-width: 800px; margin: 0 auto; }
+
+        /* Footer */
+        footer { background: var(--dark); color: white; padding: 60px 5% 20px; text-align: center; }
+        .footer-links a { color: #aaa; text-decoration: none; margin: 0 15px; font-size: 0.8rem; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .search-container { flex-direction: column; width: 90%; }
+        }
     </style>
 </head>
 <body>
 
+    <nav class="navbar">
+        <a href="/" class="logo">GEETAI VILLA</a>
+        <div class="nav-links">
+            <a href="/">HOME</a>
+            <a href="#villas">COLLECTION</a>
+            <a href="#about">ABOUT US</a>
+            <a href="#contact">CONTACT</a>
+        </div>
+    </nav>
+
     <section class="hero">
-        <h1>Geetai Villa</h1>
-        <p>Luxury Holiday Rentals</p>
+        <h1>Escape to Luxury</h1>
+        <p>Curated Private Villas for Your Perfect Getaway</p>
     </section>
 
-    <div class="container">
-        <div class="villa-grid">
+    <div style="display: flex; justify-content: center;">
+        <div class="search-container">
+            <input type="text" id="vName" placeholder="Where are you going? (e.g. Lonavala)">
+            <input type="text" placeholder="Add Guests">
+            <button onclick="filterVillas()">SEARCH</button>
+        </div>
+    </div>
+
+    <div class="container" id="villas">
+        <h2 class="section-title">Our Collection</h2>
+        <div class="villa-grid" id="villaGrid">
             {% for villa in villas %}
-            <a href="/villa/{{ villa.Villa_ID }}" class="villa-card">
-                <img src="{{ villa.Image_Main }}" class="villa-img" alt="{{ villa.Name }}">
+            <a href="/villa/{{ villa.Villa_ID }}" class="villa-card" data-name="{{ villa.Name | lower }}">
+                <img src="{{ villa.Image_Main }}" class="villa-img">
                 <div class="villa-info">
                     <h2 class="villa-name">{{ villa.Name }}</h2>
-                    <p class="villa-tagline">{{ villa.BHK }} • Private Pool • Fully Staffed</p>
-                    <div class="villa-meta">
-                        <span class="price">₹{{ villa.Price }} <small>/night</small></span>
-                        <span class="view-btn">View Details</span>
+                    <p style="color: #888; font-size: 0.8rem;">{{ villa.BHK }} • Private Pool • Wifi</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                        <span class="price">₹{{ villa.Price }} <small style="color: #777; font-weight: 300;">/night</small></span>
+                        <span style="font-size: 0.8rem; color: var(--gold);">VIEW DETAILS →</span>
                     </div>
                 </div>
             </a>
@@ -67,5 +99,39 @@
         </div>
     </div>
 
+    <section id="about">
+        <div class="about-content">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem;">The Geetai Experience</h2>
+            <p>We hand-select every villa to ensure you get the most luxurious and comfortable stay in Lonavala. From private pools to chef-on-call services, your comfort is our priority.</p>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <h2 style="font-family: 'Playfair Display', serif;">GEETAI VILLA</h2>
+        <p>Parsi Colony, Lonavala, Maharashtra</p>
+        <p>WhatsApp: +91 8830024994</p>
+        <div class="footer-links">
+            <a href="#">INSTAGRAM</a>
+            <a href="#">FACEBOOK</a>
+            <a href="#">TERMS & CONDITIONS</a>
+        </div>
+        <p style="margin-top: 40px; font-size: 0.7rem; color: #555;">© 2026 GEETAI VILLA RENTALS. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <script>
+        function filterVillas() {
+            let input = document.getElementById('vName').value.toLowerCase();
+            let cards = document.querySelectorAll('.villa-card');
+            
+            cards.forEach(card => {
+                let name = card.getAttribute('data-name');
+                if(name.includes(input)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+    </script>
 </body>
 </html>
