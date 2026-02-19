@@ -12,7 +12,7 @@
             </nav>
             
             <h1 class="fw-bold mb-3">{{ villa.Name }}</h1>
-            <img src="{{ villa.Image_URL }}" class="img-fluid rounded-4 shadow-lg mb-4" alt="{{ villa.Name }}" style="width: 100%; height: 450px; object-fit: cover;">
+            <img src="{{ villa.Image_URL }}" class="img-fluid rounded-4 shadow-lg mb-4" alt="{{ villa.Name }}" style="width: 100%; height: 450px; object-fit: cover; background-color: #eee;">
             
             <h3 class="fw-bold mt-4">Description</h3>
             <p class="text-muted fs-5" style="line-height: 1.8;">{{ villa.Description }}</p>
@@ -27,8 +27,14 @@
 
         <div class="col-lg-4">
             <div class="card shadow-lg p-4 sticky-top border-0" style="top: 20px; border-radius: 20px;">
-                <h2 class="fw-bold text-primary mb-1">₹{{ villa.Price }}</h2>
-                <p class="text-muted mb-4">Per Night + Taxes</p>
+                
+                {% if villa.Price and villa.Price != '****' and villa.Price != '' %}
+                    <h2 class="fw-bold text-primary mb-1">₹{{ villa.Price }}</h2>
+                    <p class="text-muted mb-4">Per Night + Taxes</p>
+                {% else %}
+                    <h2 class="fw-bold text-success mb-1">Price on Request</h2>
+                    <p class="text-muted mb-4">Contact us for the best deal</p>
+                {% endif %}
                 
                 <a href="https://wa.me/918830024994?text=Hi, I want to book {{ villa.Name }}" class="btn btn-success btn-lg w-100 mb-3 rounded-pill fw-bold py-3 shadow">
                     <i class="bi bi-whatsapp me-2"></i>Book on WhatsApp
@@ -38,13 +44,13 @@
                     <i class="bi bi-calendar-check me-2"></i>Send Enquiry
                 </a>
 
-                <div class="bg-light p-3 rounded-3 mb-3">
-                    <h6 class="fw-bold mb-2">Features:</h6>
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-white text-dark border p-2">Free WiFi</span>
-                        <span class="badge bg-white text-dark border p-2">Private Pool</span>
-                        <span class="badge bg-white text-dark border p-2">AC Rooms</span>
-                    </div>
+                <div class="bg-light p-3 rounded-3">
+                    <h6 class="fw-bold mb-2">Why book with us?</h6>
+                    <ul class="list-unstyled mb-0 small">
+                        <li><i class="bi bi-check2-circle text-primary me-2"></i> Best Price Guaranteed</li>
+                        <li><i class="bi bi-check2-circle text-primary me-2"></i> 24/7 Customer Support</li>
+                        <li><i class="bi bi-check2-circle text-primary me-2"></i> Verified Luxury Villas</li>
+                    </ul>
                 </div>
             </div>
         </div>
