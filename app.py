@@ -52,18 +52,15 @@ def villa_details(villa_id):
 # 3. Inquiry Form - शीट में सेव करेगा और WhatsApp पर भेजेगा
 @app.route('/submit_inquiry', methods=['POST'])
 def submit_inquiry():
-    try:
-        name = request.form.get('name', '').strip()
-        phone = request.form.get('phone', '').strip()
-        message = request.form.get('message', '').strip()
-        villa_name = request.form.get('villa_name', 'General').strip()
-        today = str(datetime.date.today())
-
-        # 1. Sheet में डेटा डालना
-        client = get_gspread_client()
-        spreadsheet = client.open("Geetai_Villa_Admin")
-        inquiry_sheet = spreadsheet.worksheet("Inquiries")
-        inquiry_sheet.append_row([today, name, phone, villa_name, message])
+    data = [
+        request.form.get('name'),
+        request.form.get('phone'),
+        request.form.get('date'),
+        request.form.get('guests'),
+        request.form.get('message')
+    ]
+    # sheet.append_row(data)  # अपनी गूगल शीट में यह डेटा भेजने के लिए
+    return "<h1>Thank you! We will contact you soon.</h1><a href='/'>Go Back</a>"
 
         # 2. WhatsApp URL (इसे ध्यान से बदलें)
         my_num = "918830024994" # आपका नंबर
