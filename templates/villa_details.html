@@ -1,50 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="https://i.postimg.cc/wv0spzpL/logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ villa.Name }} | Geetai Villa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" https://i.postimg.cc/wv0spzpL/logo.png/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #C5A059; --dark: #1a1a1a; --text: #333; }
-        body { margin: 0; font-family: 'Poppins', sans-serif; color: var(--text); background: #fff; line-height: 1.6; }
+        :root { --primary: #102C26; --gold: #C5A059; --text: #333; --bg: #F9F9F7; }
+        
+        body { margin: 0; font-family: 'Inter', sans-serif; color: var(--text); background: #fff; line-height: 1.5; }
 
         /* Navbar */
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: white; border-bottom: 1px solid #eee; sticky; top: 0; z-index: 1000; }
-        .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--dark); text-decoration: none; font-weight: bold; }
-        .back-btn { text-decoration: none; color: var(--gold); font-weight: 600; font-size: 0.9rem; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: white; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-weight: 600; font-size: 1rem; color: var(--primary); text-decoration: none; letter-spacing: 1px; }
+        .back-link { text-decoration: none; color: #666; font-size: 0.8rem; font-weight: 600; }
 
-        /* Luxury Gallery */
-        .gallery-container { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; padding: 10px; height: 500px; max-width: 1400px; margin: 0 auto; }
-        .gallery-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
-        .gallery-container img:hover { filter: brightness(0.8); }
-        .main-img { border-radius: 10px 0 0 10px; }
-        .side-imgs { display: grid; grid-template-rows: 1fr 1fr; gap: 10px; }
-        .side-img-top { border-radius: 0 10px 0 0; }
-        .side-img-bottom { border-radius: 0 0 10px 0; }
+        /* Modern Gallery Grid */
+        .gallery { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; padding: 8px; height: 350px; }
+        .gallery img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+        .side-pics { display: grid; grid-template-rows: 1fr 1fr; gap: 8px; }
 
-        .main-content { max-width: 1200px; margin: 50px auto; padding: 0 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 60px; }
+        /* Content Area */
+        .container { padding: 25px 20px; max-width: 1200px; margin: 0 auto; }
         
-        .villa-header h1 { font-family: 'Playfair Display', serif; font-size: 3rem; margin: 0; }
-        .villa-header p { color: var(--gold); font-weight: 600; letter-spacing: 1px; }
+        .villa-header { margin-bottom: 30px; }
+        .villa-header span { color: var(--gold); font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+        .villa-header h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 5px 0; color: var(--primary); }
 
-        .amenities { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 40px 0; padding: 30px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
-        .amenity { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+        /* Amenities Fix (Mobile Optimized) */
+        .amenities-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); /* एक लाइन में दो आइटम */
+            gap: 20px; 
+            padding: 25px 0; 
+            border-top: 1px solid #eee; 
+            border-bottom: 1px solid #eee;
+            margin: 30px 0;
+        }
+        .amenity-item { display: flex; align-items: center; gap: 12px; font-size: 0.85rem; color: #444; }
+        .amenity-item span { font-size: 1.2rem; }
 
-        /* Booking Card */
-        .booking-card { background: white; border: 1px solid #eee; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: sticky; top: 100px; }
-        .price-tag { font-size: 1.8rem; font-weight: 600; margin-bottom: 20px; }
-        .price-tag small { font-size: 1rem; color: #888; font-weight: 300; }
+        /* Description */
+        .description h3 { font-size: 1.1rem; margin-bottom: 10px; }
+        .description p { color: #666; font-size: 0.95rem; line-height: 1.7; }
+
+        /* Booking Section */
+        .price-card { 
+            background: var(--bg); 
+            padding: 25px; 
+            border-radius: 20px; 
+            margin-top: 40px; 
+            border: 1px solid #e0e0d5;
+        }
+        .price-text { font-size: 1.5rem; font-weight: 600; margin-bottom: 15px; }
+        .price-text small { font-size: 0.9rem; color: #777; font-weight: 400; }
         
-        input, textarea { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn-submit { width: 100%; background: var(--dark); color: white; padding: 15px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; }
-        .btn-submit:hover { background: var(--gold); }
+        .btn-wa { 
+            display: block; 
+            background: var(--primary); 
+            color: white; 
+            text-align: center; 
+            padding: 15px; 
+            border-radius: 12px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            margin-top: 10px;
+        }
+
+        /* Full Screen Gallery Overlay */
+        #galleryOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:5000; justify-content:center; align-items:center; }
+        #overlayImg { max-width: 95%; max-height: 80%; border-radius: 5px; }
 
         @media (max-width: 768px) {
-            .gallery-container { height: 300px; grid-template-columns: 1fr; }
-            .side-imgs { display: none; }
-            .main-content { grid-template-columns: 1fr; }
+            .gallery { height: 250px; grid-template-columns: 1fr; }
+            .side-pics { display: none; }
+            .villa-header h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -52,109 +83,63 @@
 
     <nav class="navbar">
         <a href="/" class="logo">GEETAI VILLA</a>
-        <a href="/" class="back-btn">← ALL VILLAS</a>
+        <a href="/" class="back-link">CLOSE ✕</a>
     </nav>
 
-    <div class="gallery-container">
-        <img src="{{ villa.Image_Main }}" class="main-img">
-        <div class="side-imgs">
-            <img src="{{ villa.Image_2 }}" class="side-img-top">
-            <img src="{{ villa.Image_3 }}" class="side-img-bottom">
+    <div class="gallery">
+        <img src="{{ villa.Image_Main }}" onclick="openGallery(0)">
+        <div class="side-pics">
+            <img src="{{ villa.Image_2 }}" onclick="openGallery(1)">
+            <img src="{{ villa.Image_3 }}" onclick="openGallery(2)">
         </div>
     </div>
 
-    <div class="main-content">
-        <div class="info-section">
-            <div class="main-content">
-    <div class="info-section">
-        
+    <div class="container">
         <div class="villa-header">
-            <p>LONAVALA • ★ {{ villa.Rating if villa.Rating else '4.9' }}</p>
+            <span>LONAVALA • ★ {{ villa.Rating if villa.Rating else '4.9' }}</span>
             <h1>{{ villa.Name }}</h1>
         </div>
-        <div class="amenities">
-            <div class="amenity">🏊 Private Pool</div>
-            <div class="amenities">
-                <div class="amenity">🏊 Private Pool</div>
-                <div class="amenity">🛏️ {{ villa.BHK }}</div>
-                <div class="amenity">🍳 Chef on Call</div>
-                <div class="amenity">🚗 Free Parking</div>
-                <div class="amenity">📶 High Speed Wifi</div>
-                <div class="amenity">❄️ AC in all rooms</div>
-            </div>
 
-            <h3>About this villa</h3>
-            <p style="color: #555;">{{ villa.Description }}</p>
-
-            <div style="margin-top: 40px;">
-                <h3>Location</h3>
-                <iframe src="{{ villa.Map_Link }}" width="100%" height="300" style="border:0; border-radius: 10px;" allowfullscreen="" loading="lazy"></iframe>
-            </div>
+        <div class="amenities-grid">
+            <div class="amenity-item"><span>🏊</span> Private Pool</div>
+            <div class="amenity-item"><span>🛏️</span> {{ villa.BHK }}</div>
+            <div class="amenity-item"><span>🍳</span> Chef on Call</div>
+            <div class="amenity-item"><span>📶</span> Free Wifi</div>
+            <div class="amenity-item"><span>❄️</span> Fully AC</div>
+            <div class="amenity-item"><span>🚗</span> Parking</div>
         </div>
 
-        <div class="booking-section">
-            <div class="booking-card">
-                <div class="price-tag">₹{{ villa.Price }} <small>/ night</small></div>
-                <form action="/submit_inquiry" method="POST">
-                    <input type="text" name="name" placeholder="Full Name" required>
-                    <input type="text" name="phone" placeholder="WhatsApp Number" required>
-                    <textarea name="message" rows="3" placeholder="I'm interested in..."></textarea>
-                    <input type="hidden" name="villa_name" value="{{ villa.Name }}">
-                    <button type="submit" class="btn-submit">BOOK YOUR STAY</button>
-                </form>
-            </div>
+        <div class="description">
+            <h3>About this stay</h3>
+            <p>{{ villa.Description }}</p>
+        </div>
+
+        <div class="price-card">
+            <div class="price-text">₹{{ villa.Price }} <small>/ night</small></div>
+            <a href="https://wa.me/918830024994?text=I'm interested in booking {{ villa.Name }}" class="btn-wa">Check Availability</a>
+        </div>
+        
+        <div style="margin-top: 40px;">
+            <h3>Location</h3>
+            <iframe src="{{ villa.Map_Link }}" width="100%" height="250" style="border:0; border-radius: 15px;" allowfullscreen="" loading="lazy"></iframe>
         </div>
     </div>
-<div id="galleryOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:5000; justify-content:center; align-items:center;">
-    <span onclick="closeGallery()" style="position:absolute; top:20px; right:30px; color:white; font-size:40px; cursor:pointer;">&times;</span>
-    <img id="overlayImg" src="" style="max-width:90%; max-height:80%; border-radius:10px; box-shadow:0 0 20px rgba(255,255,255,0.2);">
-    
-    <div style="position:absolute; width:100%; display:flex; justify-content:space-between; padding:0 20px; box-sizing:border-box;">
-        <button onclick="prevImg()" style="background:none; border:none; color:white; font-size:40px; cursor:pointer;">&#10094;</button>
-        <button onclick="nextImg()" style="background:none; border:none; color:white; font-size:40px; cursor:pointer;">&#10095;</button>
+
+    <div id="galleryOverlay" onclick="closeGallery()">
+        <img id="overlayImg" src="">
     </div>
-</div>
 
-<script>
-    let images = ["{{ villa.Image_Main }}", "{{ villa.Image_2 }}", "{{ villa.Image_3 }}"];
-    let currentIndex = 0;
+    <script>
+        let imgs = ["{{ villa.Image_Main }}", "{{ villa.Image_2 }}", "{{ villa.Image_3 }}"];
+        function openGallery(i) {
+            document.getElementById('overlayImg').src = imgs[i];
+            document.getElementById('galleryOverlay').style.display = 'flex';
+        }
+        function closeGallery() {
+            document.getElementById('galleryOverlay').style.display = 'none';
+        }
+    </script>
 
-    // फोटो पर क्लिक करने पर गैलरी खोलें
-    document.querySelectorAll('.gallery-container img').forEach((img, index) => {
-        img.onclick = () => {
-            currentIndex = index;
-            openGallery();
-        };
-    });
-
-    function openGallery() {
-        document.getElementById('overlayImg').src = images[currentIndex];
-        document.getElementById('galleryOverlay').style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // स्क्रॉल बंद करें
-    }
-
-    function closeGallery() {
-        document.getElementById('galleryOverlay').style.display = 'none';
-        document.body.style.overflow = 'auto'; // स्क्रॉल चालू करें
-    }
-
-    function nextImg() {
-        currentIndex = (currentIndex + 1) % images.length;
-        document.getElementById('overlayImg').src = images[currentIndex];
-    }
-
-    function prevImg() {
-        currentIndex = (currentIndex - 1 + images.length) % images.length;
-        document.getElementById('overlayImg').src = images[currentIndex];
-    }
-
-    // कीबोर्ड से भी कंट्रोल करें
-    document.onkeydown = function(e) {
-        if (e.key === "Escape") closeGallery();
-        if (e.key === "ArrowRight") nextImg();
-        if (e.key === "ArrowLeft") prevImg();
-    };
-</script>
-    
 </body>
-</html>
+    </html>
+    
