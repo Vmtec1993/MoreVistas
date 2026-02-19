@@ -8,18 +8,16 @@ app = Flask(__name__)
 
 def get_sheets_data():
     try:
-        scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-        creds_raw = os.environ.get("GOOGLE_CREDS")
+        # यहाँ हमने Scope बढ़ा दिया है ताकि गूगल को डेटा पढ़ने की पूरी परमिशन मिले
+        scopes = [
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
         
+        creds_raw = os.environ.get("GOOGLE_CREDS")
         if not creds_raw: return []
 
-        # सफाई: शुरुआत और अंत के फालतू हिस्से हटाना
         creds_raw = creds_raw.strip().strip("'").strip('"')
-        
-        # अगर गलती से दो JSON चिपक गए हों, तो पहले वाले को ही उठाना
-        if creds_raw.count('{') > 1:
-            creds_raw = creds_raw.split('}{')[0] + '}'
-            
         info = json.loads(creds_raw)
         
         if "private_key" in info:
@@ -28,13 +26,13 @@ def get_sheets_data():
         creds = Credentials.from_service_account_info(info, scopes=scopes)
         client = gspread.authorize(creds)
         
-        # शीट का नाम पक्का करें
+        # आपकी शीट का नाम
         spreadsheet = client.open("Geetai_Villa_Data")
         sheet = spreadsheet.get_worksheet(0)
         return sheet.get_all_records()
     except Exception as e:
-        # अब एरर मैसेज और भी साफ दिखेगा
-        return [{"Name": f"Final Step: {str(e)}", "Price": "Fix JSON in Render"}]
+        # अगर अभी भी कुछ अटका है तो यहाँ दिखेगा
+        return [{"Name": f"Final Finish: {str(e)}", "Price": "Almost Done!"}]
 
 @app.route('/')
 def index():
