@@ -50,17 +50,27 @@ def villa_details(villa_id):
         return f"Error: {str(e)}"
 
 # 3. Inquiry Form - शीट में सेव करेगा और WhatsApp पर भेजेगा
+from flask import render_template, request, redirect, url_for
+
+@app.route('/inquiry')
+def inquiry_page():
+    return render_template('inquiry.html')
+
 @app.route('/submit_inquiry', methods=['POST'])
 def submit_inquiry():
-    data = [
-        request.form.get('name'),
-        request.form.get('phone'),
-        request.form.get('date'),
-        request.form.get('guests'),
-        request.form.get('message')
-    ]
-    # sheet.append_row(data)  # अपनी गूगल शीट में यह डेटा भेजने के लिए
-    return "<h1>Thank you! We will contact you soon.</h1><a href='/'>Go Back</a>"
+    # फॉर्म से डेटा निकालना
+    name = request.form.get('name')
+    phone = request.form.get('phone')
+    date = request.form.get('date')
+    guests = request.form.get('guests')
+    message = request.form.get('message')
+
+    # यहाँ आपकी Google Sheet में डेटा भेजने का कोड आएगा
+    # sheet.append_row([name, phone, date, guests, message])
+
+    # डेटा सेव होने के बाद Success Page पर भेजें
+    return render_template('success.html')
+
 
         # 2. WhatsApp URL (इसे ध्यान से बदलें)
         my_num = "918830024994" # आपका नंबर
