@@ -70,4 +70,75 @@
                 </div>
 
                 <div class="mb-4">
-                    <h1
+                    <h1 class="display-5 fw-bold mb-2" style="font-family: 'Playfair Display';">{{ villa.Name }}</h1>
+                    <p class="fs-5 text-muted"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala • {{ villa.BHK }} BHK Villa</p>
+                </div>
+
+                <hr class="my-5">
+
+                <h4 class="fw-bold mb-3">About this Villa</h4>
+                <p class="text-secondary fs-5 mb-5" style="line-height: 1.8;">
+                    {{ villa.Description or "Welcome to your luxury getaway. Enjoy a relaxing stay with high-end amenities and beautiful surroundings." }}
+                </p>
+
+                <h4 class="fw-bold mb-4">What this place offers</h4>
+                <div class="mb-5">
+                    {% if villa.Amenities %}
+                        {% for item in villa.Amenities.split(',') %}
+                        <div class="amenity-badge"><i class="bi bi-patch-check-fill text-success me-2"></i>{{ item.strip() }}</div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">Contact us for amenities list.</p>
+                    {% endif %}
+                </div>
+
+                <h4 class="fw-bold mb-4">Location</h4>
+                <div class="map-container mb-5 shadow-sm">
+                    {% if villa.Location_Link %}
+                        <iframe 
+                            src="{{ villa.Location_Link }}" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    {% else %}
+                        <div class="h-100 d-flex align-items-center justify-content-center bg-white text-muted">
+                            <div class="text-center">
+                                <i class="bi bi-map fs-1 text-muted"></i>
+                                <p class="mt-2">Google Map link not found in Sheet.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card booking-card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="fw-bold mb-0">₹{{ villa.Price }} <small class="fs-6 fw-normal text-muted">/night</small></h2>
+                    </div>
+                    <div class="mb-4">
+                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">★ {{ villa.Rating }} Rating</span>
+                    </div>
+                    
+                    <a href="https://wa.me/918830024994?text=Hi, I want to book {{ villa.Name }}" 
+                       class="btn btn-whatsapp btn-lg w-100 py-3 mb-3">
+                        <i class="bi bi-whatsapp me-2"></i>Book via WhatsApp
+                    </a>
+                    
+                    <a href="tel:+918830024994" class="btn btn-outline-dark btn-lg w-100 py-3 fw-bold rounded-3">
+                        <i class="bi bi-telephone me-2"></i>Call Owner
+                    </a>
+                    
+                    <p class="text-center text-muted small mt-4">Direct booking • Best Price Guaranteed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
