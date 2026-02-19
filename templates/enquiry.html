@@ -5,18 +5,15 @@
         <div class="card shadow p-4 border-0" style="border-radius: 15px;">
             <h2 class="text-center mb-4 fw-bold">Book Your Stay</h2>
             <form action="/submit_enquiry" method="POST">
-                <div class="mb-3">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="name" class="form-control" placeholder="Enter your name" required>
+                <input type="hidden" name="villa_id" value="{{ villa_id }}">
+                <div class="mb-3"><input type="text" name="name" class="form-control" placeholder="Full Name" required></div>
+                <div class="mb-3"><input type="tel" name="phone" class="form-control" placeholder="Phone Number" required></div>
+                <div class="row">
+                    <div class="col-md-6 mb-3"><label class="small">Check-in</label><input type="date" name="check_in" class="form-control" required></div>
+                    <div class="col-md-6 mb-3"><label class="small">Check-out</label><input type="date" name="check_out" class="form-control" required></div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Phone Number</label>
-                    <input type="tel" name="phone" class="form-control" placeholder="Enter mobile number" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Special Requirements</label>
-                    <textarea name="message" class="form-control" rows="3" placeholder="Tell us more..."></textarea>
-                </div>
+                <div class="mb-3"><input type="number" name="guests" class="form-control" placeholder="Total Guests" required></div>
+                <div class="mb-3"><textarea name="message" class="form-control" rows="3" placeholder="Any Special Requests?"></textarea></div>
                 <button type="submit" class="btn btn-primary w-100 py-2 fw-bold rounded-pill">SEND ENQUIRY</button>
             </form>
         </div>
