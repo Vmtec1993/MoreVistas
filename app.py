@@ -38,12 +38,17 @@ def index():
     villas = get_sheets_data()
     return render_template('index.html', villas=villas)
 
-@app.route('/villa/<int:villa_id>')
+@@app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     villas = get_sheets_data()
-    villa = next((v for v in villas if v.get('Villa_ID') == villa_id), None)
-    if not villa: return "Villa not found", 404
+    # यहाँ हम दोनों को String में बदलकर मैच करेंगे ताकि गलती की गुंजाइश न रहे
+    villa = next((v for v in villas if str(v.get('Villa_ID', '')) == str(villa_id)), None)
+    
+    if not villa:
+        return "<h1>Villa not found!</h1><p>ID: " + str(villa_id) + " does not match any villa.</p><a href='/'>Back to Home</a>", 404
+        
     return render_template('villa_details.html', villa=villa)
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
