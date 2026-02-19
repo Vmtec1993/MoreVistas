@@ -57,28 +57,24 @@ def villa_details(villa_id):
         logger.error(f"Details Page Error: {e}")
         return "Error loading villa details", 500
 
-@app.route('/enquiry/<villa_id>')
-def enquiry(villa_id):
-    return render_template('enquiry.html', villa_id=villa_id)
-
 @app.route('/submit_enquiry', methods=['POST'])
 def submit_enquiry():
     try:
-        name = request.form.get('name')
-        phone = request.form.get('phone')
-        message = request.form.get('message')
-        date_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+        data = [
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            request.form.get('name'),
+            request.form.get('phone'),
+            request.form.get('check_in'),
+            request.form.get('check_out'),
+            request.form.get('guests'),
+            request.form.get('message')
+        ]
         client = get_gspread_client()
-        if client:
-            # Sheet2 का नाम 'Enquiries' होना चाहिए
-            sheet = client.open("Geetai_Villa_Data").worksheet("Enquiries")
-            sheet.append_row([date_now, name, phone, message])
-            return redirect(url_for('success'))
-        return "Database Write Error", 500
+        sheet = client.open("Geetai_Villa_Data").worksheet("Enquiries")
+        sheet.append_row(data)
+        return redirect(url_for('success'))
     except Exception as e:
-        logger.error(f"Form Error: {e}")
-        return "Submission failed. Make sure 'Enquiries' sheet exists.", 500
+        return f"Error: {e}", 500
 
 @app.route('/success')
 def success():
