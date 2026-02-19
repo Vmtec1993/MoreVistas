@@ -10,24 +10,25 @@ app = Flask(__name__)
 def get_sheets_data():
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        
-        # Render की Environment Setting से JSON उठाना
         creds_json = os.environ.get("GOOGLE_CREDS")
         
         if creds_json:
-            # अगर Render में JSON डेटा मिल गया
             creds_dict = json.loads(creds_json)
             creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
         else:
-            # अगर आप कभी कंप्यूटर पर चलाएं, तो फाइल ढूंढेगा
             creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
             
         client = gspread.authorize(creds)
-        sheet = client.open("Geetai_Villa_Data").get_all_records()
-        return sheet
+        
+        # यहाँ सुधार है: पहले शीट खोलें, फिर उसकी पहली वर्कशीट (sheet1) चुनें
+        spreadsheet = client.open("Geetai_Villa_Data")
+        sheet = spreadsheet.get_worksheet(0) # 0 मतलब पहली शीट
+        data = sheet.get_all_records()
+        return data
     except Exception as e:
         print(f"Error connecting to Google Sheets: {e}")
         return []
+
 
 @app.route('/')
 def index():
