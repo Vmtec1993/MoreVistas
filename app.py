@@ -1,4 +1,5 @@
 import os
+import json
 from flask import Flask, render_template
 import gspread
 from google.oauth2.service_account import Credentials
@@ -8,15 +9,25 @@ app = Flask(__name__)
 def get_sheets_data():
     try:
         scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+        # credentials.json फाइल को सुरक्षित तरीके से लोड करना
         if os.path.exists("credentials.json"):
-            creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
+            with open("credentials.json", "r") as f:
+                info = json.load(f)
+            
+            # Invalid JWT Signature से बचने के लिए private_key को साफ करना
+            if "private_key" in info:
+                info["private_key"] = info["private_key"].replace("\\n", "\n")
+            
+            creds = Credentials.from_service_account_info(info, scopes=scopes)
             client = gspread.authorize(creds)
-            # यहाँ अपनी शीट का नाम सही रखें
+            
+            # अपनी गूगल शीट का नाम यहाँ चेक करें
             spreadsheet = client.open("Geetai_Villa_Data")
             sheet = spreadsheet.get_worksheet(0)
             return sheet.get_all_records()
     except Exception as e:
-        print(f"SHEET CONNECTION ERROR: {e}")
+        # रेंडर के लॉग्स में अब असली वजह साफ़ दिखेगी
+        print(f"SHEET CONNECTION ERROR: {str(e)}")
     return []
 
 @app.route('/')
