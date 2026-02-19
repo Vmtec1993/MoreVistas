@@ -3,106 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ villa.Name }} | Premium Stay Lonavala</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <title>{{ villa.Name }} | Geetai Villa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #102C26; --gold: #C5A059; --text-light: #777; --bg: #F9F9F7; }
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: #fff; color: #333; line-height: 1.6; }
-
-        /* Navigation */
-        .nav-back { position: absolute; top: 20px; left: 20px; z-index: 100; background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; color: black; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-weight: bold; }
-
-        /* Gallery Slider */
-        .gallery-box { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; height: 350px; }
-        .gallery-box::-webkit-scrollbar { display: none; }
-        .gallery-box img { min-width: 100%; height: 100%; object-fit: cover; scroll-snap-align: start; }
-
-        .container { padding: 30px 20px; max-width: 900px; margin: 0 auto; }
-
-        /* Header Details */
-        .meta-tags { color: var(--gold); font-size: 0.75rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; display: block; }
-        .villa-title { font-family: 'Playfair Display', serif; font-size: 2.4rem; margin: 0 0 10px; color: var(--primary); }
-        .rating-row { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem; margin-bottom: 25px; }
-
-        /* Features Section */
-        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 25px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin: 30px 0; }
-        .feat-item { display: flex; align-items: center; gap: 12px; font-size: 0.85rem; color: #444; }
-        .feat-item b { color: var(--primary); font-size: 1.1rem; }
-
-        /* About & Description */
-        .desc-title { font-size: 1.2rem; margin-bottom: 15px; color: var(--primary); }
-        .desc-text { color: #555; font-size: 0.95rem; margin-bottom: 30px; text-align: justify; }
-
-        /* Premium Booking Sticky Card */
-        .booking-card { background: var(--bg); border: 1px solid #ecece8; padding: 25px; border-radius: 20px; margin-top: 40px; }
-        .price-tag { font-size: 1.6rem; font-weight: 700; margin-bottom: 15px; color: var(--primary); }
-        .price-tag small { font-size: 0.8rem; font-weight: 400; color: #888; }
-        .btn-wa { display: block; background: var(--primary); color: white; text-align: center; padding: 18px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: 0.3s; }
-
-        /* Map Detailing */
-        .map-section { margin-top: 40px; }
-        .map-section h3 { margin-bottom: 15px; font-size: 1.1rem; }
-        .map-frame { width: 100%; height: 250px; border-radius: 20px; border: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-
-        @media (max-width: 600px) {
-            .villa-title { font-size: 1.9rem; }
-            .gallery-box { height: 280px; }
-        }
+        :root { --primary: #102C26; --gold: #C5A059; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: #fff; }
+        .gallery { display: flex; overflow-x: auto; height: 300px; scroll-snap-type: x mandatory; }
+        .gallery img { min-width: 100%; object-fit: cover; scroll-snap-align: start; }
+        .content { padding: 25px; max-width: 800px; margin: 0 auto; }
+        .amenity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; padding: 20px 0; border-top: 1px solid #eee; }
+        .book-btn { display: block; background: var(--primary); color: white; text-align: center; padding: 18px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 20px; }
     </style>
 </head>
 <body>
-
-    <a href="/" class="nav-back">✕</a>
-
-    <div class="gallery-box">
+    <div style="position:absolute; top:20px; left:20px; background:white; border-radius:50%; width:35px; height:35px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.2); cursor:pointer" onclick="history.back()">✕</div>
+    
+    <div class="gallery">
         <img src="{{ villa.Image_Main }}">
         {% if villa.Image_2 %}<img src="{{ villa.Image_2 }}">{% endif %}
         {% if villa.Image_3 %}<img src="{{ villa.Image_3 }}">{% endif %}
     </div>
-    <p style="text-align: center; font-size: 0.7rem; color: #999; margin-top: 5px;">Swipe to see more photos ⟷</p>
 
-    <div class="container">
-        <span class="meta-tags">📍 LONAVALA, MAHARASHTRA</span>
-        <h1 class="villa-title">{{ villa.Name }}</h1>
-        
-        <div class="rating-row">
-            <span style="color: #D4AC0D;">★ {{ villa.Rating if villa.Rating else '4.9' }}</span>
-            <span style="color: #ccc;">|</span>
-            <span style="color: var(--text-light); font-weight: 400;">45+ Luxury Stays Completed</span>
+    <div class="content">
+        <span style="color:var(--gold); font-size:0.7rem; font-weight:600; letter-spacing:1px">📍 LONAVALA, MAHARASHTRA</span>
+        <h1 style="font-family:'Playfair Display', serif; margin:10px 0">{{ villa.Name }}</h1>
+        <div style="font-weight:600; font-size:0.9rem">★ {{ villa.Rating }} <span style="color:#ccc; margin:0 10px">|</span> {{ villa.BHK }}</div>
+
+        <div class="amenity-grid">
+            <div>🏊 Private Pool</div>
+            <div>🍳 Chef on Call</div>
+            <div>📶 Free WiFi</div>
+            <div>❄️ Fully AC</div>
         </div>
 
-        <div class="feature-grid">
-            <div class="feat-item"><b>🏊</b> Private Swimming Pool</div>
-            <div class="feat-item"><b>🛏️</b> {{ villa.BHK }} Bedrooms</div>
-            <div class="feat-item"><b>🍳</b> Professional Chef</div>
-            <div class="feat-item"><b>📶</b> High-Speed WiFi</div>
-            <div class="feat-item"><b>❄️</b> Fully Air Conditioned</div>
-            <div class="feat-item"><b>🚗</b> Free On-site Parking</div>
-        </div>
+        <p style="color:#555; line-height:1.6">{{ villa.Description }}</p>
 
-        <h3 class="desc-title">Experience True Luxury</h3>
-        <p class="desc-text">
-            {{ villa.Description if villa.Description else "Experience a blend of comfort and luxury in our premium villa located in the heart of Lonavala. Perfect for families and groups seeking a peaceful escape near nature." }}
-        </p>
-
-        <div class="booking-card">
-            <div class="price-tag">₹{{ villa.Price }} <small>/ starting per night</small></div>
-            <a href="https://wa.me/918830024994?text=Hi, I'm interested in booking {{ villa.Name }}. Please share more details." class="btn-wa">Check Availability & Book</a>
-            <a href="/inquiry" style="display: block; text-align: center; margin-top: 15px; color: var(--primary); text-decoration: underline; font-weight: 600;">Or fill Inquiry Form</a>
-
-            <p style="text-align: center; font-size: 0.75rem; color: #888; margin-top: 15px;">Fastest response via WhatsApp</p>
-        </div>
-
-        <div class="map-section">
-            <h3>Explore the Area</h3>
-            <iframe class="map-frame" src="{{ villa.Map_Link }}" allowfullscreen="" loading="lazy"></iframe>
+        <div style="background:#F9F9F7; padding:20px; border-radius:15px; margin-top:30px">
+            <div style="font-size:1.4rem; font-weight:700">₹{{ villa.Price }} <small style="font-weight:400; color:#888">/night</small></div>
+            <a href="/inquiry" class="book-btn">Check Availability</a>
         </div>
     </div>
-
-    <footer style="padding: 40px 20px; text-align: center; border-top: 1px solid #eee; margin-top: 50px;">
-        <p style="font-size: 0.8rem; color: #999;">© 2024 Geetai Villa. Luxury Boutique Stays.</p>
-    </footer>
-
 </body>
 </html>
