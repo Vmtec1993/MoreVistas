@@ -58,7 +58,9 @@ def success():
     return render_template('success.html')
 
 if __name__ == '__main__':
-    # Render के लिए पोर्ट बाइंडिंग
+    import os
+    # Render को पोर्ट बताने के लिए यह लाइन बहुत ज़रूरी है
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
     
