@@ -3,45 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ villa.Name }} | Geetai Villa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <title>{{ villa.Name }} - Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root { --primary: #102C26; --gold: #C5A059; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: #fff; }
-        .gallery { display: flex; overflow-x: auto; height: 300px; scroll-snap-type: x mandatory; }
-        .gallery img { min-width: 100%; object-fit: cover; scroll-snap-align: start; }
-        .content { padding: 25px; max-width: 800px; margin: 0 auto; }
-        .amenity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; padding: 20px 0; border-top: 1px solid #eee; }
-        .book-btn { display: block; background: var(--primary); color: white; text-align: center; padding: 18px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 20px; }
+        .detail-img { width: 100%; height: 400px; object-fit: cover; border-radius: 15px; }
+        .gallery-img { width: 100%; height: 150px; object-fit: cover; border-radius: 10px; cursor: pointer; }
+        .badge-amenity { background: #e9ecef; color: #333; margin-right: 5px; border-radius: 20px; padding: 5px 15px; }
+        .sticky-booking { position: sticky; top: 20px; border: 1px solid #ddd; padding: 20px; border-radius: 15px; background: #fff; }
     </style>
 </head>
-<body>
-    <div style="position:absolute; top:20px; left:20px; background:white; border-radius:50%; width:35px; height:35px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.2); cursor:pointer" onclick="history.back()">✕</div>
+<body class="bg-light">
+
+<div class="container py-5">
+    <a href="/" class="btn btn-outline-dark mb-4">← Back to List</a>
     
-    <div class="gallery">
-        <img src="{{ villa.Image_Main }}">
-        {% if villa.Image_2 %}<img src="{{ villa.Image_2 }}">{% endif %}
-        {% if villa.Image_3 %}<img src="{{ villa.Image_3 }}">{% endif %}
-    </div>
+    <div class="row">
+        <div class="col-lg-8">
+            <img src="{{ villa.Image_Main }}" class="detail-img mb-3 shadow" alt="{{ villa.Name }}">
+            
+            <h1 class="fw-bold">{{ villa.Name }}</h1>
+            <p class="text-muted"><i class="bi bi-geo-alt"></i> {{ villa.Location }} • {{ villa.BHK }} BHK</p>
+            
+            <hr>
+            
+            <h4 class="fw-bold">About this Villa</h4>
+            <p>{{ villa.Description }}</p>
 
-    <div class="content">
-        <span style="color:var(--gold); font-size:0.7rem; font-weight:600; letter-spacing:1px">📍 LONAVALA, MAHARASHTRA</span>
-        <h1 style="font-family:'Playfair Display', serif; margin:10px 0">{{ villa.Name }}</h1>
-        <div style="font-weight:600; font-size:0.9rem">★ {{ villa.Rating }} <span style="color:#ccc; margin:0 10px">|</span> {{ villa.BHK }}</div>
-
-        <div class="amenity-grid">
-            <div>🏊 Private Pool</div>
-            <div>🍳 Chef on Call</div>
-            <div>📶 Free WiFi</div>
-            <div>❄️ Fully AC</div>
+            <h4 class="fw-bold mt-4">What this place offers</h4>
+            <div class="d-flex flex-wrap mb-4">
+                {% for amenity in villa.Amenities.split(',') %}
+                <span class="badge-amenity mb-2 shadow-sm">{{ amenity.strip() }}</span>
+                {% endfor %}
+            </div>
         </div>
 
-        <p style="color:#555; line-height:1.6">{{ villa.Description }}</p>
-
-        <div style="background:#F9F9F7; padding:20px; border-radius:15px; margin-top:30px">
-            <div style="font-size:1.4rem; font-weight:700">₹{{ villa.Price }} <small style="font-weight:400; color:#888">/night</small></div>
-            <a href="/inquiry" class="book-btn">Check Availability</a>
+        <div class="col-lg-4">
+            <div class="sticky-booking shadow">
+                <h3 class="fw-bold">{{ villa.Price }} <small class="text-muted" style="font-size: 14px;">/night</small></h3>
+                <p class="text-warning">★ {{ villa.Rating }} Rating</p>
+                <hr>
+                <a href="https://wa.me/918830024994?text=Hi, I am interested in booking {{ villa.Name }}" class="btn btn-success w-100 mb-2 py-3 fw-bold">Book via WhatsApp</a>
+                <a href="tel:+918830024994" class="btn btn-outline-primary w-100 py-3 fw-bold">Call Owner</a>
+            </div>
         </div>
     </div>
+</div>
+
 </body>
 </html>
