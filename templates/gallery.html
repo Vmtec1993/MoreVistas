@@ -1,32 +1,83 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container py-5 text-center">
-    <h1 class="fw-bold display-5 mb-2">Our Destinations</h1>
-    <p class="text-muted mb-5">Click on a villa to explore its private gallery</p>
+<div class="container py-5">
+    <div class="mb-4">
+        <a href="/gallery" class="btn btn-sm btn-outline-dark rounded-pill mb-3">← Back to All Villas</a>
+        <h1 class="fw-bold">{{ villa_name }}</h1>
+        <p class="text-muted">Explore the beauty of {{ villa_name }}</p>
+    </div>
 
-    <div class="row g-4 justify-content-center">
-        {% set shown_villas = [] %}
-        {% for villa in villas %}
-            {% if villa.Name not in shown_villas %}
-            <div class="col-md-6 col-lg-5">
-                <a href="/gallery/{{ villa.Name | lower | replace(' ', '') }}" class="text-decoration-none">
-                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden gallery-main-card">
-                        <img src="{{ villa.Image_Main }}" class="card-img-top" style="height: 400px; object-fit: cover;">
-                        <div class="card-img-overlay d-flex flex-column justify-content-end p-4 text-start" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);">
-                            <h2 class="text-white fw-bold mb-1">{{ villa.Name }}</h2>
-                            <p class="text-warning mb-0">Explore Full Gallery <i class="bi bi-arrow-right-circle-fill"></i></p>
+    <div class="d-flex gap-2 mb-5 overflow-auto pb-2" id="filter-group">
+        <button class="btn btn-dark rounded-pill px-4" onclick="filterVilla('all', this)">All</button>
+        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('pool', this)">Pool</button>
+        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('bedroom', this)">Bedrooms</button>
+        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('hall', this)">Living Area</button>
+        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('garden', this)">Garden</button>
+    </div>
+
+    <div class="row g-3" id="photo-grid">
+        {% for p in photos %}
+            {% for key in ['Image_Main', 'Image_2', 'Image_3'] %}
+                {% if p[key] %}
+                {# यहाँ हम कैटेगरी को साफ़ करके क्लास में डाल रहे हैं #}
+                <div class="col-md-4 col-sm-6 villa-photo-item {{ p.Category | lower | replace(' ', '') }}">
+                    <div class="rounded-4 overflow-hidden shadow-sm position-relative" style="height: 280px; cursor: pointer;" onclick="openModal('{{ p[key] }}')">
+                        <img src="{{ p[key] }}" class="w-100 h-100" style="object-fit: cover;">
+                        <div class="position-absolute bottom-0 start-0 p-2 bg-dark bg-opacity-60 text-white small w-100">
+                            {{ p.Category }}
                         </div>
                     </div>
-                </a>
-            </div>
-            {% set _ = shown_villas.append(villa.Name) %}
-            {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
         {% endfor %}
     </div>
 </div>
 
+<div id="imgModal" class="img-modal" onclick="this.style.display='none'">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="modalImg">
+</div>
+
 <style>
-    .gallery-main-card { transition: 0.4s; }
-    .gallery-main-card:hover { transform: scale(1.02); }
+    .img-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+    .modal-content { max-width: 90%; max-height: 85%; border-radius: 10px; border: 3px solid white; }
+    .close { position: absolute; top: 20px; right: 35px; color: white; font-size: 50px; cursor: pointer; }
+    
+    /* Smooth Transition */
+    .villa-photo-item { transition: transform 0.3s ease, opacity 0.3s ease; }
 </style>
+
+<script>
+    function filterVilla(cat, btn) {
+        // 1. बटन का रंग बदलें
+        let buttons = document.querySelectorAll('#filter-group .btn');
+        buttons.forEach(b => {
+            b.classList.remove('btn-dark');
+            b.classList.add('btn-outline-dark');
+        });
+        btn.classList.add('btn-dark');
+        btn.classList.remove('btn-outline-dark');
+
+        // 2. फोटो फिल्टर करें
+        let items = document.querySelectorAll('.villa-photo-item');
+        let searchTag = cat.toLowerCase().trim();
+
+        items.forEach(item => {
+            // हम चेक करेंगे कि क्या आइटम की क्लास में वह शब्द है
+            if (searchTag === 'all' || item.classList.contains(searchTag)) {
+                item.style.display = 'block';
+                setTimeout(() => { item.style.opacity = '1'; }, 10);
+            } else {
+                item.style.opacity = '0';
+                setTimeout(() => { item.style.display = 'none'; }, 300);
+            }
+        });
+    }
+
+    function openModal(src) {
+        document.getElementById('modalImg').src = src;
+        document.getElementById('imgModal').style.display = 'flex';
+    }
+</script>
 {% endblock %}
