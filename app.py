@@ -81,7 +81,13 @@ def enquiry(villa_id):
         return render_template('success.html')
     
     return render_template('enquiry.html', villa_id=villa_id)
-
+@app.route('/gallery')
+def gallery():
+    if sheet:
+        villas = sheet.get_all_records()
+        return render_template('gallery.html', villas=villas)
+    return "Database Error", 500
+    
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
