@@ -1,93 +1,94 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <div class="row g-5">
-        <div class="col-lg-8">
-            <nav aria-label="breadcrumb" class="mb-3">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Home</a></li>
-                    <li class="breadcrumb-item active">{{ villa.Name }}</li>
-                </ol>
-            </nav>
+<div class="container py-4">
+    <a href="/" class="btn btn-outline-dark btn-sm rounded-pill mb-4">
+        <i class="bi bi-arrow-left"></i> Back to Villas
+    </a>
 
-            <h1 class="fw-bold mb-3">{{ villa.Name }} ({{ villa.BHK }} BHK)</h1>
-
-            <div id="villaCarousel" class="carousel slide shadow-lg rounded-4 overflow-hidden mb-4" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="{{ villa.Image_Main }}" class="d-block w-100" style="height: 450px; object-fit: cover; background-color: #eee;">
-                    </div>
-                    {% if villa.Image_2 and villa.Image_2 != '' %}
-                    <div class="carousel-item"><img src="{{ villa.Image_2 }}" class="d-block w-100" style="height: 450px; object-fit: cover;"></div>
-                    {% endif %}
-                    {% if villa.Image_3 and villa.Image_3 != '' %}
-                    <div class="carousel-item"><img src="{{ villa.Image_3 }}" class="d-block w-100" style="height: 450px; object-fit: cover;"></div>
-                    {% endif %}
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#villaCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-                <button class="carousel-control-next" type="button" data-bs-target="#villaCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
-            </div>
-
-            <h3 class="fw-bold mt-4 mb-3">Villa Amenities</h3>
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-4 text-center"><div class="p-3 border rounded-3 bg-light"><i class="bi bi-water text-primary fs-3"></i><p class="mb-0 mt-2 small fw-bold">Private Pool</p></div></div>
-                <div class="col-6 col-md-4 text-center"><div class="p-3 border rounded-3 bg-light"><i class="bi bi-snow text-info fs-3"></i><p class="mb-0 mt-2 small fw-bold">Fully AC</p></div></div>
-                <div class="col-6 col-md-4 text-center"><div class="p-3 border rounded-3 bg-light"><i class="bi bi-wifi text-dark fs-3"></i><p class="mb-0 mt-2 small fw-bold">Free WiFi</p></div></div>
-                <div class="col-6 col-md-4 text-center"><div class="p-3 border rounded-3 bg-light"><i class="bi bi-plug text-warning fs-3"></i><p class="mb-0 mt-2 small fw-bold">Power Backup</p></div></div>
-                <div class="col-6 col-md-4 text-center"><div class="p-3 border rounded-3 bg-light"><i class="bi bi-music-note-beamed text-danger fs-3"></i><p class="mb-0 mt-2 small fw-bold">Music System</p></div></div>
-                <div class="col-6 col-md-4 text-center"><div class="p-3 border rounded-3 bg-light"><i class="bi bi-p-circle text-success fs-3"></i><p class="mb-0 mt-2 small fw-bold">Parking</p></div></div>
-            </div>
-
-            <h3 class="fw-bold">Description</h3>
-            <p class="text-muted fs-5" style="line-height: 1.8;">{{ villa.Description }}</p>
-
-            <hr class="my-5">
-            <h3 class="fw-bold mb-4">Guest Reviews</h3>
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="p-4 border rounded-4 shadow-sm bg-white">
-                        <div class="d-flex mb-2 text-warning"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-                        <p class="fst-italic text-muted">"Amazing experience! The pool was clean and the staff was very helpful. Best villa in Lonavala."</p>
-                        <h6 class="fw-bold mb-0">- Rahul Sharma</h6>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="p-4 border rounded-4 shadow-sm bg-white">
-                        <div class="d-flex mb-2 text-warning"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-                        <p class="fst-italic text-muted">"Luxury stay at an affordable price. Perfect for family get-togethers. Highly recommended!"</p>
-                        <h6 class="fw-bold mb-0">- Priyanka Patil</h6>
-                    </div>
-                </div>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 25px;">
+                <img src="{{ villa.Image_URL }}" class="img-fluid w-100" style="height: 500px; object-fit: cover;" alt="{{ villa.Villa_Name }}">
             </div>
             
-            <hr class="my-5">
-            <h3 class="fw-bold mb-4">Location</h3>
-            <div class="rounded-4 overflow-hidden shadow-sm border" style="height: 400px;">
-                <iframe src="{{ villa.Location_Link }}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            <div class="mt-4">
+                <h3 class="fw-bold mb-3">About this Villa</h3>
+                <p class="text-muted lh-lg">{{ villa.Description if villa.Description else 'Experience luxury at its best in this beautiful villa. Perfect for families and groups looking for a peaceful getaway with all modern amenities.' }}</p>
+                
+                <h4 class="fw-bold mt-4">Top Amenities</h4>
+                <div class="row mt-3 text-center">
+                    <div class="col-3">
+                        <div class="p-3 border rounded-4 bg-light">
+                            <i class="bi bi-water fs-2 text-primary"></i>
+                            <p class="mb-0 small fw-bold">Pool</p>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="p-3 border rounded-4 bg-light">
+                            <i class="bi bi-wind fs-2 text-primary"></i>
+                            <p class="mb-0 small fw-bold">AC</p>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="p-3 border rounded-4 bg-light">
+                            <i class="bi bi-wifi fs-2 text-primary"></i>
+                            <p class="mb-0 small fw-bold">WiFi</p>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="p-3 border rounded-4 bg-light">
+                            <i class="bi bi-cup-hot fs-2 text-primary"></i>
+                            <p class="mb-0 small fw-bold">Kitchen</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="card shadow-lg p-4 sticky-top border-0" style="top: 20px; border-radius: 20px;">
-                {% if villa.Price and villa.Price != '****' and villa.Price != '' %}
-                    <h2 class="fw-bold text-primary mb-1">₹{{ villa.Price }}</h2>
-                    <p class="text-muted mb-4">Per Night + Taxes</p>
-                {% else %}
-                    <h2 class="fw-bold text-success mb-1">Price on Request</h2>
-                {% endif %}
-                
-                <div class="mb-4">
-                    <span class="badge bg-light text-dark border p-2">Rating: ⭐ {{ villa.Rating }}</span>
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-lg p-4 sticky-top" style="border-radius: 25px; top: 20px; z-index: 10;">
+                <h2 class="fw-bold text-dark mb-1">₹{{ villa.Price }} <small class="text-muted fs-6">/ night</small></h2>
+                <div class="text-warning mb-4 small">
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-half"></i>
+                    <span class="text-muted ms-2">(24 reviews)</span>
                 </div>
 
-                <a href="https://wa.me/918830024994?text=नमस्ते%20Geetai%20Villa!%20मैं%20*{{ villa.Name }}*%20बुक%20करने%20में%20रुचि%20रखता%20हूँ।" class="btn btn-success btn-lg w-100 mb-3 rounded-pill fw-bold py-3 shadow">
-                    <i class="bi bi-whatsapp me-2"></i>Book on WhatsApp
-                </a>
+                <div class="bg-light p-3 rounded-4 mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><i class="bi bi-people me-2"></i> Capacity</span>
+                        <span class="fw-bold">Up to 12 Guests</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span><i class="bi bi-door-open me-2"></i> Bedrooms</span>
+                        <span class="fw-bold">4 BHK Villa</span>
+                    </div>
+                </div>
 
-                <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary btn-lg w-100 rounded-pill fw-bold py-3">Send Enquiry</a>
+                <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary btn-lg w-100 rounded-pill py-3 fw-bold shadow">
+                    CHECK AVAILABILITY
+                </a>
+                
+                <p class="text-center text-muted mt-3 small">No payment required yet</p>
+                <hr>
+                <div class="d-flex align-items-center justify-content-center">
+                    <i class="bi bi-shield-check text-success fs-4 me-2"></i>
+                    <span class="small text-muted">100% Safe & Verified Property</span>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .btn-primary {
+        background: linear-gradient(45deg, #0d6efd, #00d2ff);
+        border: none;
+    }
+    .rounded-4 { border-radius: 1rem !important; }
+</style>
 {% endblock %}
