@@ -69,23 +69,29 @@ def enquiry(villa_id):
         villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
         
         if request.method == 'POST':
-            # फॉर्म से डेटा लेना
             name = request.form.get('name')
             phone = request.form.get('phone')
             check_in = request.form.get('check_in')
             check_out = request.form.get('check_out')
             guests = request.form.get('guests')
-            msg = request.form.get('message', '')
+            msg = request.form.get('message', 'No message provided') # Message column fix
 
-            # गूगल शीट में सेव करना
             if enquiry_sheet:
                 enquiry_sheet.append_row([villa_id, villa.get('Villa_Name'), name, phone, check_in, check_out, guests, msg])
 
-            # टेलीग्राम पर अलर्ट भेजना
-            alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {villa.get('Villa_Name')}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Check-in:* {check_in}"
-            send_telegram_alert(alert)
+            # TELEGRAM MESSAGE (Pehle jaisa format)
+            alert_text = (
+                f"🔔 *New Villa Enquiry!*\n\n"
+                f"🏡 *Villa:* {villa.get('Villa_Name')}\n"
+                f"👤 *Name:* {name}\n"
+                f"📞 *Phone:* {phone}\n"
+                f"📅 *Dates:* {check_in} to {check_out}\n"
+                f"👥 *Guests:* {guests}\n"
+                f"📝 *Message:* {msg}"
+            )
+            send_telegram_alert(alert_text)
             
-            return "<h1>Enquiry Sent Successfully! We will contact you soon.</h1>" # या success.html
+            return render_template('success.html', name=name) # Professional Success Page
 
         return render_template('enquiry.html', villa=villa)
     return "Error", 500
