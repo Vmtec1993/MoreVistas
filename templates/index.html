@@ -1,48 +1,55 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row mb-5 text-center">
-    <div class="col-md-12">
-        <h1 class="fw-bold display-4">Find Your Perfect Getaway</h1>
-        <p class="text-muted fs-5">Luxury Villas in Lonavala for a memorable stay.</p>
-    </div>
+<div class="hero-section text-center py-5 mb-5" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-position: center; color: white; border-radius: 0 0 50px 50px;">
+    <h1 class="display-4 fw-bold">Find Your Dream Escape</h1>
+    <p class="lead">Handpicked luxury villas for your perfect staycation</p>
 </div>
 
-<div class="row g-4">
-    {% for villa in villas %}
-    <div class="col-md-4">
-        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden villa-card">
-            <div class="position-relative">
-                <img src="{{ villa.Image_Main }}" class="card-img-top" style="height: 250px; object-fit: cover;">
-                <div class="position-absolute top-0 start-0 m-3">
-                    {% if villa.Status == 'Available' %}
-                        <span class="badge bg-success shadow-sm">Available</span>
-                    {% else %}
-                        <span class="badge bg-danger shadow-sm">Sold Out</span>
-                    {% endif %}
+<div class="container">
+    <div class="row g-4">
+        {% for villa in villas %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm villa-card" style="border-radius: 20px; overflow: hidden; transition: transform 0.3s ease;">
+                <div class="position-relative">
+                    <img src="{{ villa.Image_URL }}" class="card-img-top" alt="{{ villa.Villa_Name }}" style="height: 250px; object-fit: cover;">
+                    <span class="position-absolute top-0 end-0 m-3 badge rounded-pill bg-primary px-3 py-2">⭐ {{ villa.Rating if villa.Rating else '4.8' }}</span>
                 </div>
-            </div>
-            
-            <div class="card-body p-4">
-                <h4 class="fw-bold">{{ villa.Name }}</h4>
-                <p class="text-primary fw-bold mb-2">{{ villa.BHK }} BHK Villa</p>
-                <p class="text-muted small mb-3 text-truncate">{{ villa.Description }}</p>
-                
-                <div class="d-flex justify-content-between align-items-center mt-auto">
-                    <div>
-                        <span class="h5 fw-bold text-dark mb-0">₹{{ villa.Price }}</span>
-                        <small class="text-muted">/night</small>
+
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title fw-bold mb-0 text-dark">{{ villa.Villa_Name }}</h5>
+                        <span class="text-primary fw-bold">₹{{ villa.Price }}<small class="text-muted">/night</small></span>
                     </div>
-                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill px-4">View Details</a>
+                    
+                    <p class="text-muted small mb-3">
+                        <i class="bi bi-geo-alt-fill me-1"></i> {{ villa.Location if villa.Location else 'Lonavala, Maharashtra' }}
+                    </p>
+
+                    <div class="mb-4">
+                        <span class="badge bg-light text-dark border rounded-pill me-1"><i class="bi bi-wifi"></i> WiFi</span>
+                        <span class="badge bg-light text-dark border rounded-pill me-1"><i class="bi bi-water"></i> Pool</span>
+                        <span class="badge bg-light text-dark border rounded-pill me-1"><i class="bi bi-snow"></i> AC</span>
+                    </div>
+
+                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark w-100 rounded-pill py-2 fw-bold">View Details</a>
                 </div>
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
 
 <style>
-    .villa-card { transition: transform 0.3s ease; }
-    .villa-card:hover { transform: translateY(-10px); }
+    .villa-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+    }
+    body {
+        background-color: #f8f9fa;
+    }
+    .badge {
+        font-weight: 500;
+    }
 </style>
 {% endblock %}
