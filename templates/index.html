@@ -27,9 +27,11 @@
                     <div style="background: #ff4d4d; color: white; padding: 6px 12px; border-radius: 50px; font-weight: bold; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
                         <i class="bi bi-fire"></i> {{ villa.Offer }}
                     </div>
+                    {% if villa.Offer_End %}
                     <div class="mt-1 text-white text-center fw-bold" style="background: rgba(0,0,0,0.7); font-size: 11px; border-radius: 5px; padding: 2px 8px;">
-                        Ends In: <span class="villa-timer">04:15:45</span>
+                        Ends In: <span class="main-timer" data-expire="{{ villa.Offer_End }}">Loading...</span>
                     </div>
+                    {% endif %}
                 </div>
                 {% endif %}
 
@@ -59,17 +61,36 @@
 </div>
 
 <script>
-    function startTimers() {
-        document.querySelectorAll('.villa-timer').forEach(timer => {
-            let timeArr = timer.innerText.split(':');
-            let h = parseInt(timeArr[0]), m = parseInt(timeArr[1]), s = parseInt(timeArr[2]);
-            setInterval(() => {
-                if(s > 0) s--; else { s=59; if(m > 0) m--; else { m=59; if(h > 0) h--; } }
-                timer.innerText = `${h < 10 ? '0'+h : h}:${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+    function startMainTimers() {
+        document.querySelectorAll('.main-timer').forEach(timer => {
+            const expireDateStr = timer.getAttribute('data-expire');
+            const countTo = new Date(expireDateStr).getTime();
+            
+            const x = setInterval(function() {
+                const now = new Date().getTime();
+                const diff = countTo - now;
+
+                if (isNaN(countTo)) {
+                    timer.innerHTML = "Date Error";
+                    clearInterval(x);
+                    return;
+                }
+
+                if (diff < 0) {
+                    clearInterval(x);
+                    timer.innerHTML = "EXPIRED";
+                    return;
+                }
+
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                timer.innerHTML = h + "h " + m + "m " + s + "s";
             }, 1000);
         });
     }
-    window.onload = startTimers;
+    document.addEventListener('DOMContentLoaded', startMainTimers);
 </script>
 
 <div id="about-section" class="container py-5 mt-5 border-top">
