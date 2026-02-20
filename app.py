@@ -30,7 +30,7 @@ if creds_json:
     except Exception as e:
         print(f"Sheet Error: {e}")
 
-# --- Telegram Config ---
+# --- Telegram Alert ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
 
@@ -49,13 +49,14 @@ def index():
     if sheet:
         villas = sheet.get_all_records()
         return render_template('index.html', villas=villas)
-    return "Database Connection Error", 500
+    return "Database Error", 500
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     if sheet:
         villas = sheet.get_all_records()
-        villa = next((v for v in villas if str(v['Villa_ID']) == str(villa_id)), None)
+        # आपकी शीट के 'Villa_ID' कॉलम से मैच करना
+        villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
         if villa:
             return render_template('villa_details.html', villa=villa)
     return "Villa not found", 404
@@ -63,40 +64,25 @@ def villa_details(villa_id):
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
     if request.method == 'POST':
-        # आपके HTML के नामों के हिसाब से डेटा लेना
         name = request.form.get('name')
         phone = request.form.get('phone')
-        check_in = request.form.get('check_in')  # HTML में यही नाम है
-        check_out = request.form.get('check_out') # HTML में यही नाम है
+        check_in = request.form.get('check_in')
+        check_out = request.form.get('check_out')
         guests = request.form.get('guests')
         message = request.form.get('message')
 
-        # 1. Google Sheet में डेटा डालना
         if enquiry_sheet:
             try:
                 enquiry_sheet.append_row([villa_id, name, phone, check_in, check_out, guests, message])
-            except Exception as e:
-                print(f"Sheet Save Error: {e}")
+            except: pass
 
-        # 2. Telegram Alert
-        alert_text = (
-            f"🔔 *New Villa Enquiry!*\n\n"
-            f"🏡 *Villa:* {villa_id}\n"
-            f"👤 *Name:* {name}\n"
-            f"📞 *Phone:* {phone}\n"
-            f"📅 *Dates:* {check_in} to {check_out}\n"
-            f"👥 *Guests:* {guests}\n"
-            f"📝 *Message:* {message}"
-        )
+        alert_text = f"🔔 *New Enquiry!*\n🏡 *Villa:* {villa_id}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Stay:* {check_in} to {check_out}"
         send_telegram_alert(alert_text)
-
         return render_template('success.html')
     
     return render_template('enquiry.html', villa_id=villa_id)
 
 if __name__ == '__main__':
-    # Render को बताने के लिए कि पोर्ट क्या है
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-
-        
+    
