@@ -16,7 +16,7 @@
                 
                 <div style="height: 240px; background: #eee; overflow: hidden;">
                     {% set img_url = villa.Image_URL %}
-                    {% if 'drive.google.com' in img_url %}
+                    {% if img_url and 'drive.google.com' in img_url %}
                         {% set img_url = img_url.replace('/file/d/', '/uc?export=view&id=').replace('/view?usp=sharing', '').replace('/view', '') %}
                     {% endif %}
                     <img src="{{ img_url }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1580587771525-78b9daa3b6af?q=80&w=1000';">
@@ -27,6 +27,87 @@
                     <div style="background: #ff4d4d; color: white; padding: 6px 12px; border-radius: 50px; font-weight: bold; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
                         <i class="bi bi-fire"></i> {{ villa.Offer }}
                     </div>
-                    {% if villa.Offer_End %}
-                    <div class="mt-1 text-white
-                        
+                    {% if villa.Offer_End and villa.Offer_End|string != "nan" %}
+                    <div class="mt-1 text-white text-center fw-bold" style="background: rgba(0,0,0,0.7); font-size: 11px; border-radius: 5px; padding: 2px 8px;">
+                        Ends In: <span class="main-timer" data-expire="{{ villa.Offer_End }}">Loading...</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h4 class="fw-bold m-0 text-dark">{{ villa.Villa_Name }}</h4>
+                        <span class="badge bg-light text-primary border border-primary small">{{ villa.BHK }} BHK</span>
+                    </div>
+                    
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, Maharashtra</p>
+                    
+                    <div class="d-flex gap-3 mb-4 text-secondary" style="font-size: 0.85rem;">
+                        <span><i class="bi bi-water text-primary"></i> Pool</span>
+                        <span><i class="bi bi-snow text-info"></i> AC</span>
+                        <span><i class="bi bi-wifi text-success"></i> Wifi</span>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                        <div>
+                            {% if villa.Original_Price and villa.Original_Price|string != "nan" %}
+                            <small class="text-muted text-decoration-line-through d-block" style="font-size: 0.8rem; line-height: 1;">₹{{ villa.Original_Price }}</small>
+                            {% endif %}
+                            <h5 class="m-0 fw-bold text-primary">₹{{ villa.Price | default('0') }}<small class="text-muted fw-normal fs-6">/night</small></h5>
+                        </div>
+                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">View Villa</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function startMainTimers() {
+        document.querySelectorAll('.main-timer').forEach(timer => {
+            const expireDateStr = timer.getAttribute('data-expire');
+            const countTo = new Date(expireDateStr).getTime();
+            
+            const x = setInterval(function() {
+                const now = new Date().getTime();
+                const diff = countTo - now;
+
+                if (isNaN(countTo)) {
+                    timer.innerHTML = "Date Error";
+                    clearInterval(x);
+                    return;
+                }
+
+                if (diff < 0) {
+                    clearInterval(x);
+                    timer.innerHTML = "EXPIRED";
+                    return;
+                }
+
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                timer.innerHTML = h + "h " + m + "m " + s + "s";
+            }, 1000);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', startMainTimers);
+</script>
+
+<div id="about-section" class="container py-5 mt-5 border-top">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-bold">About MoreVistas</h2>
+            <p class="text-muted mt-3">MoreVistas is your premier destination for luxury villa rentals. Founded in 2026, we specialize in providing handpicked, high-end stays in Lonavala and beyond.</p>
+        </div>
+        <div class="col-md-6 text-center">
+            <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80" class="img-fluid rounded-4 shadow-sm" style="max-height: 250px;">
+        </div>
+    </div>
+</div>
+
+{% endblock %}
