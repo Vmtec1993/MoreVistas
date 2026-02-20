@@ -1,92 +1,89 @@
 import os
-import json
-import logging
-from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for
 import gspread
+from flask import Flask, render_template, request, redirect, url_for
 from oauth2client.service_account import ServiceAccountCredentials
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+import requests  # टेलीग्राम मैसेज भेजने के लिए
 
 app = Flask(__name__)
 
-def get_gspread_client():
+# --- Google Sheets Setup ---
+# पक्का करें कि आपकी 'credentials.json' फाइल GitHub में मौजूद है
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+client = gspread.authorize(creds)
+
+# अपनी Google Sheet का नाम यहाँ लिखें
+sheet = client.open("Villas_Data").sheet1  # Sheet1 का डेटा (Villas List)
+enquiry_sheet = client.open("Villas_Data").get_worksheet(1)  # दूसरी शीट (Enquiries)
+
+# --- Telegram Config ---
+TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
+TELEGRAM_CHAT_ID = "6746178673"
+
+def send_telegram_alert(message):
     try:
-        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds_json = os.environ.get("GOOGLE_CREDS")
-        creds_dict = json.loads(creds_json)
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-        return gspread.authorize(creds)
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        payload = {
+            "chat_id": TELEGRAM_CHAT_ID,
+            "text": message,
+            "parse_mode": "Markdown"
+        }
+        requests.post(url, data=payload)
     except Exception as e:
-        logger.error(f"Gspread Error: {e}")
-        return None
+        print(f"Telegram Alert Error: {e}")
+
+# --- Routes ---
 
 @app.route('/')
 def index():
-    try:
-        client = get_gspread_client()
-        if client:
-            sheet = client.open("Geetai_Villa_Data").get_worksheet(0)
-            # Duplicate header एरर से बचने के लिए सीधा values उठाना
-            data = sheet.get_all_values()
-            headers = data[0]
-            villas = [dict(zip(headers, row)) for row in data[1:]]
-            return render_template('index.html', villas=villas)
-        return "Database Connection Failed", 500
-    except Exception as e:
-        logger.error(f"Home Error: {e}")
-        return render_template('index.html', villas=[])
+    # Google Sheet से सभी विला का डेटा लाना
+    villas = sheet.get_all_records()
+    return render_template('index.html', villas=villas)
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
-    try:
-        client = get_gspread_client()
-        if client:
-            sheet = client.open("Geetai_Villa_Data").get_worksheet(0)
-            data = sheet.get_all_values()
-            headers = data[0]
-            villas = [dict(zip(headers, row)) for row in data[1:]]
-            villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
-            if not villa:
-                return "Villa Not Found", 404
-            return render_template('villa_details.html', villa=villa)
-    except Exception as e:
-        return f"Error: {e}", 500
+    villas = sheet.get_all_records()
+    # ID के आधार पर सही विला चुनना
+    villa = next((v for v in villas if str(v['Villa_ID']) == str(villa_id)), None)
+    if villa:
+        return render_template('villa_details.html', villa=villa)
+    return "Villa not found", 404
 
-@app.route('/enquiry/<villa_id>')
+@app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
-    # यहाँ सुनिश्चित करें कि villa_id HTML को पास हो रही है
+    if request.method == 'POST':
+        # फॉर्म से डेटा लेना
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        checkin = request.form.get('checkin')
+        checkout = request.form.get('checkout')
+        guests = request.form.get('guests')
+
+        # Google Sheet (Enquiries वाली शीट) में सेव करना
+        try:
+            enquiry_sheet.append_row([villa_id, name, phone, checkin, checkout, guests])
+        except:
+            # अगर दूसरी शीट नहीं है, तो पहली में ही नीचे डाल देगा
+            sheet.append_row([f"ENQ-{villa_id}", name, phone, checkin, checkout, guests])
+
+        # --- टेलीग्राम पर तुरंत अलर्ट भेजना ---
+        alert_msg = (
+            f"🔔 *New Villa Enquiry!*\n\n"
+            f"🏡 *Villa ID:* {villa_id}\n"
+            f"👤 *Customer:* {name}\n"
+            f"📞 *Phone:* {phone}\n"
+            f"📅 *Check-in:* {checkin}\n"
+            f"📅 *Check-out:* {checkout}\n"
+            f"👥 *Total Guests:* {guests}\n\n"
+            f"✅ *Please contact the customer soon!*"
+        )
+        send_telegram_alert(alert_msg)
+
+        return render_template('success.html')
+    
     return render_template('enquiry.html', villa_id=villa_id)
 
-@app.route('/submit_enquiry', methods=['POST'])
-def submit_enquiry():
-    try:
-        client = get_gspread_client()
-        if client:
-            sheet = client.open("Geetai_Villa_Data").worksheet("Enquiries")
-            row = [
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                request.form.get('name'),
-                request.form.get('phone'),
-                request.form.get('check_in'),
-                request.form.get('check_out'),
-                request.form.get('guests'),
-                request.form.get('message')
-            ]
-            sheet.append_row(row)
-            return redirect(url_for('success'))
-        return "Sheet Connection Failed", 500
-    except Exception as e:
-        logger.error(f"Submit Error: {e}")
-        return f"Submission Failed: Make sure 'Enquiries' tab exists in Google Sheets.", 500
-
-@app.route('/success')
-def success():
-    # अब यह "Success" पेज को रेंडर करेगा
-    return render_template('success.html')
-
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
     
