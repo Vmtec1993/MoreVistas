@@ -3,71 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoreVistas | Luxury Private Villas</title>
+    <title>MoreVistas | Luxury Stays 2026</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fcfcfc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fbfbfb; }
+        .logo-box { background: #007bff; color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; margin-right: 10px; }
+        .nav-brand-text { font-weight: 800; font-size: 1.5rem; color: #1a1a1a; letter-spacing: -1px; text-decoration: none; }
         
-        /* 1. Running Top Offer Bar */
-        .promo-slider {
-            background: linear-gradient(90deg, #ff4d4d, #f0932b);
-            color: white; padding: 10px 0; font-weight: 700;
-            overflow: hidden; position: relative; display: flex;
-        }
-        .promo-content {
-            display: inline-block; white-space: nowrap;
-            animation: scroll-left 20s linear infinite;
-        }
-        @keyframes scroll-left {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
+        /* Running Offer Bar */
+        .promo-bar { background: #ff4d4d; color: white; padding: 8px 0; font-weight: 600; overflow: hidden; }
 
-        /* 2. Professional Logo */
-        .logo-box { background: #007bff; color: white; width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,123,255,0.3); }
-        .nav-brand-text { font-weight: 800; font-size: 1.7rem; color: #1a1a1a; letter-spacing: -1.5px; }
-
-        /* 3. Floating WhatsApp Button */
-        .whatsapp-float {
-            position: fixed; bottom: 30px; right: 30px;
-            background: #25d366; color: white; width: 60px; height: 60px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 30px; box-shadow: 2px 5px 15px rgba(0,0,0,0.3); z-index: 1000;
-            text-decoration: none; transition: 0.3s;
-        }
-        .whatsapp-float:hover { transform: scale(1.1); color: white; }
+        /* Sidebar Customization */
+        .offcanvas { width: 280px !important; }
     </style>
 </head>
 <body>
 
-    <div class="promo-slider">
-        <div class="promo-content">
-            🔥 EXCLUSIVE SEASON SALE: FLAT 20% OFF ON ALL LUXURY VILLAS! BOOK NOW & SAVE BIG! ⚡ LIMITED TIME REMAINING! 🔥
-        </div>
+    <div class="promo-bar">
+        <marquee scrollamount="8">
+            🔥 SPECIAL 2026 OFFER: Use Code 'MOREVISTAS' for 20% OFF | Weekday Special Live Now! | Offer ends in: <span id="timer">04:59:59</span> 🔥
+        </marquee>
     </div>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3">
+    <nav class="navbar navbar-light bg-white sticky-top shadow-sm py-3">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="/">
-                <div class="logo-box me-2">M</div>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand d-flex align-items-center mx-auto" href="/">
+                <div class="logo-box">M</div>
                 <span class="nav-brand-text">More<span class="text-primary">Vistas</span></span>
             </a>
+            
+            <div style="width: 40px;"></div>
         </div>
     </nav>
 
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title fw-bold">MoreVistas Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column gap-3 fs-5">
+                <li class="nav-item"><a class="nav-link text-dark" href="/"><i class="bi bi-house-door me-2"></i> Home</a></li>
+                <li class="nav-item"><a class="nav-link text-dark" href="#"><i class="bi bi-info-circle me-2"></i> About Us</a></li>
+                <li class="nav-item"><a class="nav-link text-dark" href="https://wa.me/918830024994"><i class="bi bi-whatsapp me-2"></i> Contact Support</a></li>
+            </ul>
+        </div>
+    </div>
+
     {% block content %}{% endblock %}
 
-    <a href="https://wa.me/918830024994" class="whatsapp-float" target="_blank">
-        <i class="bi bi-whatsapp"></i>
-    </a>
-
-    <footer class="bg-dark text-white py-5 mt-5">
+    <footer class="bg-dark text-white pt-5 pb-4 mt-5">
         <div class="container text-center">
-            <p class="mb-0">© 2026 <b>MoreVistas Luxury Stays</b>. All Rights Reserved.</p>
-            <small class="text-muted">Premium Villa Collection - Lonavala | Alibaug | Karjat</small>
+            <h4 class="fw-bold mb-3">MoreVistas</h4>
+            <p class="text-secondary small mb-4">Your Trusted Partner for Luxury Stays since 2024.</p>
+            
+            <div class="d-flex justify-content-center gap-4 mb-4 fs-3">
+                <a href="https://wa.me/918830024994" class="text-success" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                <a href="#" class="text-danger" title="Instagram"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="text-primary" title="Facebook"><i class="bi bi-facebook"></i></a>
+            </div>
+
+            <hr class="border-secondary">
+            <p class="mb-0 text-secondary" style="font-size: 0.9rem;">
+                © 2026 <strong>MoreVistas</strong>. All Rights Reserved.
+            </p>
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simple Timer Logic
+        let time = 18000; // 5 hours in seconds
+        setInterval(() => {
+            if(time <= 0) time = 18000;
+            let h = Math.floor(time / 3600);
+            let m = Math.floor((time % 3600) / 60);
+            let s = time % 60;
+            document.getElementById('timer').innerHTML = `${h}h ${m}m ${s}s`;
+            time--;
+        }, 1000);
+    </script>
 </body>
 </html>
