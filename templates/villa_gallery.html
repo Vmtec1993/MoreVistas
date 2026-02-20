@@ -1,66 +1,72 @@
 {% extends 'base.html' %}
+
 {% block content %}
 <div class="container py-5">
-    <div class="mb-4">
-        <a href="/gallery" class="btn btn-sm btn-outline-dark rounded-pill mb-3">← Back to All Villas</a>
-        <h1 class="fw-bold">{{ villa_name }}</h1>
-        <p class="text-muted">Exclusive photo collection of {{ villa_name }}</p>
+    <div class="mb-4 text-center">
+        <a href="/gallery" class="btn btn-sm btn-outline-secondary rounded-pill mb-3">← Back to All Villas</a>
+        <h1 class="fw-bold text-uppercase display-5">{{ villa_name }}</h1>
+        <p class="text-muted">Explore every corner of your luxury stay</p>
+        <hr class="mx-auto" style="width: 70px; height: 4px; background-color: #ffc107; border: none; border-radius: 10px;">
     </div>
 
-    <div class="d-flex gap-2 mb-5 overflow-auto pb-2">
-        <button class="btn btn-dark rounded-pill px-4" onclick="filterVilla('all', this)">All Area</button>
-        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('pool', this)">Pool</button>
-        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('bedroom', this)">Bedrooms</button>
-        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('hall', this)">Living Area</button>
+    <div class="d-flex justify-content-center gap-2 mb-5 overflow-auto pb-2" id="filter-group">
+        <button class="btn btn-dark rounded-pill px-4 filter-btn" data-filter="all">All Photos</button>
+        <button class="btn btn-outline-dark rounded-pill px-4 filter-btn" data-filter="pool">Pool</button>
+        <button class="btn btn-outline-dark rounded-pill px-4 filter-btn" data-filter="bedroom">Bedroom</button>
+        <button class="btn btn-outline-dark rounded-pill px-4 filter-btn" data-filter="hall">Living Area</button>
     </div>
 
-    <div class="row g-3">
+    <div class="row g-3" id="photo-grid">
         {% for p in photos %}
-            {% for key in ['Image_Main', 'Image_2', 'Image_3'] %}
-                {% if p[key] %}
-                <div class="col-md-4 col-sm-6 villa-photo-item {{ p.Category | lower | replace(' ', '') }}">
-                    <div class="rounded-4 overflow-hidden shadow-sm position-relative" style="height: 280px; cursor: pointer;" onclick="openModal('{{ p[key] }}')">
-                        <img src="{{ p[key] }}" class="w-100 h-100" style="object-fit: cover;">
-                        <div class="position-absolute bottom-0 start-0 p-2 bg-dark bg-opacity-50 text-white small w-100">
-                            {{ p.Category }}
-                        </div>
+            {# यहाँ हम इमेज लिंक चेक कर रहे हैं #}
+            {% set img_url = p.display_image if p.display_image else p.Image_Main %}
+            
+            {% if img_url %}
+            <div class="col-md-4 col-sm-6 villa-photo-item all {{ p.Category | lower | trim }}">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden position-relative" style="height: 280px; cursor: pointer;" onclick="openLightbox('{{ img_url }}')">
+                    <img src="{{ img_url }}" class="w-100 h-100" style="object-fit: cover; transition: 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    <div class="position-absolute bottom-0 start-0 w-100 p-2 text-white bg-dark bg-opacity-50 small">
+                        {{ p.Category }}
                     </div>
                 </div>
-                {% endif %}
-            {% endfor %}
+            </div>
+            {% endif %}
         {% endfor %}
     </div>
 </div>
 
-<div id="imgModal" class="img-modal" onclick="this.style.display='none'">
-    <span class="close">&times;</span>
-    <img class="modal-content" id="modalImg">
+<div id="lightbox" class="fixed-top w-100 h-100 bg-dark bg-opacity-90 d-none flex-column align-items-center justify-content-center" style="z-index: 9999;" onclick="this.classList.add('d-none')">
+    <span class="position-absolute top-0 end-0 m-4 text-white fs-1" style="cursor: pointer;">&times;</span>
+    <img id="lightbox-img" class="img-fluid rounded shadow-lg" style="max-height: 85%;">
 </div>
 
-<style>
-    .img-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
-    .modal-content { max-width: 90%; max-height: 85%; border-radius: 10px; }
-    .close { position: absolute; top: 20px; right: 35px; color: white; font-size: 40px; cursor: pointer; }
-</style>
-
 <script>
-    function filterVilla(cat, btn) {
-        document.querySelectorAll('.btn').forEach(b => {
-            b.classList.remove('btn-dark');
-            b.classList.add('btn-outline-dark');
-        });
-        btn.classList.add('btn-dark');
-        btn.classList.remove('btn-outline-dark');
+    // फिल्टर लॉजिक
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // बटन का रंग बदलो
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.replace('btn-dark', 'btn-outline-dark');
+            });
+            this.classList.replace('btn-outline-dark', 'btn-dark');
 
-        document.querySelectorAll('.villa-photo-item').forEach(item => {
-            if (cat === 'all' || item.classList.contains(cat)) item.style.display = 'block';
-            else item.style.display = 'none';
-        });
-    }
+            const filterValue = this.getAttribute('data-filter').toLowerCase();
+            const photos = document.querySelectorAll('.villa-photo-item');
 
-    function openModal(src) {
-        document.getElementById('modalImg').src = src;
-        document.getElementById('imgModal').style.display = 'flex';
+            photos.forEach(photo => {
+                if (filterValue === 'all' || photo.classList.contains(filterValue)) {
+                    photo.style.display = 'block';
+                } else {
+                    photo.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // फोटो बड़ा करने का फंक्शन
+    function openLightbox(src) {
+        document.getElementById('lightbox-img').src = src;
+        document.getElementById('lightbox').classList.replace('d-none', 'd-flex');
     }
 </script>
 {% endblock %}
