@@ -2,15 +2,15 @@
 {% block content %}
 <div class="container py-5">
     <div class="text-center mb-5">
-        <h1 class="fw-bold display-5 text-dark">MoreVistas Experiences</h1>
-        <p class="text-muted">Unlock the beauty of our premium stays</p>
+        <h1 class="fw-bold display-5">The MoreVistas Collection</h1>
+        <p class="text-muted">Explore the unique charm of our handpicked stays</p>
     </div>
 
     <div class="d-flex justify-content-center flex-wrap gap-2 mb-5">
-        <button class="f-btn active" onclick="filterGallery('all', this)">All Highlights</button>
+        <button class="f-btn active" onclick="filterGallery('all', this)">All Views</button>
         <button class="f-btn" onclick="filterGallery('pool', this)">Private Pools</button>
-        <button class="f-btn" onclick="filterGallery('bedroom', this)">Bedrooms</button>
-        <button class="f-btn" onclick="filterGallery('hall', this)">Living Area</button>
+        <button class="f-btn" onclick="filterGallery('bedroom', this)">Luxury Bedrooms</button>
+        <button class="f-btn" onclick="filterGallery('garden', this)">Gardens & Views</button>
     </div>
 
     <div class="row g-4" id="gallery-grid">
@@ -18,13 +18,17 @@
             {% for key in ['Image_Main', 'Image_2', 'Image_3'] %}
                 {% if villa[key] %}
                 <div class="col-lg-4 col-md-6 gallery-item {{ villa.Category | lower | replace(' ', '') }}">
-                    <div class="premium-box" onclick="openFullScreen('{{ villa[key] }}')">
+                    <div class="premium-box shadow-sm" onclick="openFullScreen('{{ villa[key] }}')">
                         <img src="{{ villa[key] }}" class="img-fluid">
+                        
+                        <div class="villa-label px-3 py-2">
+                            <i class="bi bi-house-door me-1"></i> {{ villa.Name }}
+                        </div>
+
                         <div class="premium-overlay">
-                            <div class="content text-center">
-                                <span class="badge bg-warning text-dark mb-1">{{ villa.Category }}</span>
-                                <h6 class="text-white mb-0">{{ villa.Name }}</h6>
-                                <i class="bi bi-plus-circle text-white fs-2 mt-2"></i>
+                            <div class="text-center text-white">
+                                <span class="badge bg-warning text-dark px-3 rounded-pill mb-2">{{ villa.Category }}</span>
+                                <p class="small mb-0">Tap to expand</p>
                             </div>
                         </div>
                     </div>
@@ -41,22 +45,30 @@
 </div>
 
 <style>
-    .f-btn { background: #fff; border: 1px solid #ddd; padding: 8px 20px; border-radius: 50px; transition: 0.3s; }
-    .f-btn.active, .f-btn:hover { background: #0f172a; color: #fbbf24; border-color: #0f172a; }
+    .f-btn { background: #fff; border: 1px solid #ddd; padding: 10px 25px; border-radius: 50px; font-weight: 500; transition: 0.3s; }
+    .f-btn.active, .f-btn:hover { background: #0f172a; color: #fbbf24; border-color: #0f172a; transform: translateY(-3px); }
 
-    .premium-box { position: relative; border-radius: 15px; overflow: hidden; height: 320px; cursor: pointer; }
-    .premium-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
-    .premium-box:hover img { transform: scale(1.1); filter: blur(3px); }
+    .premium-box { position: relative; border-radius: 20px; overflow: hidden; height: 320px; cursor: pointer; border: 4px solid white; }
+    .premium-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+    .premium-box:hover img { transform: scale(1.1); filter: brightness(0.7); }
+
+    /* Villa Name Label Styling */
+    .villa-label {
+        position: absolute; top: 15px; left: 15px;
+        background: rgba(15, 23, 42, 0.85); color: white;
+        font-size: 13px; font-weight: 600; border-radius: 10px;
+        backdrop-filter: blur(5px); z-index: 5;
+    }
 
     .premium-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(15, 23, 42, 0.6); display: flex; align-items: center;
-        justify-content: center; opacity: 0; transition: 0.4s;
+        background: rgba(0,0,0,0.3); display: flex; align-items: center;
+        justify-content: center; opacity: 0; transition: 0.3s;
     }
     .premium-box:hover .premium-overlay { opacity: 1; }
 
-    .fullscreen-modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
-    .modal-content { max-width: 90%; max-height: 90%; border-radius: 10px; }
+    .fullscreen-modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; }
+    .modal-content { max-width: 90%; max-height: 90%; border-radius: 15px; border: 3px solid rgba(255,255,255,0.1); }
     .close-btn { position: absolute; top: 20px; right: 35px; color: #fff; font-size: 40px; cursor: pointer; }
 </style>
 
@@ -64,11 +76,26 @@
     function filterGallery(cat, btn) {
         document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        
         document.querySelectorAll('.gallery-item').forEach(item => {
-            item.style.display = (cat === 'all' || item.classList.contains(cat)) ? 'block' : 'none';
+            if (cat === 'all' || item.classList.contains(cat)) {
+                item.style.display = 'block';
+                item.style.animation = 'fadeIn 0.5s ease forwards';
+            } else {
+                item.style.display = 'none';
+            }
         });
     }
-    function openFullScreen(src) { document.getElementById("fullImg").src = src; document.getElementById("fullScreenModal").style.display = "flex"; }
-    function closeFullScreen() { document.getElementById("fullScreenModal").style.display = "none"; }
+
+    function openFullScreen(src) {
+        document.getElementById("fullImg").src = src;
+        document.getElementById("fullScreenModal").style.display = "flex";
+    }
+    function closeFullScreen() {
+        document.getElementById("fullScreenModal").style.display = "none";
+    }
+
+    // Escape key check
+    document.addEventListener('keydown', (e) => { if(e.key === "Escape") closeFullScreen(); });
 </script>
 {% endblock %}
