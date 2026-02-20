@@ -16,20 +16,17 @@ if creds_json:
     creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
     client = gspread.authorize(creds)
     
-    # आपकी असली Sheet ID यहाँ सेट कर दी गई है
-    # पुराने नाम "Villas_Data" की जगह ID का उपयोग करें
-SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
-main_spreadsheet = client.open_by_key(SHEET_ID)
-sheet = main_spreadsheet.sheet1
-   
+    # आपकी Sheet ID
+    SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
+    main_spreadsheet = client.open_by_key(SHEET_ID)
+    sheet = main_spreadsheet.sheet1
+    
     try:
-        # अगर आपकी शीट में दूसरा टैब है तो वहां डेटा जाएगा
-        enquiry_sheet = main_spreadsheet.get_worksheet(1) 
+        enquiry_sheet = main_spreadsheet.get_worksheet(1)
     except:
-        # अगर दूसरा टैब नहीं मिला तो पहले में ही जाएगा
-        enquiry_sheet = sheet 
+        enquiry_sheet = sheet
 else:
-    print("Error: GOOGLE_CREDS not found in Environment Variables!")
+    print("Error: GOOGLE_CREDS not found!")
 
 # --- Telegram Config ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
@@ -41,7 +38,7 @@ def send_telegram_alert(message):
         payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
         requests.post(url, data=payload)
     except Exception as e:
-        print(f"Telegram Notification Error: {e}")
+        print(f"Telegram Error: {e}")
 
 # --- Routes ---
 
@@ -67,10 +64,8 @@ def enquiry(villa_id):
         checkout = request.form.get('checkout')
         guests = request.form.get('guests')
 
-        # Google Sheet में डेटा डालना
         enquiry_sheet.append_row([villa_id, name, phone, checkin, checkout, guests])
 
-        # टेलीग्राम अलर्ट भेजना
         alert_msg = (
             f"🔔 *New Villa Enquiry!*\n\n"
             f"🏡 *Villa:* {villa_id}\n"
@@ -80,7 +75,6 @@ def enquiry(villa_id):
             f"👥 *Guests:* {guests}"
         )
         send_telegram_alert(alert_msg)
-        
         return render_template('success.html')
     
     return render_template('enquiry.html', villa_id=villa_id)
