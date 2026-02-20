@@ -48,20 +48,22 @@ def index():
     villas = []
     if sheet:
         villas = sheet.get_all_records()
+        # Safety Fix: Taaki agar sheet khali ho ya Original_Price na ho toh error na aaye
+        for v in villas:
+            v['Original_Price'] = v.get('Original_Price', '')
+            v['Offer'] = v.get('Offer', '')
     return render_template('index.html', villas=villas)
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     if sheet:
         villas = sheet.get_all_records()
-        # Villa ID match karne ka logic
         villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
         if villa:
+            villa['Original_Price'] = villa.get('Original_Price', '')
             return render_template('villa_details.html', villa=villa)
     return "Villa info not found", 404
 
-# --- YE RHA MISSING ENQUIRY ROUTE (FIXED) ---
-# app.py के enquiry वाले हिस्से में इसे बदलें
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
     if sheet:
@@ -74,12 +76,13 @@ def enquiry(villa_id):
             check_in = request.form.get('check_in')
             check_out = request.form.get('check_out')
             guests = request.form.get('guests')
-            msg = request.form.get('message', 'No message provided') # Message column fix
+            msg = request.form.get('message', 'No message')
 
             if enquiry_sheet:
-                enquiry_sheet.append_row([villa_id, villa.get('Villa_Name'), name, phone, check_in, check_out, guests, msg])
+                try:
+                    enquiry_sheet.append_row([villa_id, villa.get('Villa_Name'), name, phone, check_in, check_out, guests, msg])
+                except: pass
 
-            # TELEGRAM MESSAGE (Pehle jaisa format)
             alert_text = (
                 f"🔔 *New Villa Enquiry!*\n\n"
                 f"🏡 *Villa:* {villa.get('Villa_Name')}\n"
@@ -87,16 +90,16 @@ def enquiry(villa_id):
                 f"📞 *Phone:* {phone}\n"
                 f"📅 *Dates:* {check_in} to {check_out}\n"
                 f"👥 *Guests:* {guests}\n"
-                f"📝 *Message:* {msg}"
+                f"📝 *Msg:* {msg}"
             )
             send_telegram_alert(alert_text)
             
-            return render_template('success.html', name=name) # Professional Success Page
+            return render_template('success.html', name=name)
 
         return render_template('enquiry.html', villa=villa)
     return "Error", 500
 
-
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port)
+    
