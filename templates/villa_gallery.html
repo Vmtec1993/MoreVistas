@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="mb-4">
+        <a href="/gallery" class="btn btn-sm btn-outline-dark rounded-pill mb-3">← Back to All Villas</a>
+        <h1 class="fw-bold">{{ villa_name }}</h1>
+        <p class="text-muted">Exclusive photo collection of {{ villa_name }}</p>
+    </div>
+
+    <div class="d-flex gap-2 mb-5 overflow-auto pb-2">
+        <button class="btn btn-dark rounded-pill px-4" onclick="filterVilla('all', this)">All Area</button>
+        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('pool', this)">Pool</button>
+        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('bedroom', this)">Bedrooms</button>
+        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('hall', this)">Living Area</button>
+    </div>
+
+    <div class="row g-3">
+        {% for p in photos %}
+            {% for key in ['Image_Main', 'Image_2', 'Image_3'] %}
+                {% if p[key] %}
+                <div class="col-md-4 col-sm-6 villa-photo-item {{ p.Category | lower | replace(' ', '') }}">
+                    <div class="rounded-4 overflow-hidden shadow-sm position-relative" style="height: 280px; cursor: pointer;" onclick="openModal('{{ p[key] }}')">
+                        <img src="{{ p[key] }}" class="w-100 h-100" style="object-fit: cover;">
+                        <div class="position-absolute bottom-0 start-0 p-2 bg-dark bg-opacity-50 text-white small w-100">
+                            {{ p.Category }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+
+<div id="imgModal" class="img-modal" onclick="this.style.display='none'">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="modalImg">
+</div>
+
+<style>
+    .img-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+    .modal-content { max-width: 90%; max-height: 85%; border-radius: 10px; }
+    .close { position: absolute; top: 20px; right: 35px; color: white; font-size: 40px; cursor: pointer; }
+</style>
+
+<script>
+    function filterVilla(cat, btn) {
+        document.querySelectorAll('.btn').forEach(b => {
+            b.classList.remove('btn-dark');
+            b.classList.add('btn-outline-dark');
+        });
+        btn.classList.add('btn-dark');
+        btn.classList.remove('btn-outline-dark');
+
+        document.querySelectorAll('.villa-photo-item').forEach(item => {
+            if (cat === 'all' || item.classList.contains(cat)) item.style.display = 'block';
+            else item.style.display = 'none';
+        });
+    }
+
+    function openModal(src) {
+        document.getElementById('modalImg').src = src;
+        document.getElementById('imgModal').style.display = 'flex';
+    }
+</script>
+{% endblock %}
