@@ -1,15 +1,30 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container py-5">
+
+<div class="position-relative overflow-hidden shadow-lg" style="height: 550px; background-color: #000;">
+    <img src="https://path-to-your-saved-image.jpg" class="w-100 h-100" style="object-fit: cover; opacity: 0.65;">
+    
+    <div class="position-absolute top-50 start-50 translate-middle text-center text-white w-100 px-3">
+        <h1 class="display-3 fw-bold mb-3 animate__animated animate__fadeInDown" style="letter-spacing: 2px;">
+            <span style="font-weight: 300;">Welcome to</span> <br> 
+            <span style="color: #fbbf24;">MoreVistas</span>
+        </h1>
+        <p class="lead fs-4 mb-4 opacity-75">The Epitome of Luxury in Lonavala</p>
+        <a href="#villas" class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow">Explore Villas</a>
+    </div>
+</div>
+
+<div class="container py-5" id="villas">
     <div class="text-center mb-5">
-        <h1 class="fw-bold display-5 text-dark">Our Luxury Villas</h1>
-        <p class="text-muted">Handpicked premium stays curated by <strong>MoreVistas</strong></p>
+        <h2 class="fw-bold display-5 text-dark">Our Exclusive Properties</h2>
+        <div class="mx-auto bg-primary" style="height: 3px; width: 50px;"></div>
+        <p class="text-muted mt-3">Handpicked premium stays curated for your comfort</p>
     </div>
     
     <div class="row g-4">
         {% for villa in villas %}
         <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative villa-card">
                 
                 {% if villa.Offer %}
                 <div class="position-absolute top-0 end-0 m-3 z-3">
@@ -19,8 +34,8 @@
                 </div>
                 {% endif %}
 
-                <div class="position-relative">
-                    <img src="{{ villa.Image_Main }}" class="card-img-top" style="height:250px; object-fit:cover;">
+                <div class="position-relative overflow-hidden">
+                    <img src="{{ villa.Image_Main }}" class="card-img-top villa-img" style="height:250px; object-fit:cover;">
                     {% if villa.Status %}
                     <span class="position-absolute top-0 start-0 m-3 badge bg-dark bg-opacity-75 rounded-pill px-3 py-2 small shadow-sm">
                        <i class="bi bi-check-circle-fill text-success me-1"></i> {{ villa.Status }}
@@ -29,16 +44,19 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <h5 class="fw-bold text-dark mb-1">{{ villa.Name }}</h5>
-                    <p class="text-muted small mb-3">
-                        <i class="bi bi-house-heart me-1"></i> {{ villa.BHK }} BHK Premium Villa
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="fw-bold text-dark mb-0">{{ villa.Name }}</h5>
+                        <span class="badge bg-light text-primary border border-primary-subtle rounded-pill">{{ villa.BHK }} BHK</span>
+                    </div>
+                    <p class="text-muted small mb-4">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> Lonavala, Maharashtra
                     </p>
                     <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
                         <div>
-                            <span class="text-dark small text-muted d-block">Starting from</span>
+                            <span class="text-dark small text-muted d-block">Price per night</span>
                             <span class="text-primary fw-bold fs-4">₹{{ villa.Price }}</span>
                         </div>
-                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-outline-dark rounded-pill px-4">Details</a>
+                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-outline-dark rounded-pill px-4 fw-medium">View Details</a>
                     </div>
                 </div>
             </div>
@@ -46,4 +64,15 @@
         {% endfor %}
     </div>
 </div>
+
+<style>
+    .villa-card { transition: all 0.3s ease; }
+    .villa-card:hover { transform: translateY(-10px); }
+    .villa-img { transition: transform 0.5s ease; }
+    .villa-card:hover .villa-img { transform: scale(1.1); }
+    
+    /* Smooth Scroll */
+    html { scroll-behavior: smooth; }
+</style>
+
 {% endblock %}
