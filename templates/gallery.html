@@ -1,109 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container py-5">
-    <div class="text-center mb-5">
-        <h1 class="fw-bold">Exclusive Villa Gallery</h1>
-        <p class="text-muted">Select a villa to explore its luxury corners</p>
-    </div>
+<div class="container py-5 text-center">
+    <h1 class="fw-bold display-5 mb-2">Our Destinations</h1>
+    <p class="text-muted mb-5">Click on a villa to explore its private gallery</p>
 
-    <div class="row justify-content-center mb-4">
-        <div class="col-md-6 text-center">
-            <label class="fw-bold mb-2">1. Choose Villa:</label>
-            <select id="villa-selector" class="form-select form-select-lg rounded-pill shadow-sm border-primary" onchange="applyFilters()">
-                <option value="all">-- All Villas --</option>
-                {% set unique_villas = [] %}
-                {% for villa in villas %}
-                    {% if villa.Name not in unique_villas %}
-                        <option value="{{ villa.Name | lower | replace(' ', '') }}">{{ villa.Name }}</option>
-                        {% set _ = unique_villas.append(villa.Name) %}
-                    {% endif %}
-                {% endfor %}
-            </select>
-        </div>
-    </div>
-
-    <div class="d-flex justify-content-center flex-wrap gap-2 mb-5">
-        <button class="f-btn active" data-cat="all" onclick="setCategory('all', this)">All Area</button>
-        <button class="f-btn" data-cat="pool" onclick="setCategory('pool', this)">Pool</button>
-        <button class="f-btn" data-cat="bedroom" onclick="setCategory('bedroom', this)">Bedroom</button>
-        <button class="f-btn" data-cat="hall" onclick="setCategory('hall', this)">Hall/Living</button>
-    </div>
-
-    <div class="row g-4" id="gallery-grid">
+    <div class="row g-4 justify-content-center">
+        {% set shown_villas = [] %}
         {% for villa in villas %}
-            {% for key in ['Image_Main', 'Image_2', 'Image_3'] %}
-                {% if villa[key] %}
-                <div class="col-lg-4 col-md-6 gallery-item" 
-                     data-villa="{{ villa.Name | lower | replace(' ', '') }}" 
-                     data-category="{{ villa.Category | lower | replace(' ', '') }}">
-                    
-                    <div class="premium-box shadow-sm" onclick="openFullScreen('{{ villa[key] }}')">
-                        <img src="{{ villa[key] }}" class="img-fluid">
-                        <div class="villa-badge">{{ villa.Name }}</div>
-                        <div class="cat-tag">{{ villa.Category }}</div>
+            {% if villa.Name not in shown_villas %}
+            <div class="col-md-6 col-lg-5">
+                <a href="/gallery/{{ villa.Name | lower | replace(' ', '') }}" class="text-decoration-none">
+                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden gallery-main-card">
+                        <img src="{{ villa.Image_Main }}" class="card-img-top" style="height: 400px; object-fit: cover;">
+                        <div class="card-img-overlay d-flex flex-column justify-content-end p-4 text-start" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);">
+                            <h2 class="text-white fw-bold mb-1">{{ villa.Name }}</h2>
+                            <p class="text-warning mb-0">Explore Full Gallery <i class="bi bi-arrow-right-circle-fill"></i></p>
+                        </div>
                     </div>
-                </div>
-                {% endif %}
-            {% endfor %}
+                </a>
+            </div>
+            {% set _ = shown_villas.append(villa.Name) %}
+            {% endif %}
         {% endfor %}
     </div>
 </div>
 
-<div id="fullScreenModal" class="fullscreen-modal" onclick="closeFullScreen()">
-    <span class="close-btn">&times;</span>
-    <img class="modal-content" id="fullImg">
-</div>
-
 <style>
-    .f-btn { background: white; border: 1px solid #ddd; padding: 8px 20px; border-radius: 50px; transition: 0.3s; }
-    .f-btn.active { background: #0f172a; color: #fbbf24; border-color: #0f172a; }
-    
-    .premium-box { position: relative; border-radius: 15px; overflow: hidden; height: 300px; cursor: pointer; border: 3px solid white; }
-    .premium-box img { width: 100%; height: 100%; object-fit: cover; }
-    
-    .villa-badge { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 12px; border-radius: 5px; font-size: 12px; }
-    .cat-tag { position: absolute; bottom: 10px; right: 10px; background: #fbbf24; color: black; padding: 2px 10px; border-radius: 5px; font-size: 10px; font-weight: bold; }
-
-    .fullscreen-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
-    .modal-content { max-width: 90%; max-height: 90%; }
-    .close-btn { position: absolute; top: 20px; right: 35px; color: #fff; font-size: 40px; cursor: pointer; }
+    .gallery-main-card { transition: 0.4s; }
+    .gallery-main-card:hover { transform: scale(1.02); }
 </style>
-
-<script>
-    let currentCategory = 'all';
-
-    function setCategory(cat, btn) {
-        document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentCategory = cat;
-        applyFilters();
-    }
-
-    function applyFilters() {
-        const selectedVilla = document.getElementById('villa-selector').value;
-        const items = document.querySelectorAll('.gallery-item');
-
-        items.forEach(item => {
-            const itemVilla = item.getAttribute('data-villa');
-            const itemCat = item.getAttribute('data-category');
-
-            const villaMatch = (selectedVilla === 'all' || itemVilla === selectedVilla);
-            const catMatch = (currentCategory === 'all' || itemCat.includes(currentCategory));
-
-            if (villaMatch && catMatch) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    }
-
-    function openFullScreen(src) {
-        document.getElementById("fullImg").src = src;
-        document.getElementById("fullScreenModal").style.display = "flex";
-    }
-    function closeFullScreen() {
-        document.getElementById("fullScreenModal").style.display = "none";
-    }
-</script>
 {% endblock %}
