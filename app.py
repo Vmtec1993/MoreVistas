@@ -4,6 +4,7 @@ import gspread
 from flask import Flask, render_template, request, redirect, url_for
 from oauth2client.service_account import ServiceAccountCredentials
 import requests
+from datetime import datetime  # Date ke liye zaroori hai
 
 app = Flask(__name__)
 
@@ -21,9 +22,10 @@ if creds_json:
         
         SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
         main_spreadsheet = client.open_by_key(SHEET_ID)
-        sheet = main_spreadsheet.sheet1  # Villas Data
+        sheet = main_spreadsheet.sheet1  # Villas Data Sheet
         
         try:
+            # Sheet ka naam 'Enquiries' hona chahiye
             enquiry_sheet = main_spreadsheet.worksheet("Enquiries")
         except:
             enquiry_sheet = sheet
@@ -48,7 +50,6 @@ def index():
     villas = []
     if sheet:
         villas = sheet.get_all_records()
-        # Safety Fix: Taaki agar sheet khali ho ya Original_Price na ho toh error na aaye
         for v in villas:
             v['Original_Price'] = v.get('Original_Price', '')
             v['Offer'] = v.get('Offer', '')
@@ -77,20 +78,27 @@ def enquiry(villa_id):
             check_out = request.form.get('check_out')
             guests = request.form.get('guests')
             msg = request.form.get('message', 'No message')
+            
+            # Aaj ki date aur time
+            today_date = datetime.now().strftime("%d-%m-%Y %H:%M")
 
             if enquiry_sheet:
                 try:
-                    enquiry_sheet.append_row([villa_id, villa.get('Villa_Name'), name, phone, check_in, check_out, guests, msg])
-                except: pass
+                    # Aapke bataye gaye columns ke hisaab se sequence:
+                    # Date | Name | Phone | Check-in | Check-out | Guests | Message
+                    enquiry_sheet.append_row([today_date, name, phone, check_in, check_out, guests, msg])
+                except Exception as e:
+                    print(f"Append Error: {e}")
 
+            # Telegram Alert (Villa Name ke saath taaki aapko pata chale kaunsa villa hai)
             alert_text = (
-                f"🔔 *New Villa Enquiry!*\n\n"
+                f"🔔 *New Booking Enquiry!*\n\n"
                 f"🏡 *Villa:* {villa.get('Villa_Name')}\n"
                 f"👤 *Name:* {name}\n"
                 f"📞 *Phone:* {phone}\n"
-                f"📅 *Dates:* {check_in} to {check_out}\n"
+                f"📅 *Stay:* {check_in} to {check_out}\n"
                 f"👥 *Guests:* {guests}\n"
-                f"📝 *Msg:* {msg}"
+                f"📝 *Message:* {msg}"
             )
             send_telegram_alert(alert_text)
             
@@ -100,8 +108,5 @@ def enquiry(villa_id):
     return "Error", 500
 
 if __name__ == '__main__':
-    # Render environment variable ko prioritze karein
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port, debug=False)
-
-    
