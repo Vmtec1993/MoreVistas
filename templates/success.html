@@ -1,16 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container py-5 text-center">
-    <div class="card shadow-lg border-0 p-5 mx-auto" style="max-width: 500px; border-radius: 30px;">
-        <div class="mb-4 display-1 text-success">
-            <i class="bi bi-check-all"></i>
+    <div class="card border-0 shadow-lg p-5 mx-auto" style="max-width: 500px; border-radius: 30px;">
+        <div class="mb-4">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
         </div>
-        <h2 class="fw-bold">Request Received!</h2>
-        <p class="text-muted fs-5">Thank you for choosing <b>MoreVistas</b>. Our concierge will contact you on WhatsApp shortly to confirm your stay.</p>
-        <div class="d-grid gap-2 mt-4">
-            <a href="/" class="btn btn-primary btn-lg rounded-pill fw-bold">Back to MoreVistas</a>
-            <a href="https://wa.me/918830024994" class="btn btn-outline-success btn-lg rounded-pill">
-                <i class="bi bi-whatsapp"></i> Chat on WhatsApp
+        <h2 class="fw-bold">Thank You, {{ name }}!</h2>
+        <p class="text-muted">Aapki enquiry humein mil gayi hai. Humari team aapse jald hi contact karegi.</p>
+        <hr>
+        <a href="/" class="btn btn-primary rounded-pill px-5 fw-bold mt-3">Back to Home</a>
+        <div class="mt-4">
+            <a href="https://wa.me/918830024994" class="text-success text-decoration-none small">
+                <i class="bi bi-whatsapp"></i> Instant Help on WhatsApp
             </a>
         </div>
     </div>
