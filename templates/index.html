@@ -1,23 +1,39 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container py-5">
-    <h2 class="fw-bold mb-4">Our Premium Villas</h2>
+
+<header class="py-5 text-center" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; color: white; padding: 120px 0 !important;">
+    <div class="container">
+        <h1 class="display-3 fw-bold">Welcome to MoreVistas</h1>
+        <p class="lead mb-4">Discover the perfect escape in our handpicked luxury villas.</p>
+        <a href="#villas" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">View Villas</a>
+    </div>
+</header>
+
+<div class="container my-5" id="villas">
+    <h2 class="text-center fw-bold mb-5">Our Luxury Collection</h2>
     <div class="row g-4">
         {% for villa in villas %}
         <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="position-relative">
-                    <img src="{{ villa.Image_Main }}" class="card-img-top" style="height:220px; object-fit:cover;">
-                    {% if villa.Status %}
-                    <span class="position-absolute top-0 start-0 m-3 badge bg-success">{{ villa.Status }}</span>
-                    {% endif %}
-                </div>
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 20px; overflow: hidden;">
+                <img src="{{ villa.Image_URL }}" class="card-img-top" style="height: 250px; object-fit: cover;">
                 <div class="card-body">
-                    <h5 class="fw-bold">{{ villa.Name }}</h5>
-                    <p class="text-muted small"><i class="bi bi-house"></i> {{ villa.BHK }} BHK Villa</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-primary fw-bold fs-5">₹{{ villa.Price }}</span>
-                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark btn-sm rounded-pill px-3">Details</a>
+                    <h5 class="card-title fw-bold text-dark">{{ villa.Villa_Name }}</h5>
+                    <p class="text-muted small"><i class="bi bi-geo-alt-fill"></i> Lonavala, Maharashtra</p>
+                    
+                    <div class="d-flex justify-content-between mb-3 text-secondary" style="font-size: 0.85rem; border-top: 1px solid #eee; pt-2;">
+                        <span><i class="bi bi-water text-primary"></i> Pool</span>
+                        <span><i class="bi bi-snow text-info"></i> AC</span>
+                        <span><i class="bi bi-wifi text-success"></i> Wifi</span>
+                        <span><i class="bi bi-p-circle text-danger"></i> Parking</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="badge bg-danger">Offer: {{ villa.Offer }}</span>
+                        <small class="text-muted d-block mt-1">Ends: {{ villa.Offer_End }}</small>
+                    </div>
+
+                    <div class="d-grid">
+                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill fw-bold">View Details</a>
                     </div>
                 </div>
             </div>
@@ -25,4 +41,5 @@
         {% endfor %}
     </div>
 </div>
+
 {% endblock %}
