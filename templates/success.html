@@ -1,14 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container my-5 text-center">
-    <div class="card shadow-lg border-0 p-5 mx-auto" style="border-radius: 25px; max-width: 600px;">
-        <i class="bi bi-check-circle-fill text-success mb-4" style="font-size: 5rem;"></i>
-        <h1 class="fw-bold text-dark mb-3">Enquiry Sent!</h1>
-        <p class="lead text-muted mb-4">
-            Thank you for choosing <strong>MoreVistas</strong>. We have received your request and will contact you shortly.
-        </p>
-        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-            <a href="/" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">Back to Home</a>
+<div class="container py-5 text-center" style="margin-top: 50px;">
+    <div class="card shadow-lg border-0 p-5 mx-auto" style="max-width: 550px; border-radius: 25px; background: #ffffff;">
+        <div class="mb-4">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 80px;"></i>
+        </div>
+        <h2 class="fw-bold text-dark">Enquiry Submitted!</h2>
+        <p class="text-muted fs-5">Thank you for reaching out. We have received your request and our team will contact you on WhatsApp shortly.</p>
+        <hr class="my-4">
+        <div class="d-grid gap-3">
+            <a href="/" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow">Back to Home</a>
+            <a href="https://wa.me/918830024994" target="_blank" class="btn btn-outline-success btn-lg rounded-pill fw-bold py-3">
+                <i class="bi bi-whatsapp me-2"></i>Chat with Us
+            </a>
         </div>
     </div>
 </div>
