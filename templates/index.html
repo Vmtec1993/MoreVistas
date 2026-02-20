@@ -1,51 +1,55 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<header class="py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 120px 0 !important; margin-bottom: 40px;">
+<header class="py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 140px 0 !important;">
     <div class="container">
-        <h1 class="display-3 fw-bold mb-3">Welcome to MoreVistas</h1>
+        <h1 class="display-2 fw-bold mb-3">Welcome to MoreVistas</h1>
         <p class="lead mb-4 fs-4 opacity-75">Experience World-Class Luxury in the Heart of Nature.</p>
-        <a href="#explore" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg">Explore Collection</a>
+        <a href="#explore" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold">Explore Collection</a>
     </div>
 </header>
 
-<div class="container my-5" id="explore">
+<div class="container my-5 pt-5" id="explore">
     <div class="text-center mb-5">
         <h2 class="display-5 fw-bold">Our Exclusive Villas</h2>
-        <p class="text-muted">Handpicked luxury stays for your perfect getaway.</p>
     </div>
 
     <div class="row g-4">
         {% for villa in villas %}
-        <div class="col-md-4 col-sm-6">
-            <div class="card h-100 border-0 shadow-sm villa-card" style="border-radius: 25px; overflow: hidden; transition: 0.3s;">
-                <div style="position: relative; height: 260px; overflow: hidden;">
-                    
-                    {% if villa.Offer and villa.Offer|string != "nan" and villa.Offer|string != "" %}
-                    <div style="position: absolute; top: 15px; left: 15px; background: #ff4d4d; color: white; padding: 6px 15px; border-radius: 50px; font-weight: bold; font-size: 0.8rem; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm villa-card" style="border-radius: 25px; overflow: hidden; position: relative;">
+                
+                <div style="height: 250px; overflow: hidden;">
+                    <img src="{{ villa.Image_URL }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1580587771525-78b9daa3b6af?q=80&w=1000';">
+                </div>
+
+                {% if villa.Offer and villa.Offer|string != "nan" %}
+                <div style="position: absolute; top: 15px; left: 15px; z-index: 10;">
+                    <div style="background: #ff4d4d; color: white; padding: 5px 15px; border-radius: 50px; font-weight: bold; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
                         <i class="bi bi-patch-check-fill"></i> {{ villa.Offer }}
                     </div>
-                    {% endif %}
-
-                    <img src="{{ villa.Image_URL }}" class="card-img-top w-100 h-100" style="object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1580587771525-78b9daa3b6af?q=80&w=1000';">
-                </div>
-                
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h4 class="fw-bold m-0 text-dark">{{ villa.Villa_Name }}</h4>
-                        <span class="text-warning fw-bold"><i class="bi bi-star-fill"></i> 4.9</span>
+                    <div class="mt-1 text-white text-center" style="background: rgba(0,0,0,0.6); font-size: 10px; border-radius: 5px; padding: 2px;">
+                        Ends: <span class="villa-timer">02:45:10</span>
                     </div>
-                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill me-1"></i> Lonavala, MH</p>
+                </div>
+                {% endif %}
+
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h4 class="fw-bold m-0">{{ villa.Villa_Name }}</h4>
+                        <span class="badge bg-info text-dark">{{ villa.BHK }} BHK</span>
+                    </div>
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
                     
                     <div class="d-flex gap-3 mb-4 text-secondary small">
                         <span><i class="bi bi-water text-primary"></i> Pool</span>
-                        <span><i class="bi bi-snow text-info"></i> AC</span>
                         <span><i class="bi bi-wifi text-success"></i> Wifi</span>
+                        <span><i class="bi bi-snow text-info"></i> AC</span>
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between pt-3 border-top">
                         <p class="m-0 fw-bold text-primary fs-5">₹{{ villa.Price }}<small class="text-muted fw-normal fs-6">/night</small></p>
-                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm">View</a>
+                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark rounded-pill px-4 fw-bold">View</a>
                     </div>
                 </div>
             </div>
@@ -54,8 +58,24 @@
     </div>
 </div>
 
+<script>
+    // Villa Specific Countdown Logic
+    function startVillaTimers() {
+        setInterval(() => {
+            document.querySelectorAll('.villa-timer').forEach(timer => {
+                let time = timer.innerText.split(':');
+                let h = parseInt(time[0]), m = parseInt(time[1]), s = parseInt(time[2]);
+                if(s > 0) s--; else { s=59; if(m > 0) m--; else { m=59; h--; } }
+                timer.innerText = `${h < 10 ? '0'+h : h}:${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            });
+        }, 1000);
+    }
+    startVillaTimers();
+</script>
+
 <style>
-    .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.15) !important; }
+    .villa-card { transition: 0.3s; }
+    .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important; }
 </style>
 
 {% endblock %}
