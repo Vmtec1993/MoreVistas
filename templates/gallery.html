@@ -2,25 +2,26 @@
 {% block content %}
 <div class="container py-5">
     <div class="mb-4 text-center">
-        <a href="/gallery" class="btn btn-sm btn-outline-secondary rounded-pill mb-3">← Back</a>
-        <h1 class="fw-bold text-uppercase">{{ villa_name }}</h1>
-        <hr class="mx-auto" style="width: 60px; height: 3px; background: #fbbf24; border: none;">
+        <a href="/gallery" class="btn btn-sm btn-outline-dark rounded-pill mb-3">← Back to All Villas</a>
+        <h1 class="fw-bold">{{ villa_name }}</h1>
+        <p class="text-muted">Exclusive Photo Collection</p>
     </div>
 
-    <div class="d-flex justify-content-center gap-2 mb-5 overflow-auto pb-2">
+    <div class="d-flex justify-content-center gap-2 mb-5 overflow-auto pb-2" id="filter-buttons">
         <button class="btn btn-dark rounded-pill px-4 filter-btn" data-filter="all">All</button>
         <button class="btn btn-outline-dark rounded-pill px-4 filter-btn" data-filter="pool">Pool</button>
         <button class="btn btn-outline-dark rounded-pill px-4 filter-btn" data-filter="bedroom">Bedroom</button>
         <button class="btn btn-outline-dark rounded-pill px-4 filter-btn" data-filter="hall">Living Area</button>
     </div>
 
-    <div class="row g-3" id="photo-grid">
+    <div class="row g-3" id="gallery-grid">
         {% for p in photos %}
             {% if p.Image_Main %}
             <div class="col-md-4 col-sm-6 photo-item all {{ p.Category | lower | trim }}">
-                <div class="rounded-4 overflow-hidden shadow-sm" style="height: 250px;">
+                <div class="rounded-4 overflow-hidden shadow-sm" style="height: 280px;">
                     <img src="{{ p.Image_Main }}" class="w-100 h-100" style="object-fit: cover;">
                 </div>
+                <p class="text-center mt-2 small text-muted">{{ p.Category }}</p>
             </div>
             {% endif %}
         {% endfor %}
@@ -28,15 +29,23 @@
 </div>
 
 <script>
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.replace('btn-dark', 'btn-outline-dark'));
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // बटन का कलर बदलें
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.replace('btn-dark', 'btn-outline-dark');
+            });
             this.classList.replace('btn-outline-dark', 'btn-dark');
 
-            const val = this.getAttribute('data-filter').toLowerCase();
-            document.querySelectorAll('.photo-item').forEach(item => {
-                if (val === 'all' || item.classList.contains(val)) item.style.display = 'block';
-                else item.style.display = 'none';
+            const filterValue = this.getAttribute('data-filter').toLowerCase();
+            const items = document.querySelectorAll('.photo-item');
+
+            items.forEach(item => {
+                if (filterValue === 'all' || item.classList.contains(filterValue)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
             });
         });
     });
