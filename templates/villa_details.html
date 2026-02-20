@@ -8,14 +8,32 @@
                     <div class="carousel-item active">
                         <img src="{{ villa.Image_Main }}" class="d-block w-100" style="height:450px; object-fit:cover;">
                     </div>
+                    {% if villa.Image_2 %}
+                    <div class="carousel-item">
+                        <img src="{{ villa.Image_2 }}" class="d-block w-100" style="height:450px; object-fit:cover;">
+                    </div>
+                    {% endif %}
+                    {% if villa.Image_3 %}
+                    <div class="carousel-item">
+                        <img src="{{ villa.Image_3 }}" class="d-block w-100" style="height:450px; object-fit:cover;">
+                    </div>
+                    {% endif %}
                 </div>
+                <button class="carousel-control-prev" data-bs-target="#villaCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+                <button class="carousel-control-next" data-bs-target="#villaCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
             </div>
             
             <div class="mt-4">
-                <h2 class="fw-bold">Explore the beauty of <span style="color: #fbbf24;">{{ villa.Name }}</span></h2>
+                <h2 class="fw-bold">{{ villa.Name }}</h2>
                 <p class="badge bg-info text-dark">{{ villa.BHK }} BHK</p>
                 <p class="text-muted lh-lg">{{ villa.Description }}</p>
                 <p class="fw-bold"><i class="bi bi-star text-primary"></i> Amenities: {{ villa.Amenities }}</p>
+                
+                {% if villa.Location_Link %}
+                <a href="{{ villa.Location_Link }}" target="_blank" class="btn btn-outline-primary rounded-pill">
+                    <i class="bi bi-geo-alt"></i> View Location on Map
+                </a>
+                {% endif %}
             </div>
         </div>
 
@@ -27,7 +45,7 @@
                     <p class="mb-1 small text-muted">Rating</p>
                     <p class="fw-bold">⭐ {{ villa.Rating }} / 5</p>
                 </div>
-                <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold">Book This Villa</a>
+                <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold">ENQUIRE NOW</a>
             </div>
         </div>
     </div>
