@@ -1,51 +1,50 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div class="container">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow-lg border-0 p-4" style="border-radius: 20px;">
-                <div class="text-center mb-4">
-                    <h2 class="fw-bold text-dark">Plan Your Stay</h2>
-                    <p class="text-muted">Fill in the details to get a quote</p>
-                </div>
-                
-                <form action="/enquiry/{{ villa_id }}" method="POST">
-                    <input type="hidden" name="villa_id" value="{{ villa_id }}">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg p-4" style="border-radius: 20px;">
+                <h2 class="fw-bold text-center mb-4">Book Your Stay</h2>
+                <p class="text-center text-muted small mb-4">You are booking: <strong>{{ villa.Villa_Name }}</strong></p>
 
+                <form action="/enquiry/{{ villa.Villa_ID }}" method="POST">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Full Name</label>
-                        <input type="text" name="name" class="form-control rounded-pill px-3" placeholder="Enter your name" required>
+                        <label class="form-label small fw-bold">Full Name</label>
+                        <input type="text" name="name" class="form-control rounded-pill px-3" placeholder="John Doe" required>
                     </div>
-
+                    
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Phone Number</label>
-                        <input type="tel" name="phone" class="form-control rounded-pill px-3" placeholder="WhatsApp Number" required>
+                        <label class="form-label small fw-bold">Phone Number</label>
+                        <input type="tel" name="phone" class="form-control rounded-pill px-3" placeholder="+91 00000 00000" required>
                     </div>
 
                     <div class="row">
                         <div class="col-6 mb-3">
-                            <label class="form-label fw-semibold">Check-in</label>
-                            <input type="date" name="check_in" class="form-control rounded-pill px-3" required>
+                            <label class="form-label small fw-bold">Check-in</label>
+                            <input type="date" name="check_in" class="form-control rounded-3" required>
                         </div>
                         <div class="col-6 mb-3">
-                            <label class="form-label fw-semibold">Check-out</label>
-                            <input type="date" name="check_out" class="form-control rounded-pill px-3" required>
+                            <label class="form-label small fw-bold">Check-out</label>
+                            <input type="date" name="check_out" class="form-control rounded-3" required>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Total Guests</label>
-                        <input type="number" name="guests" class="form-control rounded-pill px-3" placeholder="e.g. 8" required>
+                        <label class="form-label small fw-bold">Total Guests</label>
+                        <select name="guests" class="form-select rounded-pill px-3">
+                            <option value="1-4">1-4 Guests</option>
+                            <option value="5-10">5-10 Guests</option>
+                            <option value="10+">10+ Guests</option>
+                        </select>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">Special Requests</label>
-                        <textarea name="message" class="form-control" rows="3" style="border-radius: 15px;" placeholder="Any specific requirements?"></textarea>
+                        <label class="form-label small fw-bold">Special Message (Optional)</label>
+                        <textarea name="message" class="form-control rounded-3" rows="3"></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow">
-                        SEND ENQUIRY
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow">
+                        Submit Enquiry <i class="bi bi-send ms-2"></i>
                     </button>
                 </form>
             </div>
