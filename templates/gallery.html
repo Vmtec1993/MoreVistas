@@ -2,29 +2,31 @@
 {% block content %}
 <div class="container py-5">
     <div class="mb-4">
-        <a href="/gallery" class="btn btn-sm btn-outline-dark rounded-pill mb-3">← Back to All Villas</a>
-        <h1 class="fw-bold">{{ villa_name }}</h1>
-        <p class="text-muted">Explore the beauty of {{ villa_name }}</p>
+        <a href="/gallery" class="btn btn-sm btn-outline-dark rounded-pill mb-3">
+            <i class="bi bi-arrow-left"></i> Back to All Villas
+        </a>
+        <h1 class="fw-bold">{{ villa_name if villa_name else "Our Luxury Villa" }}</h1>
+        <p class="text-muted">Explore the exclusive beauty of our premium stay</p>
     </div>
 
     <div class="d-flex gap-2 mb-5 overflow-auto pb-2" id="filter-group">
-        <button class="btn btn-dark rounded-pill px-4" onclick="filterVilla('all', this)">All</button>
-        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('pool', this)">Pool</button>
-        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('bedroom', this)">Bedrooms</button>
-        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('hall', this)">Living Area</button>
-        <button class="btn btn-outline-dark rounded-pill px-4" onclick="filterVilla('garden', this)">Garden</button>
+        <button class="btn btn-dark rounded-pill px-4 filter-btn" data-filter="all">All</button>
+        <button class="btn btn-outline-dark rounded-pill px-4 filter-btn" data-filter="pool">Pool</button>
+        <button class="btn btn-outline-dark rounded-pill px-4 filter-btn" data-filter="bedroom">Bedrooms</button>
+        <button class="btn btn-outline-dark rounded-pill px-4 filter-btn" data-filter="hall">Living Area</button>
+        <button class="btn btn-outline-dark rounded-pill px-4 filter-btn" data-filter="garden">Garden</button>
     </div>
 
     <div class="row g-3" id="photo-grid">
         {% for p in photos %}
             {% for key in ['Image_Main', 'Image_2', 'Image_3'] %}
-                {% if p[key] %}
-                {# यहाँ हम कैटेगरी को साफ़ करके क्लास में डाल रहे हैं #}
-                <div class="col-md-4 col-sm-6 villa-photo-item {{ p.Category | lower | replace(' ', '') }}">
-                    <div class="rounded-4 overflow-hidden shadow-sm position-relative" style="height: 280px; cursor: pointer;" onclick="openModal('{{ p[key] }}')">
-                        <img src="{{ p[key] }}" class="w-100 h-100" style="object-fit: cover;">
-                        <div class="position-absolute bottom-0 start-0 p-2 bg-dark bg-opacity-60 text-white small w-100">
-                            {{ p.Category }}
+                {% if p[key] and p[key] != '' %}
+                {# यहाँ हम क्लास को बहुत सुरक्षित तरीके से बना रहे हैं #}
+                <div class="col-md-4 col-sm-6 villa-photo-item all {{ p.Category | lower | replace(' ', '') if p.Category else '' }}">
+                    <div class="gallery-card shadow-sm" onclick="openModal('{{ p[key] }}')">
+                        <img src="{{ p[key] }}" class="img-fluid" alt="Villa Image">
+                        <div class="photo-info">
+                            {{ p.Category if p.Category else 'Luxury View' }}
                         </div>
                     </div>
                 </div>
@@ -35,45 +37,49 @@
 </div>
 
 <div id="imgModal" class="img-modal" onclick="this.style.display='none'">
-    <span class="close">&times;</span>
+    <span class="close-btn">&times;</span>
     <img class="modal-content" id="modalImg">
 </div>
 
 <style>
-    .img-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
-    .modal-content { max-width: 90%; max-height: 85%; border-radius: 10px; border: 3px solid white; }
-    .close { position: absolute; top: 20px; right: 35px; color: white; font-size: 50px; cursor: pointer; }
+    .gallery-card { position: relative; border-radius: 15px; overflow: hidden; height: 280px; cursor: pointer; background: #f8f9fa; }
+    .gallery-card img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s; }
+    .gallery-card:hover img { transform: scale(1.05); }
     
-    /* Smooth Transition */
-    .villa-photo-item { transition: transform 0.3s ease, opacity 0.3s ease; }
+    .photo-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 10px; background: rgba(0,0,0,0.6); color: white; font-size: 12px; }
+    
+    .img-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; padding: 20px; }
+    .modal-content { max-width: 100%; max-height: 90%; border-radius: 10px; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+    .close-btn { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; }
+    
+    /* Smooth transition */
+    .villa-photo-item { transition: 0.3s; }
 </style>
 
 <script>
-    function filterVilla(cat, btn) {
-        // 1. बटन का रंग बदलें
-        let buttons = document.querySelectorAll('#filter-group .btn');
-        buttons.forEach(b => {
-            b.classList.remove('btn-dark');
-            b.classList.add('btn-outline-dark');
-        });
-        btn.classList.add('btn-dark');
-        btn.classList.remove('btn-outline-dark');
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // बटन का कलर बदलें
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.replace('btn-dark', 'btn-outline-dark');
+            });
+            this.classList.replace('btn-outline-dark', 'btn-dark');
 
-        // 2. फोटो फिल्टर करें
-        let items = document.querySelectorAll('.villa-photo-item');
-        let searchTag = cat.toLowerCase().trim();
+            const filterValue = this.getAttribute('data-filter').toLowerCase();
+            const items = document.querySelectorAll('.villa-photo-item');
 
-        items.forEach(item => {
-            // हम चेक करेंगे कि क्या आइटम की क्लास में वह शब्द है
-            if (searchTag === 'all' || item.classList.contains(searchTag)) {
-                item.style.display = 'block';
-                setTimeout(() => { item.style.opacity = '1'; }, 10);
-            } else {
-                item.style.opacity = '0';
-                setTimeout(() => { item.style.display = 'none'; }, 300);
-            }
+            items.forEach(item => {
+                // 'all' या मैचिंग क्लास होने पर दिखाएं
+                if (filterValue === 'all' || item.classList.contains(filterValue)) {
+                    item.style.display = 'block';
+                    setTimeout(() => { item.style.opacity = '1'; }, 10);
+                } else {
+                    item.style.opacity = '0';
+                    setTimeout(() => { item.style.display = 'none'; }, 200);
+                }
+            });
         });
-    }
+    });
 
     function openModal(src) {
         document.getElementById('modalImg').src = src;
