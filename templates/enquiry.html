@@ -10,7 +10,7 @@
                     <p class="text-muted">Fill in the details to get a quote</p>
                 </div>
                 
-                <form action="/submit_enquiry" method="POST">
+                <form action="/enquiry/{{ villa_id }}" method="POST">
                     <input type="hidden" name="villa_id" value="{{ villa_id }}">
 
                     <div class="mb-3">
