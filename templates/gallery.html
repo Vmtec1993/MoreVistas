@@ -5,14 +5,14 @@
     <div class="row g-4 justify-content-center">
         {% set shown_villas = [] %}
         {% for villa in villas %}
-            {% if villa.Name not in shown_villas %}
+            {% if villa.Name and villa.Name not in shown_villas %}
             <div class="col-md-6 col-lg-4">
                 <a href="/gallery/{{ villa.Name | lower | replace(' ', '') }}" class="text-decoration-none">
                     <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                        <img src="{{ villa.display_image }}" class="card-img-top" style="height: 300px; object-fit: cover;">
+                        <img src="{{ villa.display_image }}" class="card-img-top" style="height: 300px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
                         <div class="card-body bg-white">
                             <h4 class="fw-bold text-dark mb-0">{{ villa.Name }}</h4>
-                            <small class="text-warning">Click to view full photos</small>
+                            <small class="text-warning">Tap to View Full Gallery</small>
                         </div>
                     </div>
                 </a>
