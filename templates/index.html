@@ -1,1 +1,131 @@
 
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .discount-badge-mini {
+        font-size: 0.65rem;
+        background-color: #28a745;
+        color: white;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-weight: 800;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 5px;
+        text-transform: uppercase;
+    }
+    .timer-box {
+        background: rgba(0,0,0,0.7);
+        color: #fff;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 5px;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 4px;
+    }
+</style>
+
+<header class="py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 100px 0 !important;">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Welcome to MoreVistas</h1>
+        <p class="lead opacity-75">Curated Luxury Stays for Your Perfect Getaway.</p>
+    </div>
+</header>
+
+<div class="container my-5">
+    <div class="row g-4">
+        {% for villa in villas %}
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm villa-card" style="border-radius: 20px; overflow: hidden; position: relative;">
+                
+                <div style="height: 240px; background: #eee; overflow: hidden;">
+                    {% set img_url = villa.get('Image_URL', '') %}
+                    <img src="{{ img_url }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1580587771525-78b9daa3b6af?q=80&w=1000';">
+                </div>
+
+                {% set offer = villa.get('Offer', '') %}
+                {% set expiry = villa.get('Offer_End', '') %}
+                {% if offer and offer|string != "nan" %}
+                <div style="position: absolute; top: 15px; left: 15px; z-index: 10;">
+                    <div style="background: #ff4d4d; color: white; padding: 6px 12px; border-radius: 50px; font-weight: bold; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                        <i class="bi bi-fire"></i> {{ offer }}
+                    </div>
+                    {% if expiry and expiry|string != "nan" %}
+                    <div class="timer-box">
+                        Ends In: <span class="main-timer" data-expire="{{ expiry }}">Loading...</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h4 class="fw-bold m-0 text-dark">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h4>
+                        <span class="badge bg-light text-primary border border-primary small">{{ villa.get('BHK', '3') }} BHK</span>
+                    </div>
+                    
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, Maharashtra</p>
+                    
+                    <div class="d-flex gap-3 mb-4 text-secondary" style="font-size: 0.85rem;">
+                        <span><i class="bi bi-water text-primary"></i> Pool</span>
+                        <span><i class="bi bi-snow text-info"></i> AC</span>
+                        <span><i class="bi bi-wifi text-success"></i> Wifi</span>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                        <div>
+                            {% set original = (villa.get('Original_Price') or 0) | float %}
+                            {% set current = (villa.get('Price') or villa.get('price') or 0) | float %}
+                            
+                            {% if original > current and current > 0 %}
+                                <div class="d-flex align-items-center mb-0" style="line-height: 1;">
+                                    <small class="text-muted text-decoration-line-through" style="font-size: 0.8rem;">₹{{ original | int }}</small>
+                                    {% set disc_perc = (((original - current) / original) * 100) | round | int %}
+                                    <span class="discount-badge-mini">{{ disc_perc }}% OFF</span>
+                                </div>
+                            {% endif %}
+                            
+                            <h5 class="m-0 fw-bold text-primary">
+                                ₹{{ current | int if current > 0 else 'Call for Price' }}
+                                <small class="text-muted fw-normal fs-6">/{{ villa.get('Per_Night', 'night') }}</small>
+                            </h5>
+                        </div>
+                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">View Villa</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function startMainTimers() {
+        document.querySelectorAll('.main-timer').forEach(timer => {
+            const expireDateStr = timer.getAttribute('data-expire');
+            const countTo = new Date(expireDateStr).getTime();
+            
+            const x = setInterval(function() {
+                const now = new Date().getTime();
+                const diff = countTo - now;
+
+                if (isNaN(countTo) || diff < 0) {
+                    timer.innerHTML = "Limited Time";
+                    clearInterval(x);
+                    return;
+                }
+
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                timer.innerHTML = h + "h " + m + "m " + s + "s";
+            }, 1000);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', startMainTimers);
+</script>
+
+{% endblock %}
