@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 p-4 rounded-4">
+                <h2 class="fw-bold mb-3 text-center">Contact <span class="text-primary">Us</span></h2>
+                <p class="text-muted text-center mb-4">हमसे संपर्क करने के लिए नीचे दिए गए बटन का उपयोग करें।</p>
+                
+                <div class="list-group list-group-flush mb-4">
+                    <div class="list-group-item d-flex align-items-center py-3 border-0">
+                        <i class="bi bi-geo-alt-fill text-primary fs-4 me-3"></i>
+                        <span>Lonavala, Maharashtra, India</span>
+                    </div>
+                    <div class="list-group-item d-flex align-items-center py-3 border-0">
+                        <i class="bi bi-telephone-fill text-success fs-4 me-3"></i>
+                        <span>+91 XXXXXXXXXX</span>
+                    </div>
+                    <div class="list-group-item d-flex align-items-center py-3 border-0">
+                        <i class="bi bi-envelope-fill text-danger fs-4 me-3"></i>
+                        <span>info@morevistas.com</span>
+                    </div>
+                </div>
+
+                <a href="https://wa.me/91XXXXXXXXXX" class="btn btn-success w-100 rounded-pill py-2 fw-bold">
+                    <i class="bi bi-whatsapp me-2"></i> Message on WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
