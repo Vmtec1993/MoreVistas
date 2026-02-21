@@ -1,98 +1,163 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoreVistas | Luxury Stays 2026</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fbfbfb; }
-        .brand-logo { height: 75px !important; width: auto; margin: -10px 0; object-fit: contain; }
-        .nav-brand-text { font-weight: 800; font-size: 1.6rem; color: #1a1a1a; letter-spacing: -1px; text-decoration: none; }
-        .promo-bar { background: #ff4d4d; color: white; padding: 8px 0; font-weight: 600; overflow: hidden; }
-        .offcanvas { width: 280px !important; }
+{% extends 'base.html' %}
+{% block content %}
 
-        .nav-link-custom { color: #1a1a1a; font-weight: 600; padding: 12px 15px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; }
-        .nav-link-custom:hover { background-color: #f0f0f0; color: #0d6efd; }
+<style>
+    .discount-badge-mini {
+        font-size: 0.65rem;
+        background-color: #28a745;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 800;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 5px;
+        text-transform: uppercase;
+    }
+    .timer-box {
+        background: rgba(0,0,0,0.85);
+        color: #fff;
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 6px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .villa-card { transition: 0.3s; border-radius: 20px !important; overflow: hidden; }
+    .villa-card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important; }
+    .feature-icon-box {
+        width: 60px; height: 60px; background: #e7f1ff; color: #0d6efd;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%; margin: 0 auto 15px; font-size: 1.5rem;
+    }
+</style>
 
-        /* 🔥 Naya Professional Footer Style */
-        .custom-footer { 
-            background: #0f172a; /* Deep Navy Blue Shade */
-            color: #cbd5e1; 
-            padding: 30px 0 20px 0; 
-            border-top: 3px solid #0d6efd; 
-        }
-        .footer-brand { color: #ffffff; font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; display: block; }
-        .footer-brand span { color: #0d6efd; }
-        
-        .social-links-footer { display: flex; justify-content: center; gap: 20px; margin-bottom: 15px; }
-        .social-links-footer a { color: #ffffff; font-size: 1.4rem; transition: 0.3s; opacity: 0.8; }
-        .social-links-footer a:hover { opacity: 1; transform: scale(1.1); color: #0d6efd; }
-        
-        .copyright-text { font-size: 0.8rem; letter-spacing: 0.5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 15px; }
-
-        @media (max-width: 576px) {
-            .brand-logo { height: 65px !important; }
-            .nav-brand-text { font-size: 1.3rem; }
-        }
-    </style>
-</head>
-<body>
-    <div class="promo-bar">
-        <marquee scrollamount="8">🔥 SPECIAL 2026 OFFER: 35% OFF | Weekend Special Live Now! 🔥</marquee>
+<header class="py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 100px 0 !important;">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Welcome to MoreVistas</h1>
+        <p class="lead opacity-75">Curated Luxury Stays for Your Perfect Getaway.</p>
     </div>
+</header>
 
-    <nav class="navbar navbar-light bg-white sticky-top shadow-sm py-1">
-        <div class="container d-flex align-items-center justify-content-between">
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <a class="navbar-brand d-flex align-items-center mx-auto" href="/">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="brand-logo">
-                <span class="nav-brand-text">More<span class="text-primary">Vistas</span></span>
-            </a>
-            <div style="width: 45px;"></div> 
-        </div>
-    </nav>
+<div class="container my-5">
+    <div class="row g-4">
+        {% for villa in villas %}
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm villa-card">
+                <div style="height: 250px; background: #f0f0f0; overflow: hidden; position: relative;">
+                    <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1580587771525-78b9daa3b6af?q=80&w=1000';">
+                    
+                    {% set offer = villa.get('Offer', '') %}
+                    {% set expiry = villa.get('Offer_End', '') | string | trim %}
+                    
+                    {% if offer and offer|lower != 'nan' and offer != '' %}
+                    <div style="position: absolute; top: 15px; left: 15px; z-index: 10;">
+                        <div style="background: #ff4d4d; color: white; padding: 6px 14px; border-radius: 50px; font-weight: bold; font-size: 0.8rem;">
+                            <i class="bi bi-fire"></i> {{ offer }}
+                        </div>
+                        {% if expiry and expiry|lower != 'nan' and expiry != '' %}
+                        <div class="timer-box">
+                            <i class="bi bi-clock-fill text-warning me-1"></i>Ends In: <span class="main-timer" data-expire="{{ expiry }}">Loading...</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
 
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
-        <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title fw-bold">Menu</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h4 class="fw-bold m-0 text-dark">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h4>
+                        <span class="badge bg-light text-primary border border-primary small">{{ villa.get('BHK', '3') }} BHK</span>
+                    </div>
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, Maharashtra</p>
+                    <div class="d-flex gap-3 mb-4 text-secondary" style="font-size: 0.85rem;">
+                        <span><i class="bi bi-water text-primary"></i> Pool</span>
+                        <span><i class="bi bi-snow text-info"></i> AC</span>
+                        <span><i class="bi bi-wifi text-success"></i> Wifi</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                        <div>
+                            {% set original = (villa.get('Original_Price') or 0) | float %}
+                            {% set current = (villa.get('Price') or 0) | float %}
+                            {% if original > current and current > 0 %}
+                                <div class="d-flex align-items-center mb-0" style="line-height: 1;">
+                                    <small class="text-muted text-decoration-line-through">₹{{ original | int }}</small>
+                                    <span class="discount-badge-mini">{{ (((original - current) / original) * 100) | round | int }}% OFF</span>
+                                </div>
+                            {% endif %}
+                            <h5 class="m-0 fw-bold text-primary">₹{{ current | int if current > 0 else 'Price on Request' }}<small class="text-muted fw-normal fs-6">/night</small></h5>
+                        </div>
+                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">View</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="offcanvas-body">
-            <div class="nav flex-column gap-2">
-                <a class="nav-link-custom" href="/"><i class="bi bi-house-door me-2"></i> Home</a>
-                <a class="nav-link-custom" href="/about"><i class="bi bi-info-circle me-2"></i> About Us</a>
-                <a class="nav-link-custom" href="/contact"><i class="bi bi-envelope me-2"></i> Contact Us</a>
+        {% endfor %}
+    </div>
+</div>
+
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3">Why stay with <span class="text-primary">MoreVistas</span>?</h2>
+        <p class="text-muted mb-5 mx-auto" style="max-width: 600px;">Lonavala is our home. We focus only on this hill town so your stay feels effortless.</p>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="p-4 bg-white shadow-sm rounded-4 h-100">
+                    <div class="feature-icon-box"><i class="bi bi-shield-check"></i></div>
+                    <h5 class="fw-bold">Curated Luxury Stays</h5>
+                    <p class="small text-muted mb-0">Each villa is personally checked for comfort and quality.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-4 bg-white shadow-sm rounded-4 h-100">
+                    <div class="feature-icon-box"><i class="bi bi-headset"></i></div>
+                    <h5 class="fw-bold">End-to-End Assistance</h5>
+                    <p class="small text-muted mb-0">Our team is available to make your holiday seamless.</p>
+                </div>
             </div>
         </div>
     </div>
+</section>
 
-    <main style="min-height: 70vh;">
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer class="custom-footer text-center">
-        <div class="container">
-            <a class="footer-brand" href="/">More<span>Vistas</span></a>
-            <p class="small mb-3">Creating Unforgettable Memories in Lonavala's Finest Villas.</p>
-            
-            <div class="social-links-footer">
-                <a href="#"><i class="bi bi-whatsapp"></i></a>
-                <a href="#"><i class="bi bi-facebook"></i></a>
-                <a href="#"><i class="bi bi-instagram"></i></a>
-            </div>
-
-            <div class="copyright-text">
-                © 2026 **MoreVistas**. All Rights Reserved. 
-                <br>
-                <span class="text-secondary" style="font-size: 0.7rem;">Luxury Experience • Premium Comfort • 24/7 Support</span>
+<section class="py-5">
+    <div class="container text-center">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <i class="bi bi-quote text-primary opacity-25" style="font-size: 3rem;"></i>
+                <h3 class="fw-bold">Experience Nature with Comfort</h3>
+                <p class="text-secondary mb-4">Create memories that last a lifetime in Lonavala.</p>
+                <div class="p-4 border rounded-4 bg-white shadow-sm">
+                    <p class="mb-2 fw-bold text-dark">Ready for your getaway?</p>
+                    <a href="https://wa.me/91XXXXXXXXXX" class="btn btn-success rounded-pill px-4">
+                        <i class="bi bi-whatsapp me-2"></i>Contact on WhatsApp
+                    </a>
+                </div>
             </div>
         </div>
-    </footer>
+    </div>
+</section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<script>
+    function startMainTimers() {
+        document.querySelectorAll('.main-timer').forEach(timer => {
+            let expireDateStr = timer.getAttribute('data-expire');
+            if (!expireDateStr || expireDateStr.toLowerCase() === "nan") return;
+            let countTo = new Date(expireDateStr.replace(" ", "T")).getTime();
+            if (isNaN(countTo)) return;
+            setInterval(function() {
+                let now = new Date().getTime();
+                let diff = countTo - now;
+                if (diff < 0) { timer.innerHTML = "EXPIRED"; return; }
+                let h = Math.floor(diff / (1000 * 60 * 60)); 
+                let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                let s = Math.floor((diff % (1000 * 60)) / 1000);
+                timer.innerHTML = h + "h " + (m < 10 ? "0"+m : m) + "m " + (s < 10 ? "0"+s : s) + "s";
+            }, 1000);
+        });
+    }
+    window.onload = startMainTimers;
+</script>
+
+{% endblock %}
