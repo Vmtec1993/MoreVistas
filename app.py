@@ -52,7 +52,7 @@ def index():
         for v in villas:
             v['Original_Price'] = v.get('Original_Price', '')
             v['Offer'] = v.get('Offer', '')
-            v['Status'] = v.get('Status', 'Available') # Index page ke liye bhi status
+            v['Status'] = v.get('Status', 'Available')
     return render_template('index.html', villas=villas)
 
 @app.route('/villa/<villa_id>')
@@ -61,7 +61,6 @@ def villa_details(villa_id):
         villas = sheet.get_all_records()
         villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
         if villa:
-            # --- SABHI NAYE COLUMNS YAHAN CONNECT HAIN ---
             villa['Original_Price'] = villa.get('Original_Price', '')
             villa['Guests'] = villa.get('Guests', '12')
             villa['Bedrooms'] = villa.get('Bedrooms', villa.get('BHK', ''))
@@ -69,7 +68,6 @@ def villa_details(villa_id):
             villa['Amenities'] = villa.get('Amenities', '')
             villa['Rules'] = villa.get('Rules', '')
             villa['Status'] = villa.get('Status', 'Available')
-            # --------------------------------------------
             return render_template('villa_details.html', villa=villa)
     return "Villa info not found", 404
 
@@ -91,6 +89,7 @@ def enquiry(villa_id):
 
             if enquiry_sheet:
                 try:
+                    # Yahan data sheet mein ja raha hai
                     enquiry_sheet.append_row([today_date, name, phone, check_in, check_out, guests, msg])
                 except Exception as e:
                     print(f"Append Error: {e}")
@@ -111,10 +110,16 @@ def enquiry(villa_id):
         return render_template('enquiry.html', villa=villa)
     return "Error", 500
 
-import os
+# --- AB YAHAN SE NAYA ADD HUA HAI ---
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+# ------------------------------------
 
 if __name__ == "__main__":
-    # Render को पोर्ट बताने के लिए यह जरूरी है
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    
