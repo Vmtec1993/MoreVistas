@@ -9,22 +9,26 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fbfbfb; }
         
-        /* 🔥 CLEAN LOGO SETTINGS - No Blank Screen */
-        .brand-logo { 
-            height: 80px !important; /* साइज को बैलेंस रखा है */
-            width: auto; 
-            margin: -10px 0;
-            object-fit: contain;
+        /* लोगो सेटिंग्स */
+        .brand-logo { height: 80px !important; width: auto; margin: -10px 0; object-fit: contain; }
+        .nav-brand-text { font-weight: 800; font-size: 1.6rem; color: #1a1a1a; letter-spacing: -1px; text-decoration: none; }
+        
+        /* 🔥 डिस्काउंट टैग की स्टाइलिंग (हरे रंग का छोटा डब्बा) */
+        .discount-tag-mini {
+            font-size: 0.62rem;
+            background-color: #28a745;
+            color: white;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: 800;
+            display: inline-block;
+            margin-left: 5px;
+            text-transform: uppercase;
+            vertical-align: middle;
+            line-height: 1.2;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .nav-brand-text { 
-            font-weight: 800; 
-            font-size: 1.6rem; 
-            color: #1a1a1a; 
-            letter-spacing: -1px; 
-            text-decoration: none;
-        }
-        
         .promo-bar { background: #ff4d4d; color: white; padding: 8px 0; font-weight: 600; overflow: hidden; }
         .offcanvas { width: 280px !important; }
         .nav-link:hover { color: #007bff !important; }
@@ -53,7 +57,6 @@
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="brand-logo">
                 <span class="nav-brand-text">More<span class="text-primary">Vistas</span></span>
             </a>
-            
             <div style="width: 45px;"></div> 
         </div>
     </nav>
@@ -76,20 +79,16 @@
 
     <footer class="bg-dark text-white pt-5 pb-4 mt-5">
         <div class="container text-center">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas" style="height: 80px; width: auto; margin-bottom: 10px;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas" style="height: 60px; width: auto; margin-bottom: 10px;">
             <h4 class="fw-bold mb-1">MoreVistas</h4>
             <p class="text-secondary small mb-4">Your Trusted Partner for Luxury Stays since 2026.</p>
-            
             <div class="d-flex justify-content-center gap-4 mb-4 fs-3">
-                <a href="https://wa.me/918830024994" class="text-success hover-zoom" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
-                <a href="#" class="text-danger hover-zoom" title="Instagram"><i class="bi bi-instagram"></i></a>
-                <a href="#" class="text-primary hover-zoom" title="Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="https://wa.me/918830024994" class="text-success hover-zoom"><i class="bi bi-whatsapp"></i></a>
+                <a href="#" class="text-danger hover-zoom"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="text-primary hover-zoom"><i class="bi bi-facebook"></i></a>
             </div>
-
             <hr class="border-secondary opacity-25">
-            <p class="mb-0 text-secondary" style="font-size: 0.8rem;">
-                © 2026 <strong>MoreVistas</strong>. Built with ❤️ in Lonavala.
-            </p>
+            <p class="mb-0 text-secondary" style="font-size: 0.8rem;">© 2026 <strong>MoreVistas</strong>. Built with ❤️ in Lonavala.</p>
         </div>
     </footer>
 
