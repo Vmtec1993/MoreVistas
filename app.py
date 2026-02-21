@@ -52,6 +52,7 @@ def index():
         for v in villas:
             v['Original_Price'] = v.get('Original_Price', '')
             v['Offer'] = v.get('Offer', '')
+            v['Status'] = v.get('Status', 'Available') # Index page ke liye bhi status
     return render_template('index.html', villas=villas)
 
 @app.route('/villa/<villa_id>')
@@ -60,12 +61,15 @@ def villa_details(villa_id):
         villas = sheet.get_all_records()
         villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
         if villa:
-            # --- YAHAN BADLAV KIYA HAI (Naye Columns ka data fetch karne ke liye) ---
+            # --- SABHI NAYE COLUMNS YAHAN CONNECT HAIN ---
             villa['Original_Price'] = villa.get('Original_Price', '')
-            villa['Guests'] = villa.get('Guests', '')
-            villa['Bedrooms'] = villa.get('Bedrooms', '')
+            villa['Guests'] = villa.get('Guests', '12')
+            villa['Bedrooms'] = villa.get('Bedrooms', villa.get('BHK', ''))
+            villa['Bathrooms'] = villa.get('Bathrooms', '2')
+            villa['Amenities'] = villa.get('Amenities', '')
             villa['Rules'] = villa.get('Rules', '')
-            # -----------------------------------------------------------------------
+            villa['Status'] = villa.get('Status', 'Available')
+            # --------------------------------------------
             return render_template('villa_details.html', villa=villa)
     return "Villa info not found", 404
 
