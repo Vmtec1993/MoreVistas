@@ -9,27 +9,101 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fbfbfb; }
         
-        /* 🔥 LOGO ZOOM SETTINGS */
+        /* 🔥 CLEAN LOGO SETTINGS - No Blank Screen */
         .brand-logo { 
-            height: 120px !important; /* हाइट को बहुत बढ़ा दिया है */
+            height: 80px !important; /* साइज को बैलेंस रखा है */
             width: auto; 
-            margin-top: -15px; /* ऊपर की खाली जगह कम करने के लिए */
-            margin-bottom: -15px; /* नीचे की खाली जगह कम करने के लिए */
-            margin-right: -10px; /* टेक्स्ट के करीब लाने के लिए */
+            margin: -10px 0;
             object-fit: contain;
-            transform: scale(1.8); /* लोगो को अंदर से और बड़ा दिखाने के लिए */
-            transform-origin: center;
         }
 
         .nav-brand-text { 
             font-weight: 800; 
-            font-size: 1.8rem; /* टेक्स्ट भी थोड़ा बड़ा किया */
+            font-size: 1.6rem; 
             color: #1a1a1a; 
             letter-spacing: -1px; 
             text-decoration: none;
-            margin-left: 25px; /* लोगो स्केल होने की वजह से थोड़ी जगह छोड़ी */
         }
         
         .promo-bar { background: #ff4d4d; color: white; padding: 8px 0; font-weight: 600; overflow: hidden; }
-        .offcanvas
-        
+        .offcanvas { width: 280px !important; }
+        .nav-link:hover { color: #007bff !important; }
+
+        @media (max-width: 576px) {
+            .brand-logo { height: 70px !important; }
+            .nav-brand-text { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="promo-bar">
+        <marquee scrollamount="8" onmouseover="this.stop();" onmouseout="this.start();">
+            🔥 SPECIAL 2026 OFFER: Use Code 'MOREVISTAS' for 20% OFF | Weekday Special Live Now! | Offer ends in: <span id="timer">04:59:59</span> 🔥
+        </marquee>
+    </div>
+
+    <nav class="navbar navbar-light bg-white sticky-top shadow-sm py-1">
+        <div class="container d-flex align-items-center justify-content-between">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand d-flex align-items-center mx-auto" href="/">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="brand-logo">
+                <span class="nav-brand-text">More<span class="text-primary">Vistas</span></span>
+            </a>
+            
+            <div style="width: 45px;"></div> 
+        </div>
+    </nav>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title fw-bold">MoreVistas Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column gap-3 fs-5">
+                <li class="nav-item"><a class="nav-link text-dark fw-medium" href="/"><i class="bi bi-house-door me-2"></i> Home</a></li>
+                <li class="nav-item"><a class="nav-link text-dark fw-medium" href="/#about-section"><i class="bi bi-info-circle me-2"></i> About Us</a></li>
+                <li class="nav-item"><a class="nav-link text-dark fw-medium" href="https://wa.me/918830024994"><i class="bi bi-whatsapp me-2"></i> Contact Support</a></li>
+            </ul>
+        </div>
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <footer class="bg-dark text-white pt-5 pb-4 mt-5">
+        <div class="container text-center">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas" style="height: 80px; width: auto; margin-bottom: 10px;">
+            <h4 class="fw-bold mb-1">MoreVistas</h4>
+            <p class="text-secondary small mb-4">Your Trusted Partner for Luxury Stays since 2026.</p>
+            
+            <div class="d-flex justify-content-center gap-4 mb-4 fs-3">
+                <a href="https://wa.me/918830024994" class="text-success hover-zoom" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                <a href="#" class="text-danger hover-zoom" title="Instagram"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="text-primary hover-zoom" title="Facebook"><i class="bi bi-facebook"></i></a>
+            </div>
+
+            <hr class="border-secondary opacity-25">
+            <p class="mb-0 text-secondary" style="font-size: 0.8rem;">
+                © 2026 <strong>MoreVistas</strong>. Built with ❤️ in Lonavala.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let time = 18000; 
+        setInterval(() => {
+            if(time <= 0) time = 18000;
+            let h = Math.floor(time / 3600);
+            let m = Math.floor((time % 3600) / 60);
+            let s = time % 60;
+            document.getElementById('timer').innerHTML = `${h}h ${m}m ${s}s`;
+            time--;
+        }, 1000);
+    </script>
+</body>
+</html>
