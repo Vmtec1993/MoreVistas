@@ -6,7 +6,7 @@
         font-size: 0.65rem;
         background-color: #28a745;
         color: white;
-        padding: 1px 6px;
+        padding: 2px 8px;
         border-radius: 4px;
         font-weight: 800;
         display: inline-block;
@@ -15,21 +15,22 @@
         text-transform: uppercase;
     }
     .timer-box {
-        background: rgba(0,0,0,0.8);
+        background: rgba(0,0,0,0.85);
         color: #fff;
         font-size: 11px;
-        padding: 3px 8px;
-        border-radius: 5px;
+        padding: 4px 10px;
+        border-radius: 6px;
         font-weight: bold;
         display: inline-block;
-        margin-top: 5px;
-        border: 1px solid rgba(255,255,255,0.1);
+        margin-top: 6px;
+        border: 1px solid rgba(255,255,255,0.2);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
-    .villa-card { transition: 0.3s; }
-    .villa-card:hover { transform: translateY(-5px); }
+    .villa-card { transition: all 0.3s ease; border-radius: 20px !important; overflow: hidden; }
+    .villa-card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important; }
 </style>
 
-<header class="py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 80px 0 !important;">
+<header class="py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 100px 0 !important;">
     <div class="container">
         <h1 class="display-4 fw-bold">Welcome to MoreVistas</h1>
         <p class="lead opacity-75">Curated Luxury Stays for Your Perfect Getaway.</p>
@@ -40,32 +41,32 @@
     <div class="row g-4">
         {% for villa in villas %}
         <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm villa-card" style="border-radius: 20px; overflow: hidden; position: relative;">
+            <div class="card h-100 border-0 shadow-sm villa-card">
                 
-                <div style="height: 240px; background: #eee; overflow: hidden;">
+                <div style="height: 250px; background: #f0f0f0; overflow: hidden; position: relative;">
                     {% set img_url = villa.get('Image_URL', '') %}
                     <img src="{{ img_url }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1580587771525-78b9daa3b6af?q=80&w=1000';">
-                </div>
-
-                {% set offer = villa.get('Offer', '') %}
-                {% set expiry = villa.get('Offer_End', '') | string %}
-                
-                {% if offer and offer != 'nan' and offer != '' %}
-                <div style="position: absolute; top: 15px; left: 15px; z-index: 10;">
-                    <div style="background: #ff4d4d; color: white; padding: 6px 12px; border-radius: 50px; font-weight: bold; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                        <i class="bi bi-fire"></i> {{ offer }}
-                    </div>
-                    {% if expiry and expiry != 'nan' and expiry != '' %}
-                    <div class="timer-box">
-                        <i class="bi bi-clock-fill me-1"></i>Ends In: <span class="main-timer" data-expire="{{ expiry }}">Loading...</span>
+                    
+                    {% set offer = villa.get('Offer', '') %}
+                    {% set expiry = villa.get('Offer_End', '') | string | trim %}
+                    
+                    {% if offer and offer|lower != 'nan' and offer != '' %}
+                    <div style="position: absolute; top: 15px; left: 15px; z-index: 10;">
+                        <div style="background: #ff4d4d; color: white; padding: 6px 14px; border-radius: 50px; font-weight: bold; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                            <i class="bi bi-fire"></i> {{ offer }}
+                        </div>
+                        {% if expiry and expiry|lower != 'nan' and expiry != '' %}
+                        <div class="timer-box">
+                            <i class="bi bi-clock-fill text-warning me-1"></i>Ends: <span class="main-timer" data-expire="{{ expiry }}">Loading...</span>
+                        </div>
+                        {% endif %}
                     </div>
                     {% endif %}
                 </div>
-                {% endif %}
 
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h4 class="fw-bold m-0 text-dark">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h4>
+                        <h4 class="fw-bold m-0 text-dark" style="letter-spacing: -0.5px;">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h4>
                         <span class="badge bg-light text-primary border border-primary small">{{ villa.get('BHK', '3') }} BHK</span>
                     </div>
                     
@@ -99,7 +100,7 @@
                                 <small class="text-muted fw-normal fs-6">/{{ villa.get('Per_Night', 'night') }}</small>
                             </h5>
                         </div>
-                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">View Villa</a>
+                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">View</a>
                     </div>
                 </div>
             </div>
@@ -112,19 +113,30 @@
     function startMainTimers() {
         document.querySelectorAll('.main-timer').forEach(timer => {
             let expireDateStr = timer.getAttribute('data-expire');
-            if (!expireDateStr || expireDateStr === "nan" || expireDateStr === "") return;
+            
+            if (!expireDateStr || expireDateStr.toLowerCase() === "nan" || expireDateStr === "") {
+                timer.closest('.timer-box').style.display = 'none';
+                return;
+            }
 
-            // Normalize Date Format for JS
+            // 🛠️ Date Formatting Fix (Handles DD/MM/YYYY and YYYY-MM-DD)
+            let finalDateStr = expireDateStr;
             if (expireDateStr.includes('/')) {
                 let parts = expireDateStr.split(' ')[0].split('/');
                 let timePart = expireDateStr.split(' ')[1] || "23:59:59";
-                if (parts[0].length === 2) { 
-                    expireDateStr = parts[2] + "-" + parts[1] + "-" + parts[0] + " " + timePart;
+                if (parts[0].length === 2) { // if DD/MM/YYYY
+                    finalDateStr = `${parts[2]}-${parts[1]}-${parts[0]}T${timePart}`;
                 }
+            } else {
+                finalDateStr = expireDateStr.replace(" ", "T");
             }
 
-            const countTo = new Date(expireDateStr).getTime();
-            if (isNaN(countTo)) return;
+            const countTo = new Date(finalDateStr).getTime();
+            
+            if (isNaN(countTo)) {
+                timer.innerHTML = "Limited Time";
+                return;
+            }
 
             const x = setInterval(function() {
                 const now = new Date().getTime();
@@ -144,7 +156,8 @@
             }, 1000);
         });
     }
-    document.addEventListener('DOMContentLoaded', startMainTimers);
+    // Run after page loads
+    window.onload = startMainTimers;
 </script>
 
 {% endblock %}
