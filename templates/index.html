@@ -27,6 +27,13 @@
     }
     .villa-card { transition: 0.3s; border-radius: 20px !important; overflow: hidden; }
     .villa-card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important; }
+    
+    /* Extra Style for Why Us Section */
+    .feature-icon-box {
+        width: 60px; height: 60px; background: #e7f1ff; color: #0d6efd;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%; margin: 0 auto 15px; font-size: 1.5rem;
+    }
 </style>
 
 <header class="py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 100px 0 !important;">
@@ -104,47 +111,7 @@
     </div>
 </div>
 
-<script>
-    function startMainTimers() {
-        document.querySelectorAll('.main-timer').forEach(timer => {
-            let expireDateStr = timer.getAttribute('data-expire');
-            if (!expireDateStr || expireDateStr.toLowerCase() === "nan") return;
-
-            // Date Format Normalization
-            let finalDateStr = expireDateStr;
-            if (expireDateStr.includes('/')) {
-                let parts = expireDateStr.split(' ')[0].split('/');
-                let timePart = expireDateStr.split(' ')[1] || "23:59:59";
-                if (parts[0].length === 2) { 
-                    finalDateStr = parts[2] + "-" + parts[1] + "-" + parts[0] + "T" + timePart;
-                }
-            } else {
-                finalDateStr = expireDateStr.replace(" ", "T");
-            }
-
-            const countTo = new Date(finalDateStr).getTime();
-            if (isNaN(countTo)) return;
-
-            const x = setInterval(function() {
-                const now = new Date().getTime();
-                const diff = countTo - now;
-
-                if (diff < 0) {
-                    timer.innerHTML = "EXPIRED";
-                    clearInterval(x);
-                    return;
-                }
-
-                // Calculation to show TOTAL HOURS (including days)
-                const h = Math.floor(diff / (1000 * 60 * 60)); // 👈 Yahan change kiya hai
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-                timer.innerHTML = h + "h " + (m < 10 ? "0"+m : m) + "m " + (s < 10 ? "0"+s : s) + "s";
-            }, 1000);
-        });
-    }
-    window.onload = startMainTimers;
-</script>
-
-{% endblock %}
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h2
+            
