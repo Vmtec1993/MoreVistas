@@ -9,17 +9,22 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fbfbfb; }
         
-        /* Logo Styling */
-        .brand-logo { height: 45px; width: auto; margin-right: 8px; border-radius: 50%; }
-        .nav-brand-text { font-weight: 800; font-size: 1.5rem; color: #1a1a1a; letter-spacing: -1px; text-decoration: none; }
+        /* 🔥 LOGO SIZE INCREASED HERE */
+        .brand-logo { 
+            height: 70px !important; /* साइज 45 से बढ़ाकर 70 कर दिया */
+            width: auto; 
+            margin-right: -5px; /* टेक्स्ट के करीब लाने के लिए */
+            transition: transform 0.3s ease;
+        }
+        .brand-logo:hover { transform: scale(1.05); }
+
+        .nav-brand-text { font-weight: 800; font-size: 1.6rem; color: #1a1a1a; letter-spacing: -1px; text-decoration: none; }
         
         /* Running Offer Bar */
         .promo-bar { background: #ff4d4d; color: white; padding: 8px 0; font-weight: 600; overflow: hidden; }
 
         /* Sidebar Customization */
         .offcanvas { width: 280px !important; }
-        
-        /* Smooth link color */
         .nav-link:hover { color: #007bff !important; }
     </style>
 </head>
@@ -31,19 +36,18 @@
         </marquee>
     </div>
 
-    <nav class="navbar navbar-light bg-white sticky-top shadow-sm py-3">
-        <div class="container text-center">
+    <nav class="navbar navbar-light bg-white sticky-top shadow-sm py-2">
+        <div class="container d-flex align-items-center justify-content-between">
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <a class="navbar-brand d-flex align-items-center mx-auto" href="/">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="brand-logo shadow-sm">
+            <a class="navbar-brand d-flex align-items-center mx-auto" href="/" style="margin-left: -20px !important;">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="brand-logo">
                 <span class="nav-brand-text">More<span class="text-primary">Vistas</span></span>
             </a>
             
-            <div style="width: 40px;"></div>
-        </div>
+            <div style="width: 45px;"></div> </div>
     </nav>
 
     <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
@@ -64,35 +68,11 @@
 
     <footer class="bg-dark text-white pt-5 pb-4 mt-5">
         <div class="container text-center">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas" style="height: 40px; width: auto;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas" style="height: 80px; width: auto; margin-bottom: 10px;">
             <h4 class="fw-bold mb-1">MoreVistas</h4>
             <p class="text-secondary small mb-4">Your Trusted Partner for Luxury Stays since 2026.</p>
             
             <div class="d-flex justify-content-center gap-4 mb-4 fs-3">
                 <a href="https://wa.me/918830024994" class="text-success hover-zoom" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
-                <a href="#" class="text-danger hover-zoom" title="Instagram"><i class="bi bi-instagram"></i></a>
-                <a href="#" class="text-primary hover-zoom" title="Facebook"><i class="bi bi-facebook"></i></a>
-            </div>
-
-            <hr class="border-secondary opacity-25">
-            <p class="mb-0 text-secondary" style="font-size: 0.8rem;">
-                © 2026 <strong>MoreVistas</strong>. Built with ❤️ in Lonavala.
-            </p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Simple Timer Logic
-        let time = 18000; // 5 hours in seconds
-        setInterval(() => {
-            if(time <= 0) time = 18000;
-            let h = Math.floor(time / 3600);
-            let m = Math.floor((time % 3600) / 60);
-            let s = time % 60;
-            document.getElementById('timer').innerHTML = `${h}h ${m}m ${s}s`;
-            time--;
-        }, 1000);
-    </script>
-</body>
-</html>
+                <a href
+                    
