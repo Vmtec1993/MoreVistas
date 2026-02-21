@@ -4,7 +4,7 @@
 <style>
     .discount-badge-mini {
         font-size: 0.65rem;
-        background-color: #28a745; /* हरा रंग */
+        background-color: #28a745; /* Green Color */
         color: white;
         padding: 1px 6px;
         border-radius: 4px;
@@ -15,6 +15,7 @@
         text-transform: uppercase;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    .villa-card:hover { transform: translateY(-5px); transition: 0.3s; }
 </style>
 
 <header class="py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 100px 0 !important;">
@@ -31,30 +32,26 @@
             <div class="card h-100 border-0 shadow-sm villa-card" style="border-radius: 20px; overflow: hidden; position: relative;">
                 
                 <div style="height: 240px; background: #eee; overflow: hidden;">
-                    {% set img_url = villa.Image_URL %}
+                    {% set img_url = villa.get('Image_URL', '') %}
                     {% if img_url and 'drive.google.com' in img_url %}
                         {% set img_url = img_url.replace('/file/d/', '/uc?export=view&id=').replace('/view?usp=sharing', '').replace('/view', '') %}
                     {% endif %}
                     <img src="{{ img_url }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1580587771525-78b9daa3b6af?q=80&w=1000';">
                 </div>
 
-                {% if villa.Offer and villa.Offer|string != "nan" %}
+                {% set offer = villa.get('Offer', '') %}
+                {% if offer and offer|string != "nan" %}
                 <div style="position: absolute; top: 15px; left: 15px; z-index: 10;">
                     <div style="background: #ff4d4d; color: white; padding: 6px 12px; border-radius: 50px; font-weight: bold; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                        <i class="bi bi-fire"></i> {{ villa.Offer }}
+                        <i class="bi bi-fire"></i> {{ offer }}
                     </div>
-                    {% if villa.Offer_End and villa.Offer_End|string != "nan" %}
-                    <div class="mt-1 text-white text-center fw-bold" style="background: rgba(0,0,0,0.7); font-size: 11px; border-radius: 5px; padding: 2px 8px;">
-                        Ends In: <span class="main-timer" data-expire="{{ villa.Offer_End }}">Loading...</span>
-                    </div>
-                    {% endif %}
                 </div>
                 {% endif %}
 
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h4 class="fw-bold m-0 text-dark">{{ villa.Villa_Name }}</h4>
-                        <span class="badge bg-light text-primary border border-primary small">{{ villa.BHK }} BHK</span>
+                        <h4 class="fw-bold m-0 text-dark">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h4>
+                        <span class="badge bg-light text-primary border border-primary small">{{ villa.get('BHK', '3') }} BHK</span>
                     </div>
                     
                     <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, Maharashtra</p>
@@ -67,22 +64,23 @@
 
                     <div class="d-flex align-items-center justify-content-between pt-3 border-top">
                         <div>
-                            {% if villa.Original_Price and villa.Original_Price|string != "nan" and villa.Original_Price|float > villa.Price|float %}
-                                <div class="d-flex align-items-center mb-0">
-                                    <small class="text-muted text-decoration-line-through" style="font-size: 0.8rem;">₹{{ villa.Original_Price }}</small>
+                            {% set original = villa.get('Original_Price', 0) | float %}
+                            {% set current = villa.get('Price', villa.get('price', 0)) | float %}
+                            
+                            {% if original > current and current > 0 %}
+                                <div class="d-flex align-items-center mb-0" style="line-height: 1;">
+                                    <small class="text-muted text-decoration-line-through" style="font-size: 0.8rem;">₹{{ original|int }}</small>
                                     
-                                    {% set disc_amt = villa.Original_Price|float - villa.Price|float %}
-                                    {% set disc_perc = (disc_amt / villa.Original_Price|float * 100) | round | int %}
+                                    {% set disc_perc = (((original - current) / original) * 100) | round | int %}
                                     <span class="discount-badge-mini">{{ disc_perc }}% OFF</span>
                                 </div>
                             {% endif %}
                             
                             <h5 class="m-0 fw-bold text-primary">
-                                ₹{{ villa.Price | default('0') }}
-                                <small class="text-muted fw-normal fs-6">/night</small>
+                                ₹{{ current|int }}<small class="text-muted fw-normal fs-6">/night</small>
                             </h5>
                         </div>
-                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">View Villa</a>
+                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">View Villa</a>
                     </div>
                 </div>
             </div>
@@ -94,33 +92,25 @@
 <div class="bg-light py-5">
     <div class="container text-center">
         <h2 class="fw-bold mb-5">Why Stay With MoreVistas?</h2>
-        <div class="row g-4">
-            <div class="col-md-3"><i class="bi bi-star-fill text-warning fs-1"></i><h6 class="fw-bold mt-2">Curated Luxury</h6></div>
-            <div class="col-md-3"><i class="bi bi-headset text-primary fs-1"></i><h6 class="fw-bold mt-2">24/7 Support</h6></div>
-            <div class="col-md-3"><i class="bi bi-patch-check-fill text-success fs-1"></i><h6 class="fw-bold mt-2">Verified Stays</h6></div>
-            <div class="col-md-3"><i class="bi bi-tags-fill text-info fs-1"></i><h6 class="fw-bold mt-2">Best Price</h6></div>
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <i class="bi bi-star-fill text-warning fs-1"></i>
+                <h6 class="fw-bold mt-2">Curated Luxury</h6>
+            </div>
+            <div class="col-md-3">
+                <i class="bi bi-headset text-primary fs-1"></i>
+                <h6 class="fw-bold mt-2">24/7 Support</h6>
+            </div>
+            <div class="col-md-3">
+                <i class="bi bi-patch-check-fill text-success fs-1"></i>
+                <h6 class="fw-bold mt-2">Verified Stays</h6>
+            </div>
+            <div class="col-md-3">
+                <i class="bi bi-tags-fill text-info fs-1"></i>
+                <h6 class="fw-bold mt-2">Best Price</h6>
+            </div>
         </div>
     </div>
 </div>
-
-<script>
-    function startMainTimers() {
-        document.querySelectorAll('.main-timer').forEach(timer => {
-            const expireDateStr = timer.getAttribute('data-expire');
-            const countTo = new Date(expireDateStr).getTime();
-            const x = setInterval(function() {
-                const now = new Date().getTime();
-                const diff = countTo - now;
-                if (isNaN(countTo)) { timer.innerHTML = "Limited"; clearInterval(x); return; }
-                if (diff < 0) { clearInterval(x); timer.innerHTML = "EXPIRED"; return; }
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-                timer.innerHTML = h + "h " + m + "m " + s + "s";
-            }, 1000);
-        });
-    }
-    document.addEventListener('DOMContentLoaded', startMainTimers);
-</script>
 
 {% endblock %}
