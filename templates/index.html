@@ -24,9 +24,8 @@
         display: inline-block;
         margin-top: 6px;
         border: 1px solid rgba(255,255,255,0.2);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
-    .villa-card { transition: all 0.3s ease; border-radius: 20px !important; overflow: hidden; }
+    .villa-card { transition: 0.3s; border-radius: 20px !important; overflow: hidden; }
     .villa-card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important; }
 </style>
 
@@ -57,7 +56,7 @@
                         </div>
                         {% if expiry and expiry|lower != 'nan' and expiry != '' %}
                         <div class="timer-box">
-                            <i class="bi bi-clock-fill text-warning me-1"></i>Ends: <span class="main-timer" data-expire="{{ expiry }}">Loading...</span>
+                            <i class="bi bi-clock-fill text-warning me-1"></i>Ends In: <span class="main-timer" data-expire="{{ expiry }}">Loading...</span>
                         </div>
                         {% endif %}
                     </div>
@@ -66,7 +65,7 @@
 
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h4 class="fw-bold m-0 text-dark" style="letter-spacing: -0.5px;">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h4>
+                        <h4 class="fw-bold m-0 text-dark">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h4>
                         <span class="badge bg-light text-primary border border-primary small">{{ villa.get('BHK', '3') }} BHK</span>
                     </div>
                     
@@ -92,11 +91,7 @@
                             {% endif %}
                             
                             <h5 class="m-0 fw-bold text-primary">
-                                {% if current > 0 %}
-                                    ₹{{ current | int }}
-                                {% else %}
-                                    Price on Request
-                                {% endif %}
+                                ₹{{ current | int if current > 0 else 'Price on Request' }}
                                 <small class="text-muted fw-normal fs-6">/{{ villa.get('Per_Night', 'night') }}</small>
                             </h5>
                         </div>
@@ -113,30 +108,22 @@
     function startMainTimers() {
         document.querySelectorAll('.main-timer').forEach(timer => {
             let expireDateStr = timer.getAttribute('data-expire');
-            
-            if (!expireDateStr || expireDateStr.toLowerCase() === "nan" || expireDateStr === "") {
-                timer.closest('.timer-box').style.display = 'none';
-                return;
-            }
+            if (!expireDateStr || expireDateStr.toLowerCase() === "nan") return;
 
-            // 🛠️ Date Formatting Fix (Handles DD/MM/YYYY and YYYY-MM-DD)
+            // Date Format Normalization
             let finalDateStr = expireDateStr;
             if (expireDateStr.includes('/')) {
                 let parts = expireDateStr.split(' ')[0].split('/');
                 let timePart = expireDateStr.split(' ')[1] || "23:59:59";
-                if (parts[0].length === 2) { // if DD/MM/YYYY
-                    finalDateStr = `${parts[2]}-${parts[1]}-${parts[0]}T${timePart}`;
+                if (parts[0].length === 2) { 
+                    finalDateStr = parts[2] + "-" + parts[1] + "-" + parts[0] + "T" + timePart;
                 }
             } else {
                 finalDateStr = expireDateStr.replace(" ", "T");
             }
 
             const countTo = new Date(finalDateStr).getTime();
-            
-            if (isNaN(countTo)) {
-                timer.innerHTML = "Limited Time";
-                return;
-            }
+            if (isNaN(countTo)) return;
 
             const x = setInterval(function() {
                 const now = new Date().getTime();
@@ -148,15 +135,15 @@
                     return;
                 }
 
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                // Calculation to show TOTAL HOURS (including days)
+                const h = Math.floor(diff / (1000 * 60 * 60)); // 👈 Yahan change kiya hai
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((diff % (1000 * 60)) / 1000);
 
-                timer.innerHTML = (h < 10 ? "0"+h : h) + "h " + (m < 10 ? "0"+m : m) + "m " + (s < 10 ? "0"+s : s) + "s";
+                timer.innerHTML = h + "h " + (m < 10 ? "0"+m : m) + "m " + (s < 10 ? "0"+s : s) + "s";
             }, 1000);
         });
     }
-    // Run after page loads
     window.onload = startMainTimers;
 </script>
 
