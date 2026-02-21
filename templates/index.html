@@ -1,6 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<style>
+    .discount-badge-mini {
+        font-size: 0.65rem;
+        background-color: #28a745; /* हरा रंग */
+        color: white;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-weight: 800;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 5px;
+        text-transform: uppercase;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+
 <header class="py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 100px 0 !important;">
     <div class="container">
         <h1 class="display-4 fw-bold">Welcome to MoreVistas</h1>
@@ -51,10 +67,20 @@
 
                     <div class="d-flex align-items-center justify-content-between pt-3 border-top">
                         <div>
-                            {% if villa.Original_Price and villa.Original_Price|string != "nan" %}
-                            <small class="text-muted text-decoration-line-through d-block" style="font-size: 0.8rem; line-height: 1;">₹{{ villa.Original_Price }}</small>
+                            {% if villa.Original_Price and villa.Original_Price|string != "nan" and villa.Original_Price|float > villa.Price|float %}
+                                <div class="d-flex align-items-center mb-0">
+                                    <small class="text-muted text-decoration-line-through" style="font-size: 0.8rem;">₹{{ villa.Original_Price }}</small>
+                                    
+                                    {% set disc_amt = villa.Original_Price|float - villa.Price|float %}
+                                    {% set disc_perc = (disc_amt / villa.Original_Price|float * 100) | round | int %}
+                                    <span class="discount-badge-mini">{{ disc_perc }}% OFF</span>
+                                </div>
                             {% endif %}
-                            <h5 class="m-0 fw-bold text-primary">₹{{ villa.Price | default('0') }}<small class="text-muted fw-normal fs-6">/night</small></h5>
+                            
+                            <h5 class="m-0 fw-bold text-primary">
+                                ₹{{ villa.Price | default('0') }}
+                                <small class="text-muted fw-normal fs-6">/night</small>
+                            </h5>
                         </div>
                         <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">View Villa</a>
                     </div>
@@ -66,62 +92,13 @@
 </div>
 
 <div class="bg-light py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">Why Stay With MoreVistas?</h2>
-            <p class="text-muted mx-auto" style="max-width: 600px;">Lonavala is our home. We focus only on this hill town to ensure your stay feels effortless and premium.</p>
-        </div>
-
-        <div class="row g-4 text-center">
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
-                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 60px; height: 60px;">
-                        <i class="bi bi-star-fill text-warning fs-4"></i>
-                    </div>
-                    <h6 class="fw-bold">Curated Luxury</h6>
-                    <p class="text-muted small mb-0">Every property is personally checked for quality.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
-                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 60px; height: 60px;">
-                        <i class="bi bi-headset text-primary fs-4"></i>
-                    </div>
-                    <h6 class="fw-bold">24/7 Support</h6>
-                    <p class="text-muted small mb-0">Our local team is always available for your needs.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
-                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 60px; height: 60px;">
-                        <i class="bi bi-patch-check-fill text-success fs-4"></i>
-                    </div>
-                    <h6 class="fw-bold">Verified Stays</h6>
-                    <p class="text-muted small mb-0">No fake photos. What you see is exactly what you get.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
-                    <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 60px; height: 60px;">
-                        <i class="bi bi-tags-fill text-info fs-4"></i>
-                    </div>
-                    <h6 class="fw-bold">Best Price</h6>
-                    <p class="text-muted small mb-0">Direct booking means no hidden portal commissions.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="about-section" class="container py-5 mt-4">
-    <div class="row align-items-center">
-        <div class="col-md-6">
-            <h2 class="fw-bold">About MoreVistas</h2>
-            <p class="text-muted mt-3">MoreVistas is your premier destination for luxury villa rentals. Founded in 2026, we specialize in providing handpicked, high-end stays in Lonavala. We believe your getaway should be as unique as you are.</p>
-            <a href="https://wa.me/yournumber" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Contact Our Concierge</a>
-        </div>
-        <div class="col-md-6 text-center mt-4 mt-md-0">
-            <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80" class="img-fluid rounded-4 shadow" style="max-height: 300px; object-fit: cover;">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-5">Why Stay With MoreVistas?</h2>
+        <div class="row g-4">
+            <div class="col-md-3"><i class="bi bi-star-fill text-warning fs-1"></i><h6 class="fw-bold mt-2">Curated Luxury</h6></div>
+            <div class="col-md-3"><i class="bi bi-headset text-primary fs-1"></i><h6 class="fw-bold mt-2">24/7 Support</h6></div>
+            <div class="col-md-3"><i class="bi bi-patch-check-fill text-success fs-1"></i><h6 class="fw-bold mt-2">Verified Stays</h6></div>
+            <div class="col-md-3"><i class="bi bi-tags-fill text-info fs-1"></i><h6 class="fw-bold mt-2">Best Price</h6></div>
         </div>
     </div>
 </div>
@@ -131,27 +108,14 @@
         document.querySelectorAll('.main-timer').forEach(timer => {
             const expireDateStr = timer.getAttribute('data-expire');
             const countTo = new Date(expireDateStr).getTime();
-            
             const x = setInterval(function() {
                 const now = new Date().getTime();
                 const diff = countTo - now;
-
-                if (isNaN(countTo)) {
-                    timer.innerHTML = "Limited";
-                    clearInterval(x);
-                    return;
-                }
-
-                if (diff < 0) {
-                    clearInterval(x);
-                    timer.innerHTML = "EXPIRED";
-                    return;
-                }
-
+                if (isNaN(countTo)) { timer.innerHTML = "Limited"; clearInterval(x); return; }
+                if (diff < 0) { clearInterval(x); timer.innerHTML = "EXPIRED"; return; }
                 const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((diff % (1000 * 60)) / 1000);
-
                 timer.innerHTML = h + "h " + m + "m " + s + "s";
             }, 1000);
         });
