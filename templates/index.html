@@ -2,18 +2,18 @@
 {% block content %}
 
 <style>
-    /* विला कार्ड डिज़ाइन */
+    /* Card Styles */
     .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; margin-bottom: 25px; }
     .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     
-    /* 🏷️ Discount Tag (35% OFF) */
-    .discount-tag { position: absolute; top: 15px; right: 15px; z-index: 20; background: #28a745; color: white; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; }
-    .offer-badge { position: absolute; top: 15px; left: 15px; z-index: 20; background: #ff4d4d; color: white; padding: 6px 14px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; }
+    /* Discount & Offer Tags */
+    .discount-tag { position: absolute; top: 15px; right: 15px; z-index: 20; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; }
+    .offer-badge { position: absolute; top: 15px; left: 15px; z-index: 20; background: #ff4d4d; color: white; padding: 6px 14px; border-radius: 50px; font-weight: 800; font-size: 0.85rem; }
 
-    /* 🖤 Footer & Logo Fix */
-    .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 50px; }
-    .footer-logo-img { height: 60px; width: auto; margin-bottom: 15px; } /* लोगो की साइज यहाँ से सेट करें */
-    .footer-bottom { background: #141414; padding: 25px 0; margin-top: 40px; border-top: 1px solid #222; }
+    /* Footer Styling */
+    .final-footer { background: #1a1a1a; color: #ffffff; padding: 70px 0 0; text-align: center; margin-top: 60px; }
+    .footer-logo-img { height: 80px; width: auto; margin-bottom: 20px; } /* Footer mein logo aur bada kiya */
+    .footer-bottom { background: #141414; padding: 30px 0; margin-top: 50px; border-top: 1px solid #222; }
 </style>
 
 <div class="container my-5">
@@ -42,7 +42,7 @@
                     <h5 class="fw-bold mb-1">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h5>
                     <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
                     
-                    <div class="d-flex gap-4 mb-3" style="font-weight: 600; color: #555;">
+                    <div class="d-flex gap-4 mb-3" style="font-weight: 700; color: #444; font-size: 0.95rem;">
                         <span><i class="bi bi-people-fill text-primary"></i> {{ villa.get('Guests', '12-15') }} Guests</span>
                         <span><i class="bi bi-door-open-fill text-primary"></i> {{ villa.get('BHK', '3') }} BHK</span>
                     </div>
@@ -72,12 +72,12 @@
 <footer class="final-footer">
     <div class="container">
         <a href="/">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="footer-logo-img" onerror="this.outerHTML='<h2 class=\'text-white fw-bold\'>More<span class=\'text-primary\'>Vistas</span></h2>'">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="footer-logo-img" onerror="this.outerHTML='<h1 class=\'text-white fw-bold\'>More<span class=\'text-primary\'>Vistas</span></h1>'">
         </a>
-        <p class="small opacity-50 mb-4 mt-2">Curating memories in Lonavala.</p>
+        <p class="opacity-75 mb-4 mt-2">Luxury Villa Rentals & Curated Stays in Lonavala.</p>
         
         <div class="footer-bottom">
-            <p class="mb-0 opacity-50" style="font-size: 0.85rem;">© 2026 MoreVistas. Built with ❤️ in Lonavala.</p>
+            <p class="mb-0 opacity-50" style="font-size: 0.9rem;">© 2026 MoreVistas. All Rights Reserved.</p>
         </div>
     </div>
 </footer>
