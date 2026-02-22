@@ -3,24 +3,27 @@
 
 <style>
     /* 1. Top Runner Styling */
-    .offer-runner {
-        background: #000; color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap;
-    }
-    .runner-text {
-        display: inline-block; animation: scroll-text 15s linear infinite; font-weight: 700; text-transform: uppercase;
-    }
-    @keyframes scroll-text {
-        0% { transform: translateX(100%); }
-        100% { transform: translateX(-100%); }
-    }
+    .offer-runner { background: #000; color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap; }
+    .runner-text { display: inline-block; animation: scroll-text 15s linear infinite; font-weight: 700; text-transform: uppercase; }
+    @keyframes scroll-text { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-    /* Card & Tags (Keeping your original look) */
-    .villa-card { border-radius: 20px !important; border: none; overflow: hidden; margin-bottom: 25px; position: relative; }
+    /* Villa Card Styles */
+    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; margin-bottom: 25px; }
+    .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     .discount-tag { position: absolute; top: 15px; right: 15px; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; z-index: 10; }
     .offer-badge { background: #ff4d4d; color: white; padding: 4px 15px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-block; margin-bottom: 5px; }
-    
-    /* Timer text style */
     .timer-text { font-size: 0.75rem; font-weight: 700; color: #ff4d4d; margin-top: 2px; display: block; }
+
+    /* Why Stay Here Section */
+    .why-stay-box { background: #f8f9fa; border-radius: 25px; padding: 50px 20px; margin: 40px 0; border: 1px solid #eee; text-align: center; }
+    .why-icon { font-size: 2.5rem; color: #0d6efd; margin-bottom: 15px; display: block; }
+
+    /* Footer Styling */
+    .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
+    .footer-logo-img { height: 75px; width: auto; margin-bottom: 20px; }
+    .social-icons a { color: white; font-size: 1.8rem; margin: 0 15px; transition: 0.3s; display: inline-block; }
+    .social-icons a:hover { transform: translateY(-5px); color: #0d6efd; }
+    .footer-bottom { background: #141414; padding: 30px 0; margin-top: 40px; border-top: 1px solid #222; }
 </style>
 
 <div class="offer-runner">
@@ -30,20 +33,21 @@
                🔥 {{ villa.Villa_Name }}: {{ villa.Offer }} | 
             {% endif %}
         {% endfor %}
-        📞 CALL US FOR SPECIAL DISCOUNTS: 8830024994 🔥
+        📞 CALL FOR INSTANT DISCOUNTS: 8830024994 🔥
     </div>
 </div>
 
-<div class="container my-4">
+<div class="container my-5">
     <div class="row g-4">
         {% for villa in villas %}
         <div class="col-md-4">
             <div class="card h-100 villa-card shadow-sm">
                 <div style="height: 250px; position: relative;">
-                    <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;">
+                    <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x250';">
                     
                     {% set current = (villa.get('Price') or 0) | float %}
                     {% set original = (villa.get('Original_Price') or 0) | float %}
+                    
                     {% if original > current and current > 0 %}
                         {% set disc = (((original - current) / original) * 100) | round | int %}
                         <div class="discount-tag">{{ disc }}% OFF</div>
@@ -64,17 +68,25 @@
                             {% set offer = villa.get('Offer', '') | string %}
                             {% if offer and offer != 'nan' and offer != '' %}
                                 <div class="offer-badge"><i class="bi bi-fire"></i> {{ offer }}</div>
-                                
                                 {% if villa.Offer_End and villa.Offer_End|string != 'nan' %}
-                                    <span class="timer-text card-timer" data-expire="{{ villa.Offer_End }}">
-                                        Ends in: Loading...
-                                    </span>
+                                    <span class="timer-text card-timer" data-expire="{{ villa.Offer_End }}">Ends in: Loading...</span>
                                 {% endif %}
                             {% endif %}
                         </div>
 
                         <div class="d-flex align-items-center justify-content-between">
-                            <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fw-normal fs-6">/night</small></h5>
+                            <div>
+                                {% if current > 0 %}
+                                    <div class="d-flex flex-column">
+                                        {% if original > current %}
+                                            <small class="text-decoration-line-through text-muted">₹{{ original | int }}</small>
+                                        {% endif %}
+                                        <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fw-normal fs-6">/night</small></h5>
+                                    </div>
+                                {% else %}
+                                    <div class="px-3 py-1 bg-light border rounded text-primary fw-bold small">Price on Request</div>
+                                {% endif %}
+                            </div>
                             <a href="/villa/{{ villa.get('Villa_ID') }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Explore</a>
                         </div>
                     </div>
@@ -83,20 +95,57 @@
         </div>
         {% endfor %}
     </div>
+
+    <div class="why-stay-box shadow-sm">
+        <h2 class="fw-bold mb-5">Why <span class="text-primary">Stay With Us</span>?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <i class="bi bi-patch-check-fill why-icon"></i>
+                <h5 class="fw-bold">Verified Luxury</h5>
+                <p class="text-muted small">Quality checked premium villas.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-headset why-icon"></i>
+                <h5 class="fw-bold">24/7 Support</h5>
+                <p class="text-muted small">Always here to help you.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-shield-lock-fill why-icon"></i>
+                <h5 class="fw-bold">Best Price</h5>
+                <p class="text-muted small">Lowest rates guaranteed.</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<footer class="final-footer">
+    <div class="container">
+        <a href="/">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="footer-logo-img" onerror="this.outerHTML='<h2 class=\'text-white fw-bold\'>More<span class=\'text-primary\'>Vistas</span></h2>'">
+        </a>
+        <p class="opacity-75 mb-4 mt-2">Luxury Villa Rentals & Curated Stays in Lonavala.</p>
+        
+        <div class="social-icons mb-4">
+            <a href="https://wa.me/918830024994" target="_blank"><i class="bi bi-whatsapp"></i></a>
+            <a href="#" target="_blank"><i class="bi bi-instagram"></i></a>
+            <a href="#" target="_blank"><i class="bi bi-facebook"></i></a>
+        </div>
+
+        <div class="footer-bottom">
+            <p class="mb-0 opacity-50 small">© 2026 MoreVistas. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
 
 <script>
     function startCardTimers() {
         const timers = document.querySelectorAll('.card-timer');
-        
         timers.forEach(timer => {
             const expireDate = timer.getAttribute('data-expire');
             const countTo = new Date(expireDate).getTime();
-            
             const x = setInterval(function() {
                 const now = new Date().getTime();
                 const diff = countTo - now;
-
                 if (isNaN(countTo) || diff < 0) {
                     timer.innerHTML = "OFFER EXPIRED";
                     clearInterval(x);
