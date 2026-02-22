@@ -28,19 +28,13 @@
     .text-blue-premium { color: #0056b3; font-weight: 800; margin-bottom: 0; line-height: 1.2; }
     .price-subtext { font-size: 0.6rem; color: #0056b3; opacity: 0.7; font-weight: 600; }
 
-    /* Why Stay Section Styling */
-    .feature-card {
-        padding: 30px; border-radius: 20px; background: white;
-        transition: 0.3s; border: 1px solid #eee; height: 100%;
-    }
-    .icon-circle {
-        width: 60px; height: 60px; background: #e7f1ff; color: #0d6efd;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 50%; font-size: 1.5rem; margin: 0 auto 20px;
-    }
+    /* Why Stay Section */
+    .feature-card { padding: 30px; border-radius: 20px; background: white; border: 1px solid #eee; height: 100%; }
+    .icon-circle { width: 60px; height: 60px; background: #e7f1ff; color: #0d6efd; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 1.5rem; margin: 0 auto 20px; }
 
-    /* Gap Fix */
-    section { margin-top: 0 !important; padding-top: 50px; padding-bottom: 50px; }
+    /* 🔥 Footer Styling - Final Fix */
+    .site-footer { background: #1a1a1a; color: #999; padding: 40px 0; border-top: 1px solid #333; margin-top: 50px; }
+    .footer-link { color: #ccc; text-decoration: none; margin: 0 10px; font-size: 0.9rem; }
 </style>
 
 <div class="container my-5">
@@ -55,7 +49,7 @@
                     {% set expiry = villa.get('Offer_End', '') | string %}
 
                     {% if offer and offer != 'nan' and offer != '' %}
-                        <div class="offer-badge"><i class="bi bi-fire text-warning"></i> {{ offer }}</div>
+                        <div class="offer-badge"><i class="bi bi-fire"></i> {{ offer }}</div>
                         {% if expiry and expiry != 'nan' and expiry != '' %}
                         <div class="timer-box">Ends In: <span class="main-timer" data-expire="{{ expiry }}">---</span></div>
                         {% endif %}
@@ -64,8 +58,7 @@
 
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-1">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h5>
-                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
-                    
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala</p>
                     <div class="d-flex gap-3 mb-3">
                         <small class="text-secondary"><i class="bi bi-people"></i> {{ villa.get('Guests', '12-15') }} Guests</small>
                         <small class="text-secondary"><i class="bi bi-door-open"></i> {{ villa.get('BHK', '3') }} BHK</small>
@@ -92,37 +85,48 @@
     </div>
 </div>
 
-<section class="bg-light">
+<section class="bg-light py-5">
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="fw-bold">Why <span class="text-primary">Stay With Us</span>?</h2>
-            <p class="text-muted">Experience luxury hospitality in the heart of Lonavala.</p>
         </div>
         <div class="row g-4 text-center">
             <div class="col-md-4">
                 <div class="feature-card shadow-sm">
                     <div class="icon-circle"><i class="bi bi-shield-check"></i></div>
-                    <h5 class="fw-bold">Handpicked Villas</h5>
-                    <p class="text-muted small">Every property is personally verified for quality and comfort.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card shadow-sm border-primary">
-                    <div class="icon-circle" style="background: #0d6efd; color: white;"><i class="bi bi-headset"></i></div>
-                    <h5 class="fw-bold">24/7 Concierge</h5>
-                    <p class="text-muted small">Our local Lonavala team is always available to assist you.</p>
+                    <h5 class="fw-bold">Verified Villas</h5>
+                    <p class="text-muted small">Quality-checked properties in Lonavala.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="feature-card shadow-sm">
-                    <div class="icon-circle"><i class="bi bi-wallet2"></i></div>
-                    <h5 class="fw-bold">Best Price Promise</h5>
-                    <p class="text-muted small">Luxury experiences at the most competitive local rates.</p>
+                    <div class="icon-circle"><i class="bi bi-headset"></i></div>
+                    <h5 class="fw-bold">24/7 Support</h5>
+                    <p class="text-muted small">Our local team is always ready to help.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card shadow-sm">
+                    <div class="icon-circle"><i class="bi bi-stars"></i></div>
+                    <h5 class="fw-bold">Luxury Service</h5>
+                    <p class="text-muted small">Exquisite experience at best rates.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<footer class="site-footer text-center">
+    <div class="container">
+        <h5 class="text-white fw-bold mb-1">More<span class="text-primary">Vistas</span></h5>
+        <div class="my-3">
+            <a href="/" class="footer-link">Home</a>
+            <a href="/about" class="footer-link">About</a>
+            <a href="/contact" class="footer-link">Contact</a>
+        </div>
+        <p class="mb-0 opacity-50" style="font-size: 0.75rem;">© 2026 MoreVistas. Private Luxury Escapes.</p>
+    </div>
+</footer>
 
 <script>
     function updateTimers() {
@@ -131,7 +135,7 @@
             if (!expireStr || expireStr === 'nan' || expireStr === '') return;
             let finalDate = expireStr.includes('/') ? expireStr.split(' ')[0].split('/').reverse().join('-') + "T" + (expireStr.split(' ')[1] || "23:59:59") : expireStr.replace(" ", "T");
             const diff = new Date(finalDate).getTime() - new Date().getTime();
-            if (diff <= 0) { timer.innerHTML = "ENDED"; return; }
+            if (diff <= 0) { timer.innerHTML = "OFFER ENDED"; return; }
             const h = Math.floor(diff / 3600000);
             const m = Math.floor((diff % 3600000) / 60000);
             const s = Math.floor((diff % 60000) / 1000);
