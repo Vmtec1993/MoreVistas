@@ -2,159 +2,94 @@
 {% block content %}
 
 <style>
-    /* 🏷️ Discount Tag on Image */
-    .detail-discount-tag {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        z-index: 20;
-        background: #28a745;
-        color: white;
-        padding: 8px 15px;
-        border-radius: 12px;
-        font-weight: 800;
-        font-size: 1rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
+    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; position: relative; margin-bottom: 25px; }
+    .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
+    
+    /* Tags */
+    .discount-tag { position: absolute; top: 15px; right: 15px; z-index: 20; background: #28a745; color: white; padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; }
+    .offer-badge { position: absolute; top: 15px; left: 15px; z-index: 20; background: #ff4d4d; color: white; padding: 6px 14px; border-radius: 50px; font-weight: 800; font-size: 0.85rem; }
 
-    /* 🖤 Footer Styling */
-    .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; border-radius: 30px 30px 0 0; }
-    .footer-logo-img { height: 70px; width: auto; margin-bottom: 20px; }
+    /* Footer Styles */
+    .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
+    .footer-logo-img { height: 80px; width: auto; margin-bottom: 20px; }
     .social-icons a { color: white; font-size: 1.8rem; margin: 0 15px; transition: 0.3s; display: inline-block; }
     .social-icons a:hover { transform: scale(1.2); }
     .bi-whatsapp:hover { color: #25D366; }
     .bi-instagram:hover { color: #E1306C; }
     .bi-facebook:hover { color: #1877F2; }
-    .footer-bottom { background: #141414; padding: 25px 0; margin-top: 40px; border-top: 1px solid #222; }
+    .footer-bottom { background: #141414; padding: 30px 0; margin-top: 40px; border-top: 1px solid #222; }
 </style>
 
-<div class="container py-4">
-    <div id="villaSlider" class="carousel slide shadow-sm position-relative" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden;">
-        
-        {% set current = (villa.Price or 0) | float %}
-        {% set original = (villa.Original_Price or 0) | float %}
-        {% if original > current and current > 0 %}
-            {% set disc = (((original - current) / original) * 100) | round | int %}
-            <div class="detail-discount-tag">{{ disc }}% OFF</div>
-        {% endif %}
-
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="{{ villa.Image_URL }}" class="d-block w-100" style="height: 400px; object-fit: cover;">
-            </div>
-            {% if villa.Image_URL_2 and villa.Image_URL_2|string != 'nan' and villa.Image_URL_2 != '' %}
-            <div class="carousel-item"><img src="{{ villa.Image_URL_2 }}" class="d-block w-100" style="height: 400px; object-fit: cover;"></div>
-            {% endif %}
-            {% if villa.Image_URL_3 and villa.Image_URL_3|string != 'nan' and villa.Image_URL_3 != '' %}
-            <div class="carousel-item"><img src="{{ villa.Image_URL_3 }}" class="d-block w-100" style="height: 400px; object-fit: cover;"></div>
-            {% endif %}
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#villaSlider" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-        <button class="carousel-control-next" type="button" data-bs-target="#villaSlider" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
-    </div>
-
-    <div class="mt-4 px-2">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-            <div>
-                <h2 class="fw-bold m-0 text-dark">{{ villa.Villa_Name }}</h2>
-                <div class="mt-1">
-                    <span class="badge {% if villa.Status == 'Available' %}bg-success{% else %}bg-warning text-dark{% endif %} rounded-pill small">
-                        {{ villa.Status | default('Available') }}
-                    </span>
-                    <small class="text-muted ms-2"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala</small>
-                </div>
-            </div>
-            
-            {% if villa.Offer_End and villa.Offer_End|string != 'nan' and villa.Offer_End != '' %}
-            <div class="text-center">
-                <div class="badge bg-danger mb-1 shadow-sm">Ends Soon!</div>
-                <div class="text-danger fw-bold" style="font-size: 0.75rem;">
-                    <i class="bi bi-clock-history"></i> <span id="sheet-timer" data-expire="{{ villa.Offer_End }}">Loading...</span>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="d-flex gap-2 my-3 overflow-auto pb-2" style="white-space: nowrap;">
-            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-people text-primary"></i> Up to {{ villa.Guests | default('12') }} Guests</div>
-            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-door-open text-primary"></i> {{ villa.BHK | default('3') }} BHK</div>
-            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-droplet text-primary"></i> {{ villa.Bathrooms | default('2') }} Baths</div>
-        </div>
-
-        <hr class="opacity-10">
-
-        <div class="card border-0 bg-light rounded-4 p-3 mb-4">
-            <div class="row align-items-center">
-                <div class="col-7">
-                    <span class="text-muted small d-block">Starting from</span>
-                    {% if original > current %}
-                    <span class="text-decoration-line-through text-muted small">₹{{ original | int }}</span>
+<div class="container my-5">
+    <div class="row g-4">
+        {% for villa in villas %}
+        <div class="col-md-4">
+            <div class="card h-100 villa-card shadow-sm">
+                <div style="height: 250px; position: relative;">
+                    <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x250';">
+                    
+                    {% set current = (villa.get('Price') or 0) | float %}
+                    {% set original = (villa.get('Original_Price') or 0) | float %}
+                    
+                    {% if original > current and current > 0 %}
+                        {% set disc = (((original - current) / original) * 100) | round | int %}
+                        <div class="discount-tag">{{ disc }}% OFF</div>
                     {% endif %}
-                    <h3 class="fw-bold text-primary mb-0">₹{{ current | int }} <small class="text-muted fs-6 fw-normal">/night</small></h3>
-                </div>
-                <div class="col-5">
-                    <a href="https://wa.me/91XXXXXXXXXX?text=Hi, I want to book {{ villa.Villa_Name }}" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm">Reserve</a>
-                </div>
-            </div>
-        </div>
 
-        <h5 class="fw-bold mt-4">About this villa</h5>
-        <p class="text-muted small" style="line-height: 1.6;">{{ villa.Description }}</p>
-        
-        <div class="mt-4">
-            <h6 class="fw-bold mb-3"><i class="bi bi-stars text-warning"></i> Premium Amenities</h6>
-            <div class="d-flex flex-wrap gap-2">
-                {% if villa.Amenities and villa.Amenities|string != 'nan' %}
-                    {% for item in villa.Amenities.split(',') %}
-                    <span class="badge bg-white text-dark border fw-normal p-2 px-3 shadow-sm rounded-3">
-                        <i class="bi bi-check2-circle text-success me-1"></i> {{ item.strip() }}
-                    </span>
-                    {% endfor %}
-                {% endif %}
+                    {% set offer = villa.get('Offer', '') | string %}
+                    {% if offer and offer != 'nan' and offer != '' %}
+                        <div class="offer-badge"><i class="bi bi-fire text-warning"></i> {{ offer }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-1">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h5>
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
+                    
+                    <div class="d-flex gap-4 mb-3" style="font-weight: 700; color: #444;">
+                        <span><i class="bi bi-people-fill text-primary"></i> {{ villa.get('Guests', '12-15') }} Guests</span>
+                        <span><i class="bi bi-door-open-fill text-primary"></i> {{ villa.get('BHK', '3') }} BHK</span>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                        <div>
+                            {% if current > 0 %}
+                                <div class="d-flex flex-column">
+                                    {% if original > current %}
+                                        <small class="text-decoration-line-through text-muted">₹{{ original | int }}</small>
+                                    {% endif %}
+                                    <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fw-normal fs-6">/night</small></h5>
+                                </div>
+                            {% else %}
+                                <div class="px-3 py-1 bg-light border rounded text-primary fw-bold small">Price on Request</div>
+                            {% endif %}
+                        </div>
+                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Explore</a>
+                    </div>
+                </div>
             </div>
         </div>
+        {% endfor %}
     </div>
 </div>
 
 <footer class="final-footer">
     <div class="container">
         <a href="/">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="footer-logo-img" onerror="this.outerHTML='<h2 class=\'text-white fw-bold\'>More<span class=\'text-primary\'>Vistas</span></h2>'">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="footer-logo-img">
         </a>
-        <p class="small opacity-50 mb-4 mt-2">Premium Villa Experiences in Lonavala.</p>
+        <p class="opacity-75 mb-4">Luxury Villa Rentals & Curated Stays in Lonavala.</p>
         
         <div class="social-icons mb-4">
-            <a href="https://wa.me/918830024994"><i class="bi bi-whatsapp"></i></a>
-            <a href="#"><i class="bi bi-facebook"></i></a>
-            <a href="#"><i class="bi bi-instagram"></i></a>
+            <a href="https://wa.me/91XXXXXXXXXX" target="_blank"><i class="bi bi-whatsapp"></i></a>
+            <a href="#" target="_blank"><i class="bi bi-facebook"></i></a>
+            <a href="#" target="_blank"><i class="bi bi-instagram"></i></a>
         </div>
 
         <div class="footer-bottom">
-            <p class="mb-0 opacity-50" style="font-size: 0.8rem;">© 2026 MoreVistas. Private Luxury Escapes.</p>
+            <p class="mb-0 opacity-50" style="font-size: 0.9rem;">© 2026 MoreVistas. All Rights Reserved.</p>
         </div>
     </div>
 </footer>
 
-<script>
-    function startSheetTimer() {
-        const timerElement = document.getElementById('sheet-timer');
-        if (!timerElement) return;
-        const countTo = new Date(timerElement.getAttribute('data-expire')).getTime();
-        const x = setInterval(function() {
-            const now = new Date().getTime();
-            const diff = countTo - now;
-            if (isNaN(countTo) || diff < 0) {
-                timerElement.innerHTML = "OFFER EXPIRED";
-                clearInterval(x);
-                return;
-            }
-            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((diff % (1000 * 60)) / 1000);
-            timerElement.innerHTML = h + "h " + m + "m " + s + "s";
-        }, 1000);
-    }
-    document.addEventListener('DOMContentLoaded', startSheetTimer);
-</script>
 {% endblock %}
-                
