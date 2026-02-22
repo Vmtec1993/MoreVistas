@@ -2,7 +2,7 @@
 {% block content %}
 
 <style>
-    /* Villa Card Styling */
+    /* विला कार्ड की स्टाइलिंग */
     .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; margin-bottom: 20px; }
     .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     
@@ -29,11 +29,11 @@
     .price-subtext { font-size: 0.6rem; color: #0056b3; opacity: 0.7; font-weight: 600; }
 
     /* Why Stay Section */
-    .why-stay-section { background: #f8f9fa; padding: 60px 0; border-bottom: 1px solid #eee; }
+    .why-stay-section { background: #f8f9fa; padding: 60px 0; }
     .feature-card { padding: 30px; border-radius: 20px; background: white; border: 1px solid #eee; height: 100%; transition: 0.3s; }
     .icon-circle { width: 60px; height: 60px; background: #e7f1ff; color: #0d6efd; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 1.5rem; margin: 0 auto 20px; }
 
-    /* 🖤 Black Footer (As per your 1000187357.jpg) */
+    /* 🖤 Merged Black Footer - As per your image */
     .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; }
     .footer-bottom { background: #141414; padding: 20px 0; margin-top: 40px; border-top: 1px solid #222; }
     .footer-links a { color: #bbb; text-decoration: none; margin: 0 15px; font-size: 0.95rem; transition: 0.3s; }
@@ -61,5 +61,97 @@
 
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-1">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h5>
-                    <p class="text-
-                        
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
+                    
+                    <div class="d-flex gap-3 mb-3">
+                        <small class="text-secondary"><i class="bi bi-people"></i> {{ villa.get('Guests', '12-15') }} Guests</small>
+                        <small class="text-secondary"><i class="bi bi-door-open"></i> {{ villa.get('BHK', '3') }} BHK</small>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                        <div>
+                            {% set current = (villa.get('Price') or 0) | float %}
+                            {% if current > 0 %}
+                                <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fw-normal fs-6">/night</small></h5>
+                            {% else %}
+                                <div class="price-request-box">
+                                    <p class="text-blue-premium small">Price on Request</p>
+                                    <p class="price-subtext mb-0">Best Deal Guaranteed</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Explore</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<section class="why-stay-section">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-5">Why <span class="text-primary">Stay With Us</span>?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card shadow-sm">
+                    <div class="icon-circle"><i class="bi bi-shield-check"></i></div>
+                    <h5 class="fw-bold">Verified Villas</h5>
+                    <p class="text-muted small mb-0">Personally checked for quality stays.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card shadow-sm">
+                    <div class="icon-circle"><i class="bi bi-headset"></i></div>
+                    <h5 class="fw-bold">24/7 Support</h5>
+                    <p class="text-muted small mb-0">Always here to help you in Lonavala.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card shadow-sm">
+                    <div class="icon-circle"><i class="bi bi-stars"></i></div>
+                    <h5 class="fw-bold">Luxury Service</h5>
+                    <p class="text-muted small mb-0">Premium experience at best rates.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="final-footer">
+    <div class="container">
+        <h2 class="fw-bold mb-2">More<span class="text-primary">Vistas</span></h2>
+        <p class="small opacity-50 mb-4">Curating memories in Lonavala.</p>
+        
+        <div class="footer-links mb-2">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+        </div>
+
+        <div class="footer-bottom">
+            <p class="mb-1 opacity-50" style="font-size: 0.8rem;">© 2026 MoreVistas. Private Luxury Escapes.</p>
+            <p class="opacity-50 mb-0" style="font-size: 0.75rem;">Built with ❤️ in Lonavala.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function updateTimers() {
+        document.querySelectorAll('.main-timer').forEach(timer => {
+            let expireStr = timer.getAttribute('data-expire');
+            if (!expireStr || expireStr === 'nan' || expireStr === '') return;
+            let finalDate = expireStr.includes('/') ? expireStr.split(' ')[0].split('/').reverse().join('-') + "T" + (expireStr.split(' ')[1] || "23:59:59") : expireStr.replace(" ", "T");
+            const diff = new Date(finalDate).getTime() - new Date().getTime();
+            if (diff <= 0) { timer.innerHTML = "OFFER ENDED"; return; }
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            timer.innerHTML = h + "h " + m + "m " + s + "s";
+        });
+    }
+    setInterval(updateTimers, 1000);
+    window.onload = updateTimers;
+</script>
+
+{% endblock %}
