@@ -1,16 +1,16 @@
 import os
 import json
 import gspread
-from flask import Flask, render_template, request, redirect, url_for, session  # ✅ session add kiya
+from flask import Flask, render_template, request, redirect, url_for, session
 from oauth2client.service_account import ServiceAccountCredentials
 import requests
 from datetime import datetime
 
 app = Flask(__name__)
-# ✅ Session के लिए Secret Key (इसे बदलना मत)
+# ✅ Session के लिए Secret Key
 app.secret_key = "morevistas_admin_secure_key_2026" 
 
-# --- Google Sheets Setup --- (आपका पुराना कोड वैसा ही रहेगा)
+# --- Google Sheets Setup ---
 creds_json = os.environ.get('GOOGLE_CREDS')
 sheet = None
 enquiry_sheet = None
@@ -33,7 +33,7 @@ if creds_json:
     except Exception as e:
         print(f"Sheet Error: {e}")
 
-# --- Telegram Setup --- (आपका पुराना कोड)
+# --- Telegram Setup ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
 
@@ -59,7 +59,7 @@ def index():
             v['Status'] = v.get('Status', 'Available')
     return render_template('index.html', villas=villas)
 
-# ✅ --- New Admin Routes (Admin Login & Dashboard) ---
+# ✅ --- Admin Routes ---
 
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
@@ -67,37 +67,62 @@ def admin_login():
     if request.method == 'POST':
         user = request.form.get('username')
         pwd = request.form.get('password')
-        
-        # 🔑 अपना आईडी और पासवर्ड यहाँ सेट करें
         if user == "admin" and pwd == "MoreVistas@2026":
             session['admin_logged_in'] = True
             return redirect(url_for('admin_dashboard'))
         else:
             error = "Invalid Username or Password!"
-            
     return render_template('admin_login.html', error=error)
 
 @app.route('/admin-dashboard')
 def admin_dashboard():
-    # चेक करें कि एडमिन लॉगिन है या नहीं
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
     
-    # डैशबोर्ड के लिए एन्क्वायरी का डेटा शीट से उठाएं
     enquiries = []
+    villas = []
+    if sheet:
+        villas = sheet.get_all_records()
     if enquiry_sheet:
         enquiries = enquiry_sheet.get_all_records()
-        enquiries.reverse() # ताकी नई एन्क्वायरी ऊपर दिखे
+        enquiries.reverse()
         
-    return render_template('admin_dashboard.html', enquiries=enquiries)
+    return render_template('admin_dashboard.html', enquiries=enquiries, villas=villas)
+
+# ✅ --- New Quick Update Route ---
+@app.route('/update-status/<villa_id>/<new_status>')
+def update_villa_status(villa_id, new_status):
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+    
+    if sheet:
+        try:
+            all_records = sheet.get_all_records()
+            headers = sheet.row_values(1)
+            
+            # ऑटोमेटिक "Status" कॉलम ढूँढना
+            try:
+                status_col_index = headers.index("Status") + 1
+            except ValueError:
+                return "Error: Please add a column named 'Status' in your Google Sheet"
+
+            row_index = 2
+            for v in all_records:
+                if str(v.get('Villa_ID')) == str(villa_id):
+                    sheet.update_cell(row_index, status_col_index, new_status)
+                    break
+                row_index += 1
+        except Exception as e:
+            print(f"Update Error: {e}")
+            
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin-logout')
 def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('admin_login'))
 
-# --- (पुराने रूट्स: /about, /contact, /villa_details, /enquiry) ---
-# ... (बाकी का कोड जो आपने ऊपर दिया है वो यहाँ वैसा ही रहेगा) ...
+# --- Other Routes ---
 
 @app.route('/about')
 def about():
@@ -164,8 +189,6 @@ def enquiry(villa_id):
     return "Error", 500
 
 if __name__ == "__main__":
-    # Render के लिए पोर्ट 10000 या Environment Variable ज़रूरी है
     port = int(os.environ.get("PORT", 10000)) 
     app.run(host='0.0.0.0', port=port)
-
-            
+    
