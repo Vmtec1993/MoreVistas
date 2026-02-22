@@ -2,27 +2,34 @@
 {% block content %}
 
 <style>
-    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; }
+    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; }
+    .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     
-    /* 🔥 Fire Offer Tag Style */
+    /* 🔥 Price on Request - Blue Luxury Look */
+    .price-request-box {
+        background: #f0f7ff;
+        padding: 5px 12px;
+        border-radius: 8px;
+        border: 1px solid #cce3ff;
+    }
+    .text-blue-premium { color: #0056b3; font-weight: 800; letter-spacing: 0.5px; }
+
+    /* Offer & Timer */
     .offer-badge {
         position: absolute; top: 15px; left: 15px; z-index: 10;
         background: #ff4d4d; color: white; padding: 5px 12px;
         border-radius: 50px; font-weight: bold; font-size: 0.8rem;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
-
-    /* ⏳ Modern Timer Box */
     .timer-box {
         position: absolute; top: 50px; left: 15px; z-index: 10;
         background: rgba(0,0,0,0.8); color: #fff; font-size: 10px;
-        padding: 4px 10px; border-radius: 6px; font-weight: bold;
-        border: 1px solid rgba(255,255,255,0.2); margin-top: 5px;
+        padding: 4px 10px; border-radius: 6px; font-weight: bold; margin-top: 5px;
     }
 
-    .price-request-box { background: #fff9ea; padding: 5px 12px; border-radius: 8px; border: 1px solid #ffe08a; }
-    .text-gold { color: #b8860b; font-weight: 800; }
-    .mini-footer { background: #1a1a1a; color: #999; padding: 30px 0; margin-top: 0 !important; }
+    /* 🔥 Footer - No Gap & Professional */
+    .mini-footer { background: #1a1a1a; color: #999; padding: 40px 0; border-top: 1px solid #333; margin-top: 50px !important; }
+    .footer-link { color: #ccc; text-decoration: none; margin: 0 10px; font-size: 0.9rem; }
+    .footer-link:hover { color: #0d6efd; }
 </style>
 
 <div class="container my-5">
@@ -35,13 +42,10 @@
                     <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1580587771525-78b9daa3b6af?q=80&w=1000';">
                     
                     {% set offer = villa.get('Offer', '') %}
-                    {% set expiry = villa.get('Offer_End', '') | string | trim %}
+                    {% set expiry = villa.get('Offer_End', '') | string %}
 
                     {% if offer and offer|lower != 'nan' and offer != '' %}
-                    <div class="offer-badge">
-                        <i class="bi bi-fire"></i> {{ offer }}
-                    </div>
-                    
+                    <div class="offer-badge"><i class="bi bi-fire"></i> {{ offer }}</div>
                     {% if expiry and expiry|lower != 'nan' and expiry != '' %}
                     <div class="timer-box">
                         <i class="bi bi-clock-fill text-warning me-1"></i>Ends In: 
@@ -67,11 +71,12 @@
                                 <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fw-normal fs-6">/night</small></h5>
                             {% else %}
                                 <div class="price-request-box">
-                                    <div class="text-gold small mb-0">Price on Request</div>
+                                    <div class="text-blue-premium small mb-0">Price on Request</div>
+                                    <div style="font-size: 0.6rem; color: #0056b3; opacity: 0.8;">Premium Selection</div>
                                 </div>
                             {% endif %}
                         </div>
-                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">View Details</a>
+                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold shadow-sm">Details</a>
                     </div>
                 </div>
             </div>
@@ -80,30 +85,47 @@
     </div>
 </div>
 
+<section class="py-5 bg-white border-top">
+    <div class="container text-center py-4">
+        <h3 class="fw-bold mb-4">Why Stay With <span class="text-primary">MoreVistas</span>?</h3>
+        <div class="row g-4">
+            <div class="col-md-4"><p class="mb-0"><i class="bi bi-shield-check text-primary fs-3"></i><br><b>Verified Villas</b></p></div>
+            <div class="col-md-4"><p class="mb-0"><i class="bi bi-headset text-primary fs-3"></i><br><b>24/7 Support</b></p></div>
+            <div class="col-md-4"><p class="mb-0"><i class="bi bi-stars text-primary fs-3"></i><br><b>Luxury Service</b></p></div>
+        </div>
+    </div>
+</section>
+
+<footer class="mini-footer">
+    <div class="container text-center">
+        <div class="mb-3">
+            <h5 class="text-white fw-bold mb-0">More<span class="text-primary">Vistas</span></h5>
+            <small class="opacity-50">Private Luxury Escapes in Lonavala.</small>
+        </div>
+        <div class="mb-3">
+            <a href="/" class="footer-link">Home</a>
+            <a href="/about" class="footer-link">About</a>
+            <a href="/contact" class="footer-link">Contact</a>
+        </div>
+        <div class="mt-4">
+            <p class="mb-0 opacity-50" style="font-size: 0.75rem;">© 2026 MoreVistas. Built with ❤️ for Travelers.</p>
+        </div>
+    </div>
+</footer>
+
 <script>
     function updateTimers() {
         document.querySelectorAll('.main-timer').forEach(timer => {
             let expireStr = timer.getAttribute('data-expire');
             if (!expireStr) return;
-
-            // Date formatting logic
             let parts = expireStr.split(' ')[0].split('/');
             let timePart = expireStr.split(' ')[1] || "23:59:59";
             let finalDate = (parts[0].length === 2) ? parts[2]+"-"+parts[1]+"-"+parts[0]+"T"+timePart : expireStr.replace(" ", "T");
-
-            const countTo = new Date(finalDate).getTime();
-            const now = new Date().getTime();
-            const diff = countTo - now;
-
-            if (diff <= 0) {
-                timer.innerHTML = "EXPIRED";
-                return;
-            }
-
-            const h = Math.floor(diff / (1000 * 60 * 60));
-            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((diff % (1000 * 60)) / 1000);
-
+            const diff = new Date(finalDate).getTime() - new Date().getTime();
+            if (diff <= 0) { timer.innerHTML = "EXPIRED"; return; }
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
             timer.innerHTML = h + "h " + (m < 10 ? "0"+m : m) + "m " + (s < 10 ? "0"+s : s) + "s";
         });
     }
