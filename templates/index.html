@@ -5,14 +5,12 @@
     .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; }
     .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     
-    /* 🔥 Offer Tag */
     .offer-badge {
         position: absolute; top: 15px; left: 15px; z-index: 20;
         background: #ff4d4d; color: white; padding: 6px 14px;
         border-radius: 50px; font-weight: 800; font-size: 0.8rem;
     }
 
-    /* ⏳ Countdown Timer */
     .timer-box {
         position: absolute; top: 52px; left: 15px; z-index: 20;
         background: rgba(0,0,0,0.75); color: #fff; font-size: 11px;
@@ -60,58 +58,5 @@
                         <div>
                             {% set current = (villa.get('Price') or 0) | float %}
                             {% if current > 0 %}
-                                <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fw-normal fs-6">/night</small></h5>
-                            {% else %}
-                                <div class="price-request-box">
-                                    <p class="text-blue-premium small">Price on Request</p>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Explore</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-
-<footer class="mini-footer text-center">
-    <div class="container">
-        <h5 class="text-white fw-bold mb-1">More<span class="text-primary">Vistas</span></h5>
-        <div class="mb-3">
-            <a href="/" class="text-white mx-2 text-decoration-none small">Home</a>
-            <a href="/about" class="text-white mx-2 text-decoration-none small">About</a>
-            <a href="/contact" class="text-white mx-2 text-decoration-none small">Contact</a>
-        </div>
-        <p class="mb-0 opacity-50" style="font-size: 0.7rem;">© 2026 MoreVistas. All Rights Reserved.</p>
-    </div>
-</footer>
-
-<script>
-    function updateTimers() {
-        document.querySelectorAll('.main-timer').forEach(timer => {
-            let expireStr = timer.getAttribute('data-expire');
-            if (!expireStr || expireStr === 'nan') return;
-            let finalDate = expireStr.includes('/') ? expireStr.split(' ')[0].split('/').reverse().join('-') + "T" + (expireStr.split(' ')[1] || "23:59:59") : expireStr.replace(" ", "T");
-            const diff = new Date(finalDate).getTime() - new Date().getTime();
-            if (diff <= 0) { timer.innerHTML = "ENDED"; return; }
-            const h = Math.floor(diff / 3600000);
-            const m = Math.floor((diff % 3600000) / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
-            timer.innerHTML = h + "h " + (m < 10 ? "0"+m : m) + "m " + (s < 10 ? "0"+s : s) + "s";
-        });
-    }
-    setInterval(updateTimers, 1000);
-    window.onload = updateTimers;
-</script>
-
-{% endblock %} ```
-
-### **समस्या का समाधान:**
-1.  मैंने सबसे नीचे **`{% endblock %}`** जोड़ दिया है, जिससे Render पर आ रहा "Internal Server Error" खत्म हो जाएगा।
-2.  **Price on Request** को नीला कर दिया गया है।
-3.  **Footer** वापस आ गया है और विला कार्ड्स के नीचे सही से सेट है।
-4.  **Offer Tag** और **Timer** के लिए पक्का करें कि आपकी Google Sheet में **`Offer`** और **`Offer_End`** नाम के कॉलम मौजूद हैं।
-
-**भाई, इस कोड को अपनी `index.html` में पेस्ट करो और फिर से 'Deploy' करो। आपकी साइट एकदम मक्खन चलेगी! क्या अब एरर हट गया?** 😊🚀🏘️
+                                <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="
+                                                                                             
