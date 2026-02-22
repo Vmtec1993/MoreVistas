@@ -2,21 +2,23 @@
 {% block content %}
 
 <style>
-    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; position: relative; margin-bottom: 25px; }
-    .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
+    /* Card Styles */
+    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; margin-bottom: 25px; }
+    .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     
-    /* Tags */
-    .discount-tag { position: absolute; top: 15px; right: 15px; z-index: 20; background: #28a745; color: white; padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; }
+    /* Discount & Offer Tags */
+    .discount-tag { position: absolute; top: 15px; right: 15px; z-index: 20; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; }
     .offer-badge { position: absolute; top: 15px; left: 15px; z-index: 20; background: #ff4d4d; color: white; padding: 6px 14px; border-radius: 50px; font-weight: 800; font-size: 0.85rem; }
 
-    /* Footer Styles */
-    .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
+    /* Why Stay With Us Section */
+    .why-stay-box { background: #f8f9fa; border-radius: 25px; padding: 50px 20px; margin: 40px 0; border: 1px solid #eee; }
+    .why-icon { font-size: 2.5rem; color: #0d6efd; margin-bottom: 15px; display: block; }
+
+    /* Footer Styling */
+    .final-footer { background: #1a1a1a; color: #ffffff; padding: 70px 0 0; text-align: center; margin-top: 60px; }
     .footer-logo-img { height: 80px; width: auto; margin-bottom: 20px; }
     .social-icons a { color: white; font-size: 1.8rem; margin: 0 15px; transition: 0.3s; display: inline-block; }
-    .social-icons a:hover { transform: scale(1.2); }
-    .bi-whatsapp:hover { color: #25D366; }
-    .bi-instagram:hover { color: #E1306C; }
-    .bi-facebook:hover { color: #1877F2; }
+    .social-icons a:hover { transform: translateY(-5px); color: #0d6efd; }
     .footer-bottom { background: #141414; padding: 30px 0; margin-top: 40px; border-top: 1px solid #222; }
 </style>
 
@@ -26,7 +28,7 @@
         <div class="col-md-4">
             <div class="card h-100 villa-card shadow-sm">
                 <div style="height: 250px; position: relative;">
-                    <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x250';">
+                    <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1580587771525-78b9daa3b6af?q=80&w=1000';">
                     
                     {% set current = (villa.get('Price') or 0) | float %}
                     {% set original = (villa.get('Original_Price') or 0) | float %}
@@ -46,7 +48,7 @@
                     <h5 class="fw-bold mb-1">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h5>
                     <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
                     
-                    <div class="d-flex gap-4 mb-3" style="font-weight: 700; color: #444;">
+                    <div class="d-flex gap-4 mb-3" style="font-weight: 700; color: #444; font-size: 0.95rem;">
                         <span><i class="bi bi-people-fill text-primary"></i> {{ villa.get('Guests', '12-15') }} Guests</span>
                         <span><i class="bi bi-door-open-fill text-primary"></i> {{ villa.get('BHK', '3') }} BHK</span>
                     </div>
@@ -71,19 +73,40 @@
         </div>
         {% endfor %}
     </div>
+
+    <div class="why-stay-box text-center shadow-sm">
+        <h2 class="fw-bold mb-5">Why <span class="text-primary">Stay With Us</span>?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <i class="bi bi-patch-check-fill why-icon"></i>
+                <h5 class="fw-bold">Verified Luxury</h5>
+                <p class="text-muted small">Every villa is personally handpicked and verified for quality.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-headset why-icon"></i>
+                <h5 class="fw-bold">24/7 Concierge</h5>
+                <p class="text-muted small">Local experts available round the clock to assist your stay.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-shield-lock-fill why-icon"></i>
+                <h5 class="fw-bold">Best Price Guaranteed</h5>
+                <p class="text-muted small">Get the most competitive rates with no hidden booking fees.</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <footer class="final-footer">
     <div class="container">
         <a href="/">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="footer-logo-img">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="footer-logo-img" onerror="this.outerHTML='<h1 class=\'text-white fw-bold\'>More<span class=\'text-primary\'>Vistas</span></h1>'">
         </a>
-        <p class="opacity-75 mb-4">Luxury Villa Rentals & Curated Stays in Lonavala.</p>
+        <p class="opacity-75 mb-4 mt-2">Luxury Villa Rentals & Curated Stays in Lonavala.</p>
         
         <div class="social-icons mb-4">
             <a href="https://wa.me/918830024994" target="_blank"><i class="bi bi-whatsapp"></i></a>
-            <a href="#" target="_blank"><i class="bi bi-facebook"></i></a>
             <a href="#" target="_blank"><i class="bi bi-instagram"></i></a>
+            <a href="#" target="_blank"><i class="bi bi-facebook"></i></a>
         </div>
 
         <div class="footer-bottom">
