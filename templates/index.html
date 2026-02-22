@@ -2,29 +2,25 @@
 {% block content %}
 
 <style>
-    /* विला कार्ड और इफेक्ट्स */
+    /* Card Design */
     .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; margin-bottom: 25px; }
     .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     
-    /* 🏷️ Discount Tag (35% OFF) - जो पहले से ठीक है */
-    .discount-tag {
-        position: absolute; top: 15px; right: 15px; z-index: 20;
-        background: #28a745; color: white; padding: 4px 10px;
-        border-radius: 8px; font-weight: 800; font-size: 0.75rem;
-    }
-
-    /* 🔥 Offer Tag (Red) */
+    /* Green Discount Tag */
+    .discount-tag { position: absolute; top: 15px; right: 15px; z-index: 20; background: #28a745; color: white; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; }
+    
+    /* Red Offer Tag */
     .offer-badge { position: absolute; top: 15px; left: 15px; z-index: 20; background: #ff4d4d; color: white; padding: 6px 14px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; }
 
-    /* Price Styling */
-    .original-price { text-decoration: line-through; color: #999; font-size: 0.85rem; display: block; margin-bottom: -5px; }
-    .price-request-box { background: #f0f7ff; padding: 6px 14px; border-radius: 10px; border: 1px solid #cce3ff; }
+    /* Info Icons (BHK/Guests) */
+    .villa-info { font-size: 0.9rem; color: #666; font-weight: 600; }
+    .villa-info i { color: #0d6efd; margin-right: 5px; }
 
-    /* 🖤 Footer Styling */
+    /* Footer Logo & Styling */
     .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 50px; }
-    .footer-logo-text { font-size: 2rem; font-weight: 800; text-decoration: none; color: white !important; display: inline-block; }
+    /* यहाँ अपना लोगो इमेज URL बदलें */
+    .footer-logo-img { height: 45px; margin-bottom: 15px; filter: brightness(0) invert(1); } 
     .footer-bottom { background: #141414; padding: 25px 0; margin-top: 40px; border-top: 1px solid #222; }
-    .footer-links a { color: #bbb; text-decoration: none; margin: 0 15px; font-size: 0.95rem; }
 </style>
 
 <div class="container my-5">
@@ -37,9 +33,10 @@
                     
                     {% set current = (villa.get('Price') or 0) | float %}
                     {% set original = (villa.get('Original_Price') or 0) | float %}
+                    
                     {% if original > current and current > 0 %}
-                        {% set discount_percent = (((original - current) / original) * 100) | round | int %}
-                        <div class="discount-tag">{{ discount_percent }}% OFF</div>
+                        {% set disc = (((original - current) / original) * 100) | round | int %}
+                        <div class="discount-tag">{{ disc }}% OFF</div>
                     {% endif %}
 
                     {% set offer = villa.get('Offer', '') | string %}
@@ -52,22 +49,22 @@
                     <h5 class="fw-bold mb-1">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h5>
                     <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
                     
-                    <div class="d-flex gap-3 mb-3">
-                        <small class="text-secondary fw-600"><i class="bi bi-people-fill me-1"></i>{{ villa.get('Guests', '12-15') }} Guests</small>
-                        <small class="text-secondary fw-600"><i class="bi bi-house-door-fill me-1"></i>{{ villa.get('BHK', '3') }} BHK</small>
+                    <div class="d-flex gap-4 mb-3 villa-info">
+                        <span><i class="bi bi-people-fill"></i>{{ villa.get('Guests', '12-15') }} Guests</span>
+                        <span><i class="bi bi-door-open-fill"></i>{{ villa.get('BHK', '3') }} BHK</span>
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between pt-3 border-top">
                         <div>
                             {% if current > 0 %}
-                                {% if original > current %}
-                                    <span class="original-price">₹{{ original | int }}</span>
-                                {% endif %}
-                                <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fw-normal fs-6">/night</small></h5>
-                            {% else %}
-                                <div class="price-request-box">
-                                    <p class="text-primary fw-bold mb-0" style="font-size: 0.9rem;">Price on Request</p>
+                                <div class="d-flex flex-column">
+                                    {% if original > current %}
+                                        <small class="text-decoration-line-through text-muted">₹{{ original | int }}</small>
+                                    {% endif %}
+                                    <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fw-normal fs-6">/night</small></h5>
                                 </div>
+                            {% else %}
+                                <div class="px-3 py-1 bg-light border rounded text-primary fw-bold small">Price on Request</div>
                             {% endif %}
                         </div>
                         <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Explore</a>
@@ -81,28 +78,32 @@
 
 <section class="bg-light py-5 border-top">
     <div class="container text-center">
-        <h2 class="fw-bold mb-4">Why <span class="text-primary">Stay With Us</span>?</h2>
+        <h2 class="fw-bold mb-5">Why <span class="text-primary">Stay With Us</span>?</h2>
         <div class="row g-4">
-            <div class="col-md-4"><h5><i class="bi bi-shield-check text-primary"></i> Verified Villas</h5></div>
-            <div class="col-md-4"><h5><i class="bi bi-headset text-primary"></i> 24/7 Support</h5></div>
-            <div class="col-md-4"><h5><i class="bi bi-stars text-primary"></i> Luxury Service</h5></div>
+            <div class="col-md-4">
+                <i class="bi bi-shield-check fs-1 text-primary"></i>
+                <h5 class="fw-bold mt-3">Verified Villas</h5>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-headset fs-1 text-primary"></i>
+                <h5 class="fw-bold mt-3">24/7 Support</h5>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-stars fs-1 text-primary"></i>
+                <h5 class="fw-bold mt-3">Luxury Service</h5>
+            </div>
         </div>
     </div>
 </section>
 
 <footer class="final-footer">
     <div class="container">
-        <a href="/" class="footer-logo-text">
-            More<span class="text-primary">Vistas</span>
+        <a href="/">
+            <img src="https://static.wixstatic.com/media/your-logo-file.png" alt="MoreVistas" class="footer-logo-img" onerror="this.style.display='none'">
+            <h2 class="text-white fw-bold d-inline-block align-middle ms-2">More<span class="text-primary">Vistas</span></h2>
         </a>
         <p class="small opacity-50 mb-4 mt-2">Curating memories in Lonavala.</p>
         
-        <div class="footer-links">
-            <a href="/">Home</a>
-            <a href="/about">About</a>
-            <a href="/contact">Contact</a>
-        </div>
-
         <div class="footer-bottom">
             <p class="mb-0 opacity-50" style="font-size: 0.85rem;">© 2026 MoreVistas. Built with ❤️ in Lonavala.</p>
         </div>
