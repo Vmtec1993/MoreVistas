@@ -2,78 +2,76 @@
 {% block content %}
 
 <style>
-    /* लग्जरी कार्ड डिजाइन */
-    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
+    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; }
     
-    .discount-badge-mini {
-        font-size: 0.7rem; background: #28a745; color: white;
-        padding: 3px 10px; border-radius: 6px; font-weight: 800;
+    /* 🔥 Fire Offer Tag Style */
+    .offer-badge {
+        position: absolute; top: 15px; left: 15px; z-index: 10;
+        background: #ff4d4d; color: white; padding: 5px 12px;
+        border-radius: 50px; font-weight: bold; font-size: 0.8rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-    /* Why Stay With Us Section */
-    .feature-card {
-        padding: 30px; border-radius: 20px; background: white;
-        transition: 0.3s; border: 1px solid #eee; height: 100%;
-    }
-    .feature-card:hover { background: #f8faff; border-color: #0d6efd; }
-    .icon-circle {
-        width: 60px; height: 60px; background: #e7f1ff; color: #0d6efd;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 50%; font-size: 1.5rem; margin-bottom: 20px;
+    /* ⏳ Modern Timer Box */
+    .timer-box {
+        position: absolute; top: 50px; left: 15px; z-index: 10;
+        background: rgba(0,0,0,0.8); color: #fff; font-size: 10px;
+        padding: 4px 10px; border-radius: 6px; font-weight: bold;
+        border: 1px solid rgba(255,255,255,0.2); margin-top: 5px;
     }
 
-    /* Mini Professional Footer */
-    .mini-footer { background: #1a1a1a; color: #999; padding: 40px 0 20px; font-size: 0.85rem; }
-    .footer-link { color: #ccc; text-decoration: none; transition: 0.2s; }
-    .footer-link:hover { color: #fff; }
+    .price-request-box { background: #fff9ea; padding: 5px 12px; border-radius: 8px; border: 1px solid #ffe08a; }
+    .text-gold { color: #b8860b; font-weight: 800; }
+    .mini-footer { background: #1a1a1a; color: #999; padding: 30px 0; margin-top: 0 !important; }
 </style>
-
-<header class="py-5 text-center text-white" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 120px 0 !important;">
-    <div class="container">
-        <h1 class="display-4 fw-bold mb-3">Your Private Escape in Lonavala</h1>
-        <p class="lead opacity-75">Handpicked Luxury Villas for Unforgettable Memories.</p>
-    </div>
-</header>
 
 <div class="container my-5">
     <div class="row g-4">
         {% for villa in villas %}
         <div class="col-md-4">
-            <div class="card h-100 villa-card">
-                <div style="height: 240px; position: relative;">
-                    <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover; border-radius: 20px 20px 0 0;" onerror="this.src='https://images.unsplash.com/photo-1580587771525-78b9daa3b6af?q=80&w=1000';">
-                    {% if villa.get('Status') == 'Booked' %}
-                    <span class="badge bg-danger" style="position: absolute; top: 15px; right: 15px;">Sold Out</span>
+            <div class="card h-100 villa-card shadow-sm">
+                
+                <div style="height: 240px; position: relative; overflow: hidden;">
+                    <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1580587771525-78b9daa3b6af?q=80&w=1000';">
+                    
+                    {% set offer = villa.get('Offer', '') %}
+                    {% set expiry = villa.get('Offer_End', '') | string | trim %}
+
+                    {% if offer and offer|lower != 'nan' and offer != '' %}
+                    <div class="offer-badge">
+                        <i class="bi bi-fire"></i> {{ offer }}
+                    </div>
+                    
+                    {% if expiry and expiry|lower != 'nan' and expiry != '' %}
+                    <div class="timer-box">
+                        <i class="bi bi-clock-fill text-warning me-1"></i>Ends In: 
+                        <span class="main-timer" data-expire="{{ expiry }}">Calculating...</span>
+                    </div>
+                    {% endif %}
                     {% endif %}
                 </div>
 
                 <div class="card-body p-4">
-                    <h5 class="fw-bold mb-1">{{ villa.get('Villa_Name', 'Luxury Property') }}</h5>
-                    <p class="text-muted small"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
+                    <h5 class="fw-bold mb-1">{{ villa.get('Villa_Name', 'Luxury Villa') }}</h5>
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
                     
-                    <div class="d-flex gap-3 my-3">
-                        <small class="text-secondary"><i class="bi bi-people"></i> 12-15 Guests</small>
+                    <div class="d-flex gap-3 mb-3">
+                        <small class="text-secondary"><i class="bi bi-people"></i> {{ villa.get('Guests', '12') }} Guests</small>
                         <small class="text-secondary"><i class="bi bi-door-open"></i> {{ villa.get('BHK', '3') }} BHK</small>
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between pt-3 border-top">
                         <div>
-                            {% set original = (villa.get('Original_Price') or 0) | float %}
                             {% set current = (villa.get('Price') or 0) | float %}
-                            
                             {% if current > 0 %}
-                                {% if original > current %}
-                                <small class="text-muted text-decoration-line-through">₹{{ original | int }}</small>
-                                <span class="discount-badge-mini mb-1">{{ (((original - current) / original) * 100) | round | int }}% OFF</span>
-                                {% endif %}
                                 <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fw-normal fs-6">/night</small></h5>
                             {% else %}
-                                <h6 class="m-0 fw-bold text-dark">Price on Request</h6>
-                                <small class="text-muted">Best Deal Guaranteed</small>
+                                <div class="price-request-box">
+                                    <div class="text-gold small mb-0">Price on Request</div>
+                                </div>
                             {% endif %}
                         </div>
-                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Explore</a>
+                        <a href="/villa/{{ villa.get('Villa_ID', '') }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">View Details</a>
                     </div>
                 </div>
             </div>
@@ -82,59 +80,35 @@
     </div>
 </div>
 
-<section class="py-5 bg-white">
-    <div class="container py-4">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">Why <span class="text-primary">Stay With Us</span>?</h2>
-            <p class="text-muted">Experience hospitality like never before.</p>
-        </div>
-        <div class="row g-4 text-center">
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <div class="icon-circle mx-auto"><i class="bi bi-shield-check"></i></div>
-                    <h5 class="fw-bold">Trusted Selection</h5>
-                    <p class="text-muted small">Every villa is personally verified for luxury and cleanliness.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card border-primary">
-                    <div class="icon-circle mx-auto" style="background: #0d6efd; color: white;"><i class="bi bi-headset"></i></div>
-                    <h5 class="fw-bold">24/7 Concierge</h5>
-                    <p class="text-muted small">Our local team is always available to help you during your stay.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <div class="icon-circle mx-auto"><i class="bi bi-wallet2"></i></div>
-                    <h5 class="fw-bold">Best Price Promise</h5>
-                    <p class="text-muted small">Get the most premium experience without the hidden costs.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+<script>
+    function updateTimers() {
+        document.querySelectorAll('.main-timer').forEach(timer => {
+            let expireStr = timer.getAttribute('data-expire');
+            if (!expireStr) return;
 
-<footer class="mini-footer">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
-                <h5 class="text-white fw-bold mb-1">More<span class="text-primary">Vistas</span></h5>
-                <p class="mb-0 small">Curating memories in Lonavala.</p>
-            </div>
-            <div class="col-md-4 text-center mb-3 mb-md-0">
-                <a href="/" class="footer-link mx-2">Home</a>
-                <a href="/about" class="footer-link mx-2">About</a>
-                <a href="/contact" class="footer-link mx-2">Contact</a>
-            </div>
-            <div class="col-md-4 text-center text-md-end">
-                <div class="mb-2">
-                    <a href="#" class="text-white mx-2"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="text-white mx-2"><i class="bi bi-facebook"></i></a>
-                </div>
-                <p class="mb-0 x-small">© 2026 MoreVistas. All Rights Reserved.</p>
-            </div>
-        </div>
-    </div>
-</footer>
+            // Date formatting logic
+            let parts = expireStr.split(' ')[0].split('/');
+            let timePart = expireStr.split(' ')[1] || "23:59:59";
+            let finalDate = (parts[0].length === 2) ? parts[2]+"-"+parts[1]+"-"+parts[0]+"T"+timePart : expireStr.replace(" ", "T");
+
+            const countTo = new Date(finalDate).getTime();
+            const now = new Date().getTime();
+            const diff = countTo - now;
+
+            if (diff <= 0) {
+                timer.innerHTML = "EXPIRED";
+                return;
+            }
+
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            timer.innerHTML = h + "h " + (m < 10 ? "0"+m : m) + "m " + (s < 10 ? "0"+s : s) + "s";
+        });
+    }
+    setInterval(updateTimers, 1000);
+    window.onload = updateTimers;
+</script>
 
 {% endblock %}
