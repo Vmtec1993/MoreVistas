@@ -13,27 +13,16 @@
         .brand-logo { height: 75px !important; width: auto; margin: -10px 0; object-fit: contain; }
         .nav-brand-text { font-weight: 800; font-size: 1.6rem; color: #1a1a1a; letter-spacing: -1px; text-decoration: none; }
         
-        /* डिस्काउंट टैग स्टाइल */
         .discount-tag-mini {
-            font-size: 0.65rem;
-            background-color: #28a745;
-            color: white;
-            padding: 1px 6px;
-            border-radius: 4px;
-            font-weight: 800;
-            display: inline-block;
-            margin-left: 5px;
-            text-transform: uppercase;
-            vertical-align: middle;
-            line-height: 1.2;
+            font-size: 0.65rem; background-color: #28a745; color: white;
+            padding: 1px 6px; border-radius: 4px; font-weight: 800;
+            display: inline-block; margin-left: 5px; text-transform: uppercase;
+            vertical-align: middle; line-height: 1.2;
         }
 
         .promo-bar { background: #ff4d4d; color: white; padding: 8px 0; font-weight: 600; overflow: hidden; }
-        .offcanvas { width: 280px !important; border-radius: 0 20px 20px 0 !important; }
-        
-        /* Sidebar Links Styling */
-        .nav-link:hover { color: #0d6efd !important; background: #f0f7ff; border-radius: 10px; }
-        .sidebar-footer { position: absolute; bottom: 20px; width: 85%; }
+        .offcanvas { width: 280px !important; }
+        .nav-link:hover { color: #0d6efd !important; background: #f8f9fa; border-radius: 8px; }
 
         @media (max-width: 576px) {
             .brand-logo { height: 65px !important; }
@@ -63,49 +52,33 @@
 
     <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
         <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title fw-bold text-primary">MoreVistas Menu</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <h5 class="offcanvas-title fw-bold">MoreVistas Menu</h5>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
-            <ul class="nav flex-column gap-2 fs-6">
+            <ul class="nav flex-column gap-2 fs-5">
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-medium p-3 d-flex align-items-center" href="/">
-                        <i class="bi bi-house-door me-3 text-primary fs-5"></i> Home
-                    </a>
+                    <a class="nav-link text-dark fw-medium" href="/"><i class="bi bi-house me-2"></i> Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-medium p-3 d-flex align-items-center" href="/about">
-                        <i class="bi bi-info-circle me-3 text-primary fs-5"></i> About Us
-                    </a>
+                    <a class="nav-link text-dark fw-medium" href="/about"><i class="bi bi-info-circle me-2"></i> About Us</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-medium p-3 d-flex align-items-center" href="/contact">
-                        <i class="bi bi-telephone me-3 text-primary fs-5"></i> Contact Us
-                    </a>
+                    <a class="nav-link text-dark fw-medium" href="/contact"><i class="bi bi-telephone me-2"></i> Contact Us</a>
                 </li>
             </ul>
-
-            <div class="sidebar-footer">
-                <hr>
-                <a href="https://wa.me/918830024994" class="btn btn-success w-100 rounded-pill fw-bold">
-                    <i class="bi bi-whatsapp me-2"></i> WhatsApp Support
+            <div class="mt-5 pt-3 border-top">
+                <a href="https://wa.me/91XXXXXXXXXX" class="btn btn-success w-100 rounded-pill fw-bold">
+                    <i class="bi bi-whatsapp me-2"></i> WhatsApp Us
                 </a>
-                <p class="small text-muted text-center mt-3">Lonavala's Best Stays</p>
             </div>
         </div>
     </div>
 
     {% block content %}{% endblock %}
 
-    <footer class="bg-dark text-white pt-5 pb-4 mt-5">
-        <div class="container text-center">
-            <h5 class="fw-bold mb-3">More<span class="text-primary">Vistas</span></h5>
-            <div class="d-flex justify-content-center gap-3 mb-4 fs-4">
-                <a href="#" class="text-white"><i class="bi bi-instagram"></i></a>
-                <a href="#" class="text-white"><i class="bi bi-facebook"></i></a>
-            </div>
-            <p class="small opacity-50 mb-0">© 2026 MoreVistas Luxury Stays. Built with ❤️ in Lonavala.</p>
-        </div>
+    <footer class="bg-dark text-white pt-5 pb-4 mt-5 text-center">
+        <p>© 2026 MoreVistas. Built with ❤️ in Lonavala.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
