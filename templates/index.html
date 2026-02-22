@@ -2,32 +2,38 @@
 {% block content %}
 
 <style>
+    /* Villa Card Styling */
     .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; margin-bottom: 20px; }
     .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     
-    /* 🔥 Discount Tag (Auto Calculated) */
+    /* 🏷️ Discount Tag (Auto Calculated) */
     .discount-tag {
         position: absolute; top: 15px; right: 15px; z-index: 20;
-        background: #28a745; color: white; padding: 4px 10px;
-        border-radius: 8px; font-weight: 800; font-size: 0.75rem;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        background: #28a745; color: white; padding: 5px 12px;
+        border-radius: 10px; font-weight: 800; font-size: 0.75rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
 
+    /* 🔥 Offer Tag & Timer */
     .offer-badge { position: absolute; top: 15px; left: 15px; z-index: 20; background: #ff4d4d; color: white; padding: 6px 14px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; }
     .timer-box { position: absolute; top: 52px; left: 15px; z-index: 20; background: rgba(0,0,0,0.75); color: #fff; font-size: 11px; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
 
+    /* Price Styling */
     .original-price { text-decoration: line-through; color: #999; font-size: 0.85rem; font-weight: 400; display: block; margin-bottom: -5px; }
     .price-request-box { background: #f0f7ff; padding: 6px 14px; border-radius: 10px; border: 1px solid #cce3ff; display: inline-block; }
     .text-blue-premium { color: #0056b3; font-weight: 800; margin-bottom: 0; font-size: 0.9rem; }
 
+    /* Sections */
     .why-stay-section { background: #f8f9fa; padding: 60px 0; border-top: 1px solid #eee; }
     .feature-card { padding: 30px; border-radius: 20px; background: white; border: 1px solid #eee; height: 100%; transition: 0.3s; }
     .icon-circle { width: 60px; height: 60px; background: #e7f1ff; color: #0d6efd; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 1.5rem; margin: 0 auto 20px; }
 
+    /* 🖤 Footer Styling */
     .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; }
-    .footer-logo-img { height: 50px; margin-bottom: 15px; } /* लोगो की साइज यहाँ से बदलें */
+    .footer-logo-text { font-size: 1.8rem; font-weight: 800; text-decoration: none; color: white; display: inline-block; margin-bottom: 10px; }
     .footer-bottom { background: #141414; padding: 25px 0; margin-top: 40px; border-top: 1px solid #222; }
-    .footer-links a { color: #bbb; text-decoration: none; margin: 0 15px; font-size: 0.95rem; }
+    .footer-links a { color: #bbb; text-decoration: none; margin: 0 15px; font-size: 0.95rem; transition: 0.3s; }
+    .footer-links a:hover { color: #0d6efd; }
 </style>
 
 <div class="container my-5">
@@ -42,8 +48,8 @@
                     {% set original = (villa.get('Original_Price') or 0) | float %}
                     
                     {% if original > current and current > 0 %}
-                        {% set discount = ((original - current) / original * 100) | round | int %}
-                        <div class="discount-tag">{{ discount }}% OFF</div>
+                        {% set discount_percent = (((original - current) / original) * 100) | round | int %}
+                        <div class="discount-tag">{{ discount_percent }}% OFF</div>
                     {% endif %}
 
                     {% set offer = villa.get('Offer', '') | string %}
@@ -82,18 +88,17 @@
     <div class="container text-center">
         <h2 class="fw-bold mb-5">Why <span class="text-primary">Stay With Us</span>?</h2>
         <div class="row g-4">
-            <div class="col-md-4"><div class="feature-card shadow-sm"><div class="icon-circle"><i class="bi bi-shield-check"></i></div><h5 class="fw-bold">Verified Villas</h5><p class="text-muted small mb-0">Quality checked properties.</p></div></div>
-            <div class="col-md-4"><div class="feature-card shadow-sm"><div class="icon-circle"><i class="bi bi-headset"></i></div><h5 class="fw-bold">24/7 Support</h5><p class="text-muted small mb-0">Always here to help.</p></div></div>
-            <div class="col-md-4"><div class="feature-card shadow-sm"><div class="icon-circle"><i class="bi bi-stars"></i></div><h5 class="fw-bold">Luxury Service</h5><p class="text-muted small mb-0">Best-in-class hospitality.</p></div></div>
+            <div class="col-md-4"><div class="feature-card shadow-sm"><div class="icon-circle"><i class="bi bi-shield-check"></i></div><h5 class="fw-bold">Verified Villas</h5><p class="text-muted small mb-0">Personally checked for quality stays.</p></div></div>
+            <div class="col-md-4"><div class="feature-card shadow-sm"><div class="icon-circle"><i class="bi bi-headset"></i></div><h5 class="fw-bold">24/7 Support</h5><p class="text-muted small mb-0">Always here to help you in Lonavala.</p></div></div>
+            <div class="col-md-4"><div class="feature-card shadow-sm"><div class="icon-circle"><i class="bi bi-stars"></i></div><h5 class="fw-bold">Luxury Service</h5><p class="text-muted small mb-0">Premium hospitality experience.</p></div></div>
         </div>
     </div>
 </section>
 
 <footer class="final-footer">
     <div class="container">
-        <a href="/">
-            <img src="https://your-logo-url-here.png" alt="MoreVistas Logo" class="footer-logo-img" onerror="this.style.display='none'">
-            <h2 style="color:white; font-weight:800;">More<span class="text-primary">Vistas</span></h2>
+        <a href="/" class="footer-logo-text">
+            More<span class="text-primary">Vistas</span>
         </a>
         <p class="small opacity-50 mb-4 mt-2">Curating memories in Lonavala.</p>
         
@@ -105,6 +110,7 @@
 
         <div class="footer-bottom">
             <p class="mb-1 opacity-50" style="font-size: 0.85rem;">© 2026 MoreVistas. Private Luxury Escapes.</p>
+            <p class="opacity-50 mb-0" style="font-size: 0.75rem;">Built with ❤️ in Lonavala.</p>
         </div>
     </div>
 </footer>
