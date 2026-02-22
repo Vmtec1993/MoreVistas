@@ -6,6 +6,7 @@
     .offer-runner { background: #000; color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap; }
     .runner-text { display: inline-block; animation: scroll-text 15s linear infinite; font-weight: 700; text-transform: uppercase; }
     @keyframes scroll-text { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+    .app-link { color: #0d6efd !important; text-decoration: none; font-weight: 800; margin: 0 20px; }
 
     /* Villa Card Styles */
     .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; margin-bottom: 25px; }
@@ -14,26 +15,27 @@
     .offer-badge { background: #ff4d4d; color: white; padding: 4px 15px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-block; margin-bottom: 5px; }
     .timer-text { font-size: 0.75rem; font-weight: 700; color: #ff4d4d; margin-top: 2px; display: block; }
 
-    /* Why Stay Here Section */
+    /* Why Stay Section */
     .why-stay-box { background: #f8f9fa; border-radius: 25px; padding: 50px 20px; margin: 40px 0; border: 1px solid #eee; text-align: center; }
     .why-icon { font-size: 2.5rem; color: #0d6efd; margin-bottom: 15px; display: block; }
 
     /* Footer Styling */
     .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
     .footer-logo-img { height: 75px; width: auto; margin-bottom: 20px; }
-    .social-icons a { color: white; font-size: 1.8rem; margin: 0 15px; transition: 0.3s; display: inline-block; }
-    .social-icons a:hover { transform: translateY(-5px); color: #0d6efd; }
+    .social-icons a { color: white; font-size: 1.8rem; margin: 0 15px; display: inline-block; }
     .footer-bottom { background: #141414; padding: 30px 0; margin-top: 40px; border-top: 1px solid #222; }
 </style>
 
 <div class="offer-runner">
     <div class="runner-text">
+        <a href="https://drive.google.com/file/d/12cErjJSSzXthfBtjItHf5vLwod7rIdbj/view?usp=drivesdk" class="app-link"><i class="bi bi-android2"></i> 📲 DOWNLOAD APP</a> |
         {% for villa in villas %}
             {% if villa.Offer and villa.Offer|string != 'nan' %}
                🔥 {{ villa.Villa_Name }}: {{ villa.Offer }} | 
             {% endif %}
         {% endfor %}
-        📞 CALL FOR INSTANT DISCOUNTS: 8830024994 🔥
+        📞 CALL: 8830024994 |
+        <a href="https://drive.google.com/file/d/12cErjJSSzXthfBtjItHf5vLwod7rIdbj/view?usp=drivesdk" class="app-link">BOOK FASTER ON OUR APP <i class="bi bi-android2"></i></a>
     </div>
 </div>
 
@@ -43,7 +45,7 @@
         <div class="col-md-4">
             <div class="card h-100 villa-card shadow-sm">
                 <div style="height: 250px; position: relative;">
-                    <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x250';">
+                    <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;">
                     
                     {% set current = (villa.get('Price') or 0) | float %}
                     {% set original = (villa.get('Original_Price') or 0) | float %}
@@ -120,12 +122,17 @@
 
 <footer class="final-footer">
     <div class="container">
+        <div class="mb-5">
+            <a href="https://drive.google.com/file/d/12cErjJSSzXthfBtjItHf5vLwod7rIdbj/view?usp=drivesdk" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow">
+                <i class="bi bi-android2 me-2"></i> Download Our Android App
+            </a>
+        </div>
+
         <a href="/">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="footer-logo-img" onerror="this.outerHTML='<h2 class=\'text-white fw-bold\'>More<span class=\'text-primary\'>Vistas</span></h2>'">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" class="footer-logo-img" onerror="this.outerHTML='<h2 class=\'text-white fw-bold\'>More<span class=\'text-primary\'>Vistas</span></h2>'">
         </a>
-        <p class="opacity-75 mb-4 mt-2">Luxury Villa Rentals & Curated Stays in Lonavala.</p>
         
-        <div class="social-icons mb-4">
+        <div class="social-icons mb-4 mt-3">
             <a href="https://wa.me/918830024994" target="_blank"><i class="bi bi-whatsapp"></i></a>
             <a href="#" target="_blank"><i class="bi bi-instagram"></i></a>
             <a href="#" target="_blank"><i class="bi bi-facebook"></i></a>
