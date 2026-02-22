@@ -2,17 +2,32 @@
 {% block content %}
 
 <style>
-    /* Card Styles */
+    /* Villa Card Styles */
     .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; margin-bottom: 25px; }
     .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     
-    /* Discount & Offer Tags */
-    .discount-tag { position: absolute; top: 15px; right: 15px; z-index: 20; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; }
+    /* Tags Styling */
+    .discount-tag { position: absolute; top: 15px; right: 15px; z-index: 20; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
     .offer-badge { position: absolute; top: 15px; left: 15px; z-index: 20; background: #ff4d4d; color: white; padding: 6px 14px; border-radius: 50px; font-weight: 800; font-size: 0.85rem; }
 
-    /* Footer Styling */
-    .final-footer { background: #1a1a1a; color: #ffffff; padding: 70px 0 0; text-align: center; margin-top: 60px; }
-    .footer-logo-img { height: 80px; width: auto; margin-bottom: 20px; } /* Footer mein logo aur bada kiya */
+    /* 🖤 Updated Footer & Social Icons */
+    .final-footer { background: #1a1a1a; color: #ffffff; padding: 70px 0 0; text-align: center; margin-top: 60px; border-top: 5px solid #0d6efd; }
+    .footer-logo-img { height: 80px; width: auto; margin-bottom: 20px; }
+    
+    .social-icons { margin: 25px 0; }
+    .social-icons a { 
+        color: white; 
+        font-size: 1.8rem; 
+        margin: 0 15px; 
+        transition: 0.3s ease-in-out; 
+        display: inline-block; 
+    }
+    /* Hover Effects for Icons */
+    .social-icons a:hover { transform: translateY(-5px); }
+    .bi-whatsapp:hover { color: #25D366; }
+    .bi-instagram:hover { color: #E1306C; }
+    .bi-facebook:hover { color: #1877F2; }
+
     .footer-bottom { background: #141414; padding: 30px 0; margin-top: 50px; border-top: 1px solid #222; }
 </style>
 
@@ -74,10 +89,16 @@
         <a href="/">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="footer-logo-img" onerror="this.outerHTML='<h1 class=\'text-white fw-bold\'>More<span class=\'text-primary\'>Vistas</span></h1>'">
         </a>
-        <p class="opacity-75 mb-4 mt-2">Luxury Villa Rentals & Curated Stays in Lonavala.</p>
+        <p class="opacity-75 mb-1 mt-2">Luxury Villa Rentals & Curated Stays in Lonavala.</p>
         
+        <div class="social-icons">
+            <a href="https://wa.me/91XXXXXXXXXX" target="_blank" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+            <a href="https://instagram.com/yourhandle" target="_blank" title="Instagram"><i class="bi bi-instagram"></i></a>
+            <a href="https://facebook.com/yourpage" target="_blank" title="Facebook"><i class="bi bi-facebook"></i></a>
+        </div>
+
         <div class="footer-bottom">
-            <p class="mb-0 opacity-50" style="font-size: 0.9rem;">© 2026 MoreVistas. All Rights Reserved.</p>
+            <p class="mb-0 opacity-50" style="font-size: 0.9rem;">© 2026 MoreVistas. All Rights Reserved. | <a href="/contact" class="text-white-50 text-decoration-none">Contact Us</a></p>
         </div>
     </div>
 </footer>
