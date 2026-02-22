@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
-{% block content %}
 
-<style>
-    <head>
+{% block head %}
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-</head>
-    
+{% endblock %}
+
+{% block content %}
+
+<style>
     /* 1. Top Runner Styling */
     .offer-runner { background: #000; color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap; }
     .runner-text { display: inline-block; animation: scroll-text 15s linear infinite; font-weight: 700; text-transform: uppercase; }
@@ -69,18 +70,14 @@
         <div class="col-md-4">
             <div class="card h-100 villa-card shadow-sm {% if villa.get('Status') == 'Sold Out' %}sold-out-overlay{% endif %}">
                 <div style="height: 250px; position: relative;">
-                    
                     {% if villa.get('Status') == 'Sold Out' %}
                     <div class="ribbon-wrapper">
                         <div class="sold-out-ribbon">Sold Out</div>
                     </div>
                     {% endif %}
-
                     <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;">
-                    
                     {% set current = (villa.get('Price') or 0) | float %}
                     {% set original = (villa.get('Original_Price') or 0) | float %}
-                    
                     {% if villa.get('Status') != 'Sold Out' and original > current and current > 0 %}
                         {% set disc = (((original - current) / original) * 100) | round | int %}
                         <div class="discount-tag">{{ disc }}% OFF</div>
@@ -90,7 +87,6 @@
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-1">{{ villa.get('Villa_Name') }}</h5>
                     <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
-                    
                     <div class="d-flex gap-4 mb-3 small fw-bold">
                         <span><i class="bi bi-people-fill text-primary"></i> {{ villa.get('Guests') }} Guests</span>
                         <span><i class="bi bi-door-open-fill text-primary"></i> {{ villa.get('BHK') }} BHK</span>
@@ -120,13 +116,12 @@
                                     <div class="px-3 py-1 bg-light border rounded text-primary fw-bold small">Price on Request</div>
                                 {% endif %}
                             </div>
-                            
                             <div class="d-flex gap-2">
                                 {% if villa.get('Status') == 'Sold Out' %}
                                     <button class="btn btn-secondary rounded-pill px-3 btn-sm fw-bold" disabled>Sold Out</button>
                                 {% else %}
                                     <a href="/villa/{{ villa.get('Villa_ID') }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Explore</a>
-                                    <button onclick="shareSingleVilla('{{ villa.get('Villa_Name') }}', '{{ villa.get('Villa_ID') }}')" class="btn btn-outline-dark btn-sm btn-share-card" title="Share Villa">
+                                    <button onclick="shareSingleVilla('{{ villa.get('Villa_Name') }}', '{{ villa.get('Villa_ID') }}')" class="btn btn-outline-dark btn-sm btn-share-card">
                                         <i class="bi bi-share"></i>
                                     </button>
                                 {% endif %}
@@ -138,54 +133,15 @@
         </div>
         {% endfor %}
     </div>
-
-    <div class="why-stay-box shadow-sm">
-        <h2 class="fw-bold mb-5">Why <span class="text-primary">Stay With Us</span>?</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <i class="bi bi-patch-check-fill why-icon"></i>
-                <h5 class="fw-bold">Verified Luxury</h5>
-                <p class="text-muted small">Quality checked premium villas.</p>
-            </div>
-            <div class="col-md-4">
-                <i class="bi bi-headset why-icon"></i>
-                <h5 class="fw-bold">24/7 Support</h5>
-                <p class="text-muted small">Always here to help you.</p>
-            </div>
-            <div class="col-md-4">
-                <i class="bi bi-shield-lock-fill why-icon"></i>
-                <h5 class="fw-bold">Best Price</h5>
-                <p class="text-muted small">Lowest rates guaranteed.</p>
-            </div>
-        </div>
-    </div>
 </div>
-
-<footer class="final-footer">
-    <div class="container">
-        <div class="mb-5">
-            <a href="https://drive.google.com/file/d/12cErjJSSzXthfBtjItHf5vLwod7rIdbj/view?usp=drivesdk" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow">
-                <i class="bi bi-android2 me-2"></i> Download Our Android App
-            </a>
-        </div>
-
-        <a href="/">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" class="footer-logo-img" onerror="this.outerHTML='<h2 class=\'text-white fw-bold\'>More<span class=\'text-primary\'>Vistas</span></h2>'">
-        </a>
-        
-        <div class="social-icons mb-4 mt-3">
-            <a href="https://wa.me/918830024994" target="_blank"><i class="bi bi-whatsapp"></i></a>
-            <a href="#" target="_blank"><i class="bi bi-instagram"></i></a>
-            <a href="#" target="_blank"><i class="bi bi-facebook"></i></a>
-        </div>
-
-        <div class="footer-bottom">
-            <p class="mb-0 opacity-50 small">© 2026 MoreVistas. All Rights Reserved.</p>
-        </div>
-    </div>
-</footer>
-
 <script>
+    // ✅ ब्राउज़र को मजबूर करना कि 'Back' बटन पर पेज रिलोड करे (Status update देखने के लिए)
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+
     function startCardTimers() {
         const timers = document.querySelectorAll('.card-timer');
         timers.forEach(timer => {
