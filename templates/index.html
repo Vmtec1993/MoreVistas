@@ -200,5 +200,59 @@
     }
     document.addEventListener('DOMContentLoaded', startCardTimers);
 </script>
+<footer class="final-footer">
+    <div class="container">
+        <div class="mb-5">
+            <a href="https://drive.google.com/file/d/12cErjJSSzXthfBtjItHf5vLwod7rIdbj/view?usp=drivesdk" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow">
+                <i class="bi bi-android2 me-2"></i> Download Our Android App
+            </a>
+        </div>
+
+        <a href="/">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" class="footer-logo-img" onerror="this.outerHTML='<h2 class=\'text-white fw-bold\'>More<span class=\'text-primary\'>Vistas</span></h2>'">
+        </a>
+        
+        <div class="social-icons mb-4 mt-3">
+            <a href="https://wa.me/918830024994" target="_blank" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+            <a href="https://instagram.com/your_profile" target="_blank" title="Instagram"><i class="bi bi-instagram"></i></a>
+            <a href="https://facebook.com/your_page" target="_blank" title="Facebook"><i class="bi bi-facebook"></i></a>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="container d-md-flex justify-content-between align-items-center text-center">
+                <p class="mb-0 opacity-50 small">© 2026 MoreVistas. All Rights Reserved.</p>
+                <div class="footer-links mt-3 mt-md-0">
+                    <a href="/about" class="text-white-50 text-decoration-none small mx-2">About Us</a>
+                    <a href="/contact" class="text-white-50 text-decoration-none small mx-2">Privacy Policy</a>
+                    <a href="/contact" class="text-white-50 text-decoration-none small mx-2">Terms & Conditions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    /* फुटर को सुंदर बनाने के लिए अतिरिक्त CSS */
+    .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
+    .footer-logo-img { height: 75px; width: auto; margin-bottom: 20px; }
+    
+    .social-icons a { 
+        color: white; 
+        font-size: 1.5rem; 
+        margin: 0 12px; 
+        display: inline-block; 
+        transition: 0.3s;
+        opacity: 0.8;
+    }
+    .social-icons a:hover { color: #0d6efd; opacity: 1; transform: translateY(-3px); }
+    
+    .footer-bottom { 
+        background: #141414; 
+        padding: 25px 0; 
+        margin-top: 40px; 
+        border-top: 1px solid #222; 
+    }
+    .footer-links a:hover { color: #ffffff !important; }
+</style>
 
 {% endblock %}
