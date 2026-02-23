@@ -33,6 +33,13 @@
     .offer-badge { background: #ff4d4d; color: white; padding: 4px 15px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-block; margin-bottom: 5px; }
     .timer-text { font-size: 0.75rem; font-weight: 700; color: #ff4d4d; margin-top: 2px; display: block; }
 
+    /* ✅ Explore Promo Section Styling */
+    .explore-promo { 
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1350&q=80');
+        background-size: cover; background-position: center;
+        border-radius: 30px; color: white; padding: 60px 20px; margin-top: 40px;
+    }
+
     /* Why Stay Section */
     .why-stay-box { background: #f8f9fa; border-radius: 25px; padding: 50px 20px; margin: 40px 0; border: 1px solid #eee; text-align: center; }
     .why-icon { font-size: 2.5rem; color: #0d6efd; margin-bottom: 15px; display: block; }
@@ -59,8 +66,8 @@
                🔥 {{ villa.Villa_Name }}: {{ villa.Offer }} | 
             {% endif %}
         {% endfor %}
-        📞 CALL: 8830024994 |
-        <a href="https://drive.google.com/file/d/12cErjJSSzXthfBtjItHf5vLwod7rIdbj/view?usp=drivesdk" class="app-link">BOOK FASTER ON OUR APP <i class="bi bi-android2"></i></a>
+        <a href="/explore-lonavala" class="text-warning text-decoration-none mx-3 fw-bold"><i class="bi bi-map"></i> EXPLORE LONAVALA POINTS</a> |
+        📞 CALL: 8830024994
     </div>
 </div>
 
@@ -133,9 +140,38 @@
         </div>
         {% endfor %}
     </div>
+
+    <div class="explore-promo text-center shadow">
+        <h2 class="fw-bold mb-3">Plan Your Perfect Sightseeing</h2>
+        <p class="mb-4 opacity-90">हमने आपके लिए लोनावला के सबसे बेहतरीन टूरिस्ट पॉइंट्स की लिस्ट तैयार की है।</p>
+        <a href="/explore-lonavala" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">
+            Explore Lonavala Points <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+    </div>
+
+    <div class="why-stay-box shadow-sm">
+        <h2 class="fw-bold mb-5">Why <span class="text-primary">Stay With Us</span>?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <i class="bi bi-patch-check-fill why-icon"></i>
+                <h5 class="fw-bold">Verified Luxury</h5>
+                <p class="text-muted small">Quality checked premium villas.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-headset why-icon"></i>
+                <h5 class="fw-bold">24/7 Support</h5>
+                <p class="text-muted small">Always here to help you.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-shield-lock-fill why-icon"></i>
+                <h5 class="fw-bold">Best Price</h5>
+                <p class="text-muted small">Lowest rates guaranteed.</p>
+            </div>
+        </div>
+    </div>
 </div>
+
 <script>
-    // ✅ ब्राउज़र को मजबूर करना कि 'Back' बटन पर पेज रिलोड करे (Status update देखने के लिए)
     window.addEventListener('pageshow', function(event) {
         if (event.persisted) {
             window.location.reload();
