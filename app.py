@@ -53,7 +53,6 @@ def send_telegram_alert(message):
 # --- ✅ Live Weather Fetch Function ---
 def get_lonavala_weather():
     try:
-        # OpenWeatherMap API
         api_key = "b8ee20104f767837862a93361e68787c" 
         url = f"https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid={api_key}"
         data = requests.get(url, timeout=5).json()
@@ -69,12 +68,16 @@ def get_lonavala_weather():
 
 @app.route('/')
 def index():
-    weather_data = get_lonavala_weather() # मौसम का डेटा यहाँ लोड हो रहा है
+    weather_data = get_lonavala_weather()
     villas = []
     if sheet:
-        villas = sheet.get_all_records()
-        for v in villas:
-            v['Status'] = v.get('Status', 'Available')
+        try:
+            # ✅ head=1 का इस्तेमाल किया ताकि Header Errors न आएं
+            villas = sheet.get_all_records(head=1)
+            for v in villas:
+                v['Status'] = v.get('Status', 'Available')
+        except Exception as e:
+            print(f"Data Fetch Error: {e}")
     return render_template('index.html', villas=villas, weather=weather_data)
 
 @app.route('/explore-lonavala')
@@ -82,7 +85,7 @@ def explore_lonavala():
     places = []
     if places_sheet:
         try:
-            places = places_sheet.get_all_records()
+            places = places_sheet.get_all_records(head=1)
         except Exception as e:
             print(f"Places Fetch Error: {e}")
     return render_template('explore.html', places=places)
@@ -108,9 +111,9 @@ def admin_dashboard():
     enquiries = []
     villas = []
     if sheet:
-        villas = sheet.get_all_records()
+        villas = sheet.get_all_records(head=1)
     if enquiry_sheet:
-        enquiries = enquiry_sheet.get_all_records()
+        enquiries = enquiry_sheet.get_all_records(head=1)
         enquiries.reverse()
         
     return render_template('admin_dashboard.html', enquiries=enquiries, villas=villas)
@@ -122,7 +125,7 @@ def update_villa_status(villa_id, new_status):
     
     if sheet:
         try:
-            all_records = sheet.get_all_records()
+            all_records = sheet.get_all_records(head=1)
             headers = sheet.row_values(1)
             try:
                 status_col_index = headers.index("Status") + 1
@@ -148,27 +151,37 @@ def admin_logout():
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     if sheet:
-        villas = sheet.get_all_records()
-        villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
-        if villa:
-            villa['Status'] = villa.get('Status', 'Available')
+        try:
+            villas = sheet.get_all_records(head=1)
+            villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
+            if villa:
+                villa['Status'] = villa.get('Status', 'Available')
+                
+                # --- ✅ गैलरी फिक्स (Image_URL और Image_URL_2-20) ---
+                villa_images = []
+                
+                # पहले मेन इमेज डालें (Column N)
+                main_img = villa.get('Image_URL')
+                if main_img and str(main_img).strip() != "" and str(main_img).lower() != 'nan':
+                    villa_images.append(main_img)
+
+                # फिर बाकी 2 से 20 तक के इमेज डालें
+                for i in range(2, 21):
+                    col_name = f"Image_URL_{i}"
+                    img_url = villa.get(col_name)
+                    if img_url and str(img_url).strip() != "" and str(img_url).lower() != 'nan': 
+                        villa_images.append(img_url)
+                
+                return render_template('villa_details.html', villa=villa, villa_images=villa_images)
+        except Exception as e:
+            print(f"Details Page Error: {e}")
             
-            # --- ✅ गैलरी के लिए फोटो लिस्ट (Image_URL_1 से 20 तक) ---
-            villa_images = []
-            for i in range(1, 21):
-                col_name = f"Image_URL_{i}"
-                img_url = villa.get(col_name)
-                # चेक करें कि URL खाली तो नहीं है
-                if img_url and str(img_url).strip() != "" and str(img_url).lower() != 'nan': 
-                    villa_images.append(img_url)
-            
-            return render_template('villa_details.html', villa=villa, villa_images=villa_images)
     return "Villa info not found", 404
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
     if sheet:
-        villas = sheet.get_all_records()
+        villas = sheet.get_all_records(head=1)
         villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
         
         if request.method == 'POST':
