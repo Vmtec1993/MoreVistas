@@ -7,13 +7,13 @@ import requests
 from datetime import datetime
 
 app = Flask(__name__)
-# ✅ Session के लिए Secret Key
 app.secret_key = "morevistas_admin_secure_key_2026" 
 
 # --- Google Sheets Setup ---
 creds_json = os.environ.get('GOOGLE_CREDS')
 sheet = None
 enquiry_sheet = None
+places_sheet = None # ✅ नया: टूरिस्ट पॉइंट्स के लिए
 
 if creds_json:
     try:
@@ -30,6 +30,13 @@ if creds_json:
             enquiry_sheet = main_spreadsheet.worksheet("Enquiries")
         except:
             enquiry_sheet = sheet
+
+        # ✅ नया: "Places" वर्कशीट लोड करना
+        try:
+            places_sheet = main_spreadsheet.worksheet("Places")
+        except:
+            places_sheet = None
+
     except Exception as e:
         print(f"Sheet Error: {e}")
 
@@ -52,15 +59,21 @@ def index():
     if sheet:
         villas = sheet.get_all_records()
         for v in villas:
-            v['Original_Price'] = v.get('Original_Price', '')
-            v['Offer'] = v.get('Offer', '')
-            v['Offer_End'] = v.get('Offer_End', '')
-            v['Guests'] = v.get('Guests', '12')
             v['Status'] = v.get('Status', 'Available')
     return render_template('index.html', villas=villas)
 
-# ✅ --- Admin Routes ---
+# ✅ नया: Explore Lonavala Route
+@app.route('/explore-lonavala')
+def explore_lonavala():
+    places = []
+    if places_sheet:
+        try:
+            places = places_sheet.get_all_records()
+        except Exception as e:
+            print(f"Places Fetch Error: {e}")
+    return render_template('explore.html', places=places)
 
+# ✅ Admin Routes
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
     error = None
@@ -89,7 +102,6 @@ def admin_dashboard():
         
     return render_template('admin_dashboard.html', enquiries=enquiries, villas=villas)
 
-# ✅ --- New Quick Update Route ---
 @app.route('/update-status/<villa_id>/<new_status>')
 def update_villa_status(villa_id, new_status):
     if not session.get('admin_logged_in'):
@@ -99,8 +111,6 @@ def update_villa_status(villa_id, new_status):
         try:
             all_records = sheet.get_all_records()
             headers = sheet.row_values(1)
-            
-            # ऑटोमेटिक "Status" कॉलम ढूँढना
             try:
                 status_col_index = headers.index("Status") + 1
             except ValueError:
@@ -115,22 +125,13 @@ def update_villa_status(villa_id, new_status):
         except Exception as e:
             print(f"Update Error: {e}")
             
-    return redirect(url_for('admin_dashboard'))
+    # ✅ Auto-refresh फिक्स के लिए टाइमस्टैम्प के साथ रीडायरेक्ट
+    return redirect(url_for('admin_dashboard', t=datetime.now().timestamp()))
 
 @app.route('/admin-logout')
 def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('admin_login'))
-
-# --- Other Routes ---
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
@@ -138,15 +139,7 @@ def villa_details(villa_id):
         villas = sheet.get_all_records()
         villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
         if villa:
-            villa['Original_Price'] = villa.get('Original_Price', '')
-            villa['Guests'] = villa.get('Guests', '12')
-            villa['Bedrooms'] = villa.get('Bedrooms', villa.get('BHK', ''))
-            villa['Bathrooms'] = villa.get('Bathrooms', '2')
-            villa['Amenities'] = villa.get('Amenities', '')
-            villa['Rules'] = villa.get('Rules', '')
             villa['Status'] = villa.get('Status', 'Available')
-            villa['Offer'] = villa.get('Offer', '')
-            villa['Offer_End'] = villa.get('Offer_End', '')
             return render_template('villa_details.html', villa=villa)
     return "Villa info not found", 404
 
@@ -163,26 +156,15 @@ def enquiry(villa_id):
             check_out = request.form.get('check_out')
             guests = request.form.get('guests')
             msg = request.form.get('message', 'No message')
-            
             today_date = datetime.now().strftime("%d-%m-%Y %H:%M")
 
             if enquiry_sheet:
                 try:
                     enquiry_sheet.append_row([today_date, name, phone, check_in, check_out, guests, msg])
-                except Exception as e:
-                    print(f"Append Error: {e}")
+                except: pass
 
-            alert_text = (
-                f"🔔 *New Booking Enquiry!*\n\n"
-                f"🏡 *Villa:* {villa.get('Villa_Name')}\n"
-                f"👤 *Name:* {name}\n"
-                f"📞 *Phone:* {phone}\n"
-                f"📅 *Stay:* {check_in} to {check_out}\n"
-                f"👥 *Guests:* {guests}\n"
-                f"📝 *Message:* {msg}"
-            )
+            alert_text = (f"🔔 *New Booking Enquiry!*\n\n🏡 *Villa:* {villa.get('Villa_Name')}\n👤 *Name:* {name}\n📞 *Phone:* {phone}")
             send_telegram_alert(alert_text)
-            
             return render_template('success.html', name=name)
 
         return render_template('enquiry.html', villa=villa)
@@ -191,4 +173,4 @@ def enquiry(villa_id):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000)) 
     app.run(host='0.0.0.0', port=port)
-    
+            
