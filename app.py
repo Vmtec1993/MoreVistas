@@ -72,7 +72,7 @@ def index():
     villas = []
     if sheet:
         try:
-            # ✅ head=1 का इस्तेमाल किया ताकि Header Errors न आएं
+            # head=1 ensures we read headers correctly even if sheet has issues
             villas = sheet.get_all_records(head=1)
             for v in villas:
                 v['Status'] = v.get('Status', 'Available')
@@ -124,87 +124,4 @@ def update_villa_status(villa_id, new_status):
         return redirect(url_for('admin_login'))
     
     if sheet:
-        try:
-            all_records = sheet.get_all_records(head=1)
-            headers = sheet.row_values(1)
-            try:
-                status_col_index = headers.index("Status") + 1
-            except ValueError:
-                return "Error: Please add a column named 'Status' in your Google Sheet"
-
-            row_index = 2
-            for v in all_records:
-                if str(v.get('Villa_ID')) == str(villa_id):
-                    sheet.update_cell(row_index, status_col_index, new_status)
-                    break
-                row_index += 1
-        except Exception as e:
-            print(f"Update Error: {e}")
             
-    return redirect(url_for('admin_dashboard', t=datetime.now().timestamp()))
-
-@app.route('/admin-logout')
-def admin_logout():
-    session.pop('admin_logged_in', None)
-    return redirect(url_for('admin_login'))
-
-@app.route('/villa/<villa_id>')
-def villa_details(villa_id):
-    if sheet:
-        try:
-            villas = sheet.get_all_records(head=1)
-            villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
-            if villa:
-                villa['Status'] = villa.get('Status', 'Available')
-                
-                # --- ✅ गैलरी फिक्स (Image_URL और Image_URL_2-20) ---
-                villa_images = []
-                
-                # पहले मेन इमेज डालें (Column N)
-                main_img = villa.get('Image_URL')
-                if main_img and str(main_img).strip() != "" and str(main_img).lower() != 'nan':
-                    villa_images.append(main_img)
-
-                # फिर बाकी 2 से 20 तक के इमेज डालें
-                for i in range(2, 21):
-                    col_name = f"Image_URL_{i}"
-                    img_url = villa.get(col_name)
-                    if img_url and str(img_url).strip() != "" and str(img_url).lower() != 'nan': 
-                        villa_images.append(img_url)
-                
-                return render_template('villa_details.html', villa=villa, villa_images=villa_images)
-        except Exception as e:
-            print(f"Details Page Error: {e}")
-            
-    return "Villa info not found", 404
-
-@app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
-def enquiry(villa_id):
-    if sheet:
-        villas = sheet.get_all_records(head=1)
-        villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
-        
-        if request.method == 'POST':
-            name = request.form.get('name')
-            phone = request.form.get('phone')
-            check_in = request.form.get('check_in')
-            check_out = request.form.get('check_out')
-            guests = request.form.get('guests')
-            msg = request.form.get('message', 'No message')
-            today_date = datetime.now().strftime("%d-%m-%Y %H:%M")
-
-            if enquiry_sheet:
-                try:
-                    enquiry_sheet.append_row([today_date, name, phone, check_in, check_out, guests, msg])
-                except: pass
-
-            alert_text = (f"🔔 *New Booking Enquiry!*\n\n🏡 *Villa:* {villa.get('Villa_Name')}\n👤 *Name:* {name}\n📞 *Phone:* {phone}")
-            send_telegram_alert(alert_text)
-            return render_template('success.html', name=name)
-
-        return render_template('enquiry.html', villa=villa)
-    return "Error", 500
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000)) 
-    app.run(host='0.0.0.0', port=port)
