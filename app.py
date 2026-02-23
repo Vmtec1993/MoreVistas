@@ -50,9 +50,10 @@ def send_telegram_alert(message):
         requests.get(url, params=params, timeout=10)
     except: pass
 
-# --- ✅ नया: Weather Fetch Function ---
+# --- ✅ Live Weather Fetch Function ---
 def get_lonavala_weather():
     try:
+        # OpenWeatherMap API
         api_key = "b8ee20104f767837862a93361e68787c" 
         url = f"https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid={api_key}"
         data = requests.get(url, timeout=5).json()
@@ -68,7 +69,7 @@ def get_lonavala_weather():
 
 @app.route('/')
 def index():
-    weather_data = get_lonavala_weather() # मौसम का डेटा यहाँ आ गया
+    weather_data = get_lonavala_weather() # मौसम का डेटा यहाँ लोड हो रहा है
     villas = []
     if sheet:
         villas = sheet.get_all_records()
@@ -152,12 +153,13 @@ def villa_details(villa_id):
         if villa:
             villa['Status'] = villa.get('Status', 'Available')
             
-            # --- ✅ गैलरी के लिए फोटो लिस्ट ---
+            # --- ✅ गैलरी के लिए फोटो लिस्ट (Image_URL_1 से 20 तक) ---
             villa_images = []
             for i in range(1, 21):
                 col_name = f"Image_URL_{i}"
                 img_url = villa.get(col_name)
-                if img_url and str(img_url).strip() != "": 
+                # चेक करें कि URL खाली तो नहीं है
+                if img_url and str(img_url).strip() != "" and str(img_url).lower() != 'nan': 
                     villa_images.append(img_url)
             
             return render_template('villa_details.html', villa=villa, villa_images=villa_images)
@@ -193,4 +195,3 @@ def enquiry(villa_id):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000)) 
     app.run(host='0.0.0.0', port=port)
-                                              
