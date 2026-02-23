@@ -15,11 +15,21 @@
     @keyframes scroll-text { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
     .app-link { color: #0d6efd !important; text-decoration: none; font-weight: 800; margin: 0 20px; }
 
+    /* ✅ New: Weather Widget Glassmorphism Style */
+    .weather-card {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        border-radius: 20px;
+        color: white;
+        transition: 0.3s;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .weather-card:hover { transform: scale(1.01); }
+
     /* Villa Card Styles */
     .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; margin-bottom: 25px; }
     .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     
-    /* ✅ Sold Out Ribbon Styling */
+    /* Sold Out Ribbon Styling */
     .ribbon-wrapper { position: absolute; top: 0; left: 0; width: 100px; height: 100px; overflow: hidden; z-index: 15; }
     .sold-out-ribbon {
         position: absolute; display: block; width: 150px; padding: 5px 0;
@@ -29,28 +39,25 @@
     }
     .sold-out-overlay { filter: grayscale(0.5); opacity: 0.8; }
 
+    /* बाकी आपकी सारी पुरानी स्टाइलिंग यहाँ बरकरार है... */
     .discount-tag { position: absolute; top: 15px; right: 15px; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; z-index: 10; }
     .offer-badge { background: #ff4d4d; color: white; padding: 4px 15px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-block; margin-bottom: 5px; }
     .timer-text { font-size: 0.75rem; font-weight: 700; color: #ff4d4d; margin-top: 2px; display: block; }
 
-    /* ✅ Explore Promo Section Styling */
     .explore-promo { 
         background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1350&q=80');
         background-size: cover; background-position: center;
         border-radius: 30px; color: white; padding: 60px 20px; margin-top: 40px;
     }
 
-    /* Why Stay Section */
     .why-stay-box { background: #f8f9fa; border-radius: 25px; padding: 50px 20px; margin: 40px 0; border: 1px solid #eee; text-align: center; }
     .why-icon { font-size: 2.5rem; color: #0d6efd; margin-bottom: 15px; display: block; }
 
-    /* Footer Styling */
     .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
     .footer-logo-img { height: 75px; width: auto; margin-bottom: 20px; }
     .social-icons a { color: white; font-size: 1.8rem; margin: 0 15px; display: inline-block; }
     .footer-bottom { background: #141414; padding: 30px 0; margin-top: 40px; border-top: 1px solid #222; }
 
-    /* ✅ Share Button Styling inside Card */
     .btn-share-card {
         width: 38px; height: 38px; display: flex; align-items: center;
         justify-content: center; border-radius: 50% !important; padding: 0; transition: 0.3s;
@@ -70,6 +77,24 @@
         📞 CALL: 8830024994
     </div>
 </div>
+
+{% if weather %}
+<div class="container mt-4">
+    <div class="weather-card shadow-sm p-3 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <img src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" alt="weather" style="width: 55px;">
+            <div class="ms-2">
+                <h6 class="fw-bold mb-0">Lonavala Weather</h6>
+                <p class="mb-0 small opacity-75">{{ weather.desc }}</p>
+            </div>
+        </div>
+        <div class="text-end">
+            <h3 class="fw-bold mb-0">{{ weather.temp }}°C</h3>
+            <span class="badge bg-white text-primary rounded-pill small" style="font-size: 0.6rem;">LIVE NOW</span>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <div class="container my-5">
     <div class="row g-4">
@@ -172,6 +197,7 @@
 </div>
 
 <script>
+    // आपका सारा ओरिजिनल स्क्रिप्ट यहाँ है
     window.addEventListener('pageshow', function(event) {
         if (event.persisted) {
             window.location.reload();
@@ -200,6 +226,7 @@
     }
     document.addEventListener('DOMContentLoaded', startCardTimers);
 </script>
+
 <footer class="final-footer">
     <div class="container">
         <div class="mb-5">
@@ -220,39 +247,5 @@
 
         <div class="footer-bottom">
             <div class="container d-md-flex justify-content-between align-items-center text-center">
-                <p class="mb-0 opacity-50 small">© 2026 MoreVistas. All Rights Reserved.</p>
-                <div class="footer-links mt-3 mt-md-0">
-                    <a href="/about" class="text-white-50 text-decoration-none small mx-2">About Us</a>
-                    <a href="/contact" class="text-white-50 text-decoration-none small mx-2">Privacy Policy</a>
-                    <a href="/contact" class="text-white-50 text-decoration-none small mx-2">Terms & Conditions</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<style>
-    /* फुटर को सुंदर बनाने के लिए अतिरिक्त CSS */
-    .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
-    .footer-logo-img { height: 75px; width: auto; margin-bottom: 20px; }
-    
-    .social-icons a { 
-        color: white; 
-        font-size: 1.5rem; 
-        margin: 0 12px; 
-        display: inline-block; 
-        transition: 0.3s;
-        opacity: 0.8;
-    }
-    .social-icons a:hover { color: #0d6efd; opacity: 1; transform: translateY(-3px); }
-    
-    .footer-bottom { 
-        background: #141414; 
-        padding: 25px 0; 
-        margin-top: 40px; 
-        border-top: 1px solid #222; 
-    }
-    .footer-links a:hover { color: #ffffff !important; }
-</style>
-
-{% endblock %}
+                <p class="mb-0
+                
