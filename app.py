@@ -13,7 +13,7 @@ app.secret_key = "morevistas_admin_secure_key_2026"
 creds_json = os.environ.get('GOOGLE_CREDS')
 sheet = None
 enquiry_sheet = None
-places_sheet = None # ✅ नया: टूरिस्ट पॉइंट्स के लिए
+places_sheet = None 
 
 if creds_json:
     try:
@@ -31,7 +31,6 @@ if creds_json:
         except:
             enquiry_sheet = sheet
 
-        # ✅ नया: "Places" वर्कशीट लोड करना
         try:
             places_sheet = main_spreadsheet.worksheet("Places")
         except:
@@ -62,7 +61,6 @@ def index():
             v['Status'] = v.get('Status', 'Available')
     return render_template('index.html', villas=villas)
 
-# ✅ नया: Explore Lonavala Route
 @app.route('/explore-lonavala')
 def explore_lonavala():
     places = []
@@ -73,7 +71,6 @@ def explore_lonavala():
             print(f"Places Fetch Error: {e}")
     return render_template('explore.html', places=places)
 
-# ✅ Admin Routes
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
     error = None
@@ -125,7 +122,6 @@ def update_villa_status(villa_id, new_status):
         except Exception as e:
             print(f"Update Error: {e}")
             
-    # ✅ Auto-refresh फिक्स के लिए टाइमस्टैम्प के साथ रीडायरेक्ट
     return redirect(url_for('admin_dashboard', t=datetime.now().timestamp()))
 
 @app.route('/admin-logout')
@@ -140,7 +136,17 @@ def villa_details(villa_id):
         villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
         if villa:
             villa['Status'] = villa.get('Status', 'Available')
-            return render_template('villa_details.html', villa=villa)
+            
+            # --- ✅ नया: गैलरी के लिए फोटो लिस्ट बनाना ---
+            villa_images = []
+            # हम Image_URL_1 से Image_URL_20 तक चेक करेंगे
+            for i in range(1, 21):
+                col_name = f"Image_URL_{i}"
+                img_url = villa.get(col_name)
+                if img_url and str(img_url).strip() != "": # अगर लिंक खाली नहीं है
+                    villa_images.append(img_url)
+            
+            return render_template('villa_details.html', villa=villa, villa_images=villa_images)
     return "Villa info not found", 404
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
@@ -171,9 +177,5 @@ def enquiry(villa_id):
     return "Error", 500
 
 if __name__ == "__main__":
-    # Render के लिए पोर्ट को डायनामिक रखें
     port = int(os.environ.get("PORT", 5000)) 
-    # host को '0.0.0.0' रखना बहुत ज़रूरी है
     app.run(host='0.0.0.0', port=port)
-
-            
