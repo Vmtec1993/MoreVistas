@@ -171,6 +171,9 @@ def enquiry(villa_id):
     return "Error", 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000)) 
+    # Render के लिए पोर्ट को डायनामिक रखें
+    port = int(os.environ.get("PORT", 5000)) 
+    # host को '0.0.0.0' रखना बहुत ज़रूरी है
     app.run(host='0.0.0.0', port=port)
+
             
