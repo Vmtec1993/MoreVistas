@@ -7,12 +7,13 @@ import requests
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "morevistas_secure_2026" # Admin session maintain karne ke liye
+app.secret_key = "morevistas_secure_2026"
 
 # --- Google Sheets Setup ---
 creds_json = os.environ.get('GOOGLE_CREDS')
 sheet = None
 enquiry_sheet = None
+places_sheet = None  # 👈 Places sheet ke liye variable
 
 if creds_json:
     try:
@@ -23,24 +24,32 @@ if creds_json:
         
         SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
         main_spreadsheet = client.open_by_key(SHEET_ID)
-        sheet = main_spreadsheet.sheet1  # Villas Data Sheet
         
+        sheet = main_spreadsheet.sheet1  # Villas Data
+        
+        # ✅ Places Sheet load karne ka logic
         try:
-            # Check karein agar 'Enquiries' naam ki alag sheet hai
+            places_sheet = main_spreadsheet.worksheet("Places")
+        except:
+            print("Places sheet not found in Spreadsheet")
+            places_sheet = None
+
+        try:
             enquiry_sheet = main_spreadsheet.worksheet("Enquiries")
         except:
             enquiry_sheet = sheet
+            
     except Exception as e:
         print(f"Critical Sheet Error: {e}")
 
-# --- ✅ SAFE DATA LOADER (Ye Images aur Data ko gayab hone se bachata hai) ---
+# --- ✅ SAFE DATA LOADER ---
 def get_safe_data(target_sheet):
     try:
         if not target_sheet: return []
         data = target_sheet.get_all_values()
         if not data or len(data) < 1: return []
         
-        headers = [h.strip() for h in data[0]] # Column names se extra space hatana
+        headers = [h.strip() for h in data[0]]
         rows = data[1:]
         clean_data = []
         
@@ -50,7 +59,6 @@ def get_safe_data(target_sheet):
                 val = row[i] if i < len(row) else ""
                 record[h] = val
             
-            # 🖼️ Image Logic: Agar Image_URL khali hai to Image_URL_1 ko fallback banayein
             if not record.get('Image_URL') or record.get('Image_URL').strip() == "":
                 record['Image_URL'] = record.get('Image_URL_1', '')
                 
@@ -60,10 +68,9 @@ def get_safe_data(target_sheet):
         print(f"Data Fetch Error: {e}")
         return []
 
-# --- Weather Alert (Lonavala Live Temperature) ---
+# --- Weather Alert ---
 def get_weather():
     try:
-        # OpenWeather API using your key
         url = "https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid=b8ee20104f767837862a93361e68787c"
         d = requests.get(url, timeout=5).json()
         return {
@@ -74,7 +81,7 @@ def get_weather():
     except:
         return None
 
-# --- Telegram Setup (Alerts ke liye) ---
+# --- Telegram Setup ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
 
@@ -92,13 +99,19 @@ def send_telegram_alert(message):
 def index():
     weather = get_weather()
     villas = get_safe_data(sheet)
-    # Default values handle karna taki page crash na ho
+    # ✅ Places ka data load kiya
+    tourist_places = get_safe_data(places_sheet) 
+    
     for v in villas:
         v['Status'] = v.get('Status', 'Available')
         v['Guests'] = v.get('Guests', '12')
         v['Offer'] = v.get('Offer', '')
         v['BHK'] = v.get('BHK', '3')
-    return render_template('index.html', villas=villas, weather=weather)
+        
+    return render_template('index.html', 
+                           villas=villas, 
+                           weather=weather, 
+                           tourist_places=tourist_places) # 👈 Template ko bheja
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
@@ -106,7 +119,6 @@ def villa_details(villa_id):
     villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
     
     if villa:
-        # 📸 Gallery Images Logic (Check Image_URL_1 up to Image_URL_20)
         villa_images = []
         for i in range(1, 21):
             key = f"Image_URL_{i}"
@@ -131,7 +143,6 @@ def enquiry(villa_id):
         guests = request.form.get('guests')
         msg = request.form.get('message', 'No message')
         
-        # Google Sheet mein data save karna
         if enquiry_sheet:
             try:
                 enquiry_sheet.append_row([
@@ -141,7 +152,6 @@ def enquiry(villa_id):
             except:
                 pass
 
-        # Telegram Alert bhejna
         alert_text = (
             f"🔔 *New Booking Enquiry!*\n\n"
             f"🏡 *Villa:* {villa.get('Villa_Name')}\n"
@@ -155,7 +165,6 @@ def enquiry(villa_id):
 
     return render_template('enquiry.html', villa=villa)
 
-# --- 🔐 Admin Routes ---
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
@@ -168,13 +177,10 @@ def admin_login():
 def admin_dashboard():
     if not session.get('admin_logged_in'): return redirect(url_for('admin_login'))
     villas = get_safe_data(sheet)
-    enquiries = get_safe_data(enquiry_sheet)[::-1] # Newest enquiries first
+    enquiries = get_safe_data(enquiry_sheet)[::-1]
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries)
 
-# --- 🚀 Render Deployment Fix ---
 if __name__ == "__main__":
-    # Render hamesha PORT environment variable provide karta hai
-    # Iske bina 'No open ports' wala error aata hai
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
         
