@@ -179,6 +179,14 @@ def admin_dashboard():
     villas = get_safe_data(sheet)
     enquiries = get_safe_data(enquiry_sheet)[::-1]
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries)
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+    
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
