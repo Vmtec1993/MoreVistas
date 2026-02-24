@@ -32,6 +32,7 @@ def init_sheets():
             SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
             main_spreadsheet = client.open_by_key(SHEET_ID)
             
+            # पुरानी साइट वाला तरीका ही इस्तेमाल कर रहे हैं
             sheet = main_spreadsheet.sheet1
             all_ws = [ws.title for ws in main_spreadsheet.worksheets()]
             if "Places" in all_ws: places_sheet = main_spreadsheet.worksheet("Places")
@@ -42,81 +43,70 @@ def init_sheets():
 
 init_sheets()
 
-# --- 🛠️ Functions ---
-
+# --- Functions ---
 def send_telegram_alert(message):
     try:
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
         requests.get(url, params={"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}, timeout=5)
     except: pass
 
-def get_safe_data(target_sheet):
-    """रिकर्सन एरर और क्रैश से बचने के लिए सबसे सुरक्षित डेटा फेचिंग तरीका"""
+def get_clean_data(target_sheet):
+    """पुराना वर्किंग तरीका - बस 'Price on Request' के लिए सेफ चेक के साथ"""
     if not target_sheet: return []
     try:
-        # get_all_values() का उपयोग रिकर्सन एरर को पूरी तरह खत्म करता है
+        # get_all_records() रिकर्सन एरर दे रहा था, इसलिए इसे सादे तरीके से कर रहे हैं
         rows = target_sheet.get_all_values()
-        if not rows or len(rows) < 1: return []
-        
+        if not rows: return []
         headers = [h.strip() for h in rows[0]]
-        data = []
+        final_data = []
         for row in rows[1:]:
-            item = {}
-            for i, h in enumerate(headers):
-                val = row[i] if i < len(row) else ""
-                item[h] = val
+            item = {headers[i]: row[i] if i < len(row) else "" for i, h in enumerate(headers)}
             
-            # प्राइस और इमेज लॉजिक (बिना बदलाव के)
+            # सिर्फ यहाँ डेटा को सेफ किया है ताकि Blue Theme एरर न दे
             p = str(item.get('Price', '')).lower().strip()
             if p in ['', 'nan', '0', 'none']: item['Price'] = None
             
-            op = str(item.get('Original_Price', '')).lower().strip()
-            if op in ['', 'nan', '0', 'none']: item['Original_Price'] = None
-            
             if not item.get('Image_URL'): item['Image_URL'] = item.get('Image_URL_1', '')
-            data.append(item)
-        return data
-    except:
-        return []
+            final_data.append(item)
+        return final_data
+    except: return []
 
-def get_weather():
-    try:
-        url = "https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid=602d32574e40263f16952813df186b59"
-        r = requests.get(url, timeout=3).json()
-        return {'temp': round(r['main']['temp']), 'desc': r['weather'][0]['description'].title()}
-    except: return None
-
-# --- 🏠 Routes ---
-
+# --- Routes ---
 @app.route('/')
 def index():
     try:
-        villas = get_safe_data(sheet)
-        places = get_safe_data(places_sheet)
-        weather = get_weather()
+        villas = get_clean_data(sheet)
+        places = get_clean_data(places_sheet)
         
+        # Weather Logic (बिना बदलाव के)
+        weather = None
+        try:
+            w_url = "https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid=602d32574e40263f16952813df186b59"
+            r = requests.get(w_url, timeout=3).json()
+            weather = {'temp': round(r['main']['temp']), 'desc': r['weather'][0]['description'].title()}
+        except: pass
+
         runner_text = "Welcome to MoreVistas Lonavala | Call 8830024994"
         if settings_sheet:
             try:
-                # IndentationError (Line 53-54) को यहाँ फिक्स किया गया है
-                sets = settings_sheet.get_all_values()
-                if sets:
-                    for r in sets:
-                        if len(r) >= 2 and str(r[0]).strip() == 'Offer_Text':
-                            runner_text = r[1]
-                            break
+                s_vals = settings_sheet.get_all_values()
+                for r in s_vals:
+                    if len(r) >= 2 and r[0] == 'Offer_Text':
+                        runner_text = r[1]
+                        break
             except: pass
-            
+
         return render_template('index.html', villas=villas, weather=weather, runner_text=runner_text, tourist_places=places)
     except Exception as e:
-        return f"System Error: {e}", 500
+        return f"Error: {e}", 500
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
-    villas = get_safe_data(sheet)
+    villas = get_clean_data(sheet)
     villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
-    if not villa: return "Villa Not Found", 404
+    if not villa: return "Not Found", 404
     
+    # इमेज लिस्ट (पुरानी साइट वाला लॉजिक)
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}') and str(villa.get(f'Image_URL_{i}')).lower() != 'nan']
     if not imgs: imgs = [villa.get('Image_URL')]
     
@@ -124,7 +114,7 @@ def villa_details(villa_id):
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
-    villas = get_safe_data(sheet)
+    villas = get_clean_data(sheet)
     villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
     
     if request.method == 'POST':
@@ -143,7 +133,7 @@ def enquiry(villa_id):
     return render_template('enquiry.html', villa=villa)
 
 @app.route('/explore')
-def explore(): return render_template('explore.html', tourist_places=get_safe_data(places_sheet))
+def explore(): return render_template('explore.html', tourist_places=get_clean_data(places_sheet))
 
 @app.route('/about')
 def about(): return render_template('about.html')
@@ -153,4 +143,4 @@ def contact(): return render_template('contact.html')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-                            
+    
