@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .flatpickr-calendar { border-radius: 15px !important; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
+</style>
+
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
@@ -20,14 +25,11 @@
                         <input type="tel" name="phone" class="form-control rounded-pill px-4 border-light-subtle shadow-sm" placeholder="Enter mobile number" required>
                     </div>
 
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label small fw-bold text-secondary">Check-in</label>
-                            <input type="date" name="check_in" id="check_in" class="form-control rounded-3 border-light-subtle shadow-sm" required onchange="setMinCheckOut()">
-                        </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label small fw-bold text-secondary">Check-out</label>
-                            <input type="date" name="check_out" id="check_out" class="form-control rounded-3 border-light-subtle shadow-sm" required>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Select Stay Dates (Check-in to Check-out)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-light-subtle rounded-start-pill px-3"><i class="bi bi-calendar-range text-primary"></i></span>
+                            <input type="text" name="stay_dates" id="stay_dates" class="form-control rounded-end-pill px-4 border-light-subtle shadow-sm" placeholder="Click to select dates" required>
                         </div>
                     </div>
 
@@ -36,34 +38,16 @@
                         <input type="number" name="guests" class="form-control rounded-pill px-4 border-light-subtle shadow-sm" placeholder="How many guests?" min="1" required>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label small fw-bold text-secondary">Special Message (Optional)</label>
-                        <textarea name="message" class="form-control rounded-3 border-light-subtle shadow-sm" rows="2" placeholder="Any specific requirements?"></textarea>
-                    </div>
-
                     <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow text-uppercase">
                         Confirm Booking Request <i class="bi bi-send ms-2"></i>
                     </button>
-                    <p class="text-center text-muted mt-2 small">
-                        <i class="bi bi-shield-check text-success"></i> No payment required now
-                    </p>
                 </form>
 
                 <div class="mt-4 border-top pt-4">
-                    <h6 class="fw-bold mb-3 text-dark">Why Book With Us?</h6>
                     <div class="d-flex flex-column gap-2">
-                        <div class="d-flex align-items-center bg-light p-2 rounded-3">
-                            <i class="bi bi-tags-fill text-primary me-3"></i>
-                            <span class="small fw-medium">Best rates guaranteed</span>
-                        </div>
-                        <div class="d-flex align-items-center bg-light p-2 rounded-3">
-                            <i class="bi bi-patch-check-fill text-primary me-3"></i>
-                            <span class="small fw-medium">Verified luxury properties</span>
-                        </div>
-                        <div class="d-flex align-items-center bg-light p-2 rounded-3">
-                            <i class="bi bi-headset text-primary me-3"></i>
-                            <span class="small fw-medium">24/7 Concierge support</span>
-                        </div>
+                        <a href="https://wa.me/918830024994?text=Hi%20MoreVistas,%20I%20am%20interested%20in%20booking%20{{ villa.Villa_Name|urlencode }}" target="_blank" class="btn btn-outline-success rounded-pill fw-bold">
+                            <i class="bi bi-whatsapp me-2"></i> Chat on WhatsApp
+                        </a>
                     </div>
                 </div>
             </div>
@@ -71,18 +55,16 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    // आज की तारीख सेट करना
-    const today = new Date().toISOString().split("T")[0];
-    document.getElementById('check_in').min = today;
-    document.getElementById('check_out').min = today;
-    
-    function setMinCheckOut() {
-        let checkInVal = document.getElementById('check_in').value;
-        document.getElementById('check_out').min = checkInVal;
-        if (document.getElementById('check_out').value < checkInVal) {
-            document.getElementById('check_out').value = checkInVal;
+    flatpickr("#stay_dates", {
+        mode: "range",
+        minDate: "today",
+        dateFormat: "d-m-Y",
+        showMonths: 1,
+        onClose: function(selectedDates, dateStr, instance) {
+            console.log("Selected Range: " + dateStr);
         }
-    }
+    });
 </script>
 {% endblock %}
