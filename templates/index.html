@@ -68,17 +68,11 @@
                     <h5 class="fw-bold mb-1">{{ villa.Villa_Name }}</h5>
 
                     <div class="mb-2">
-                        {% if villa.Price and villa.Price|string != '' and villa.Price|string != '0' %}
-                            <div class="d-flex align-items-center">
-                                {% if villa.Original_Price and villa.Original_Price|string != '' %}
-                                    <span class="text-decoration-line-through me-2 opacity-50" style="color: #007bff; font-size: 0.9rem;">₹{{ villa.Original_Price }}</span>
-                                    <span class="price-blue fs-4">₹{{ villa.Price }}</span>
-                                    
-                                    {% set discount = ((villa.Original_Price|float - villa.Price|float) / villa.Original_Price|float * 100)|round %}
-                                    <span class="badge ms-2" style="background-color: #007bff;">{{ discount }}% OFF</span>
-                                {% else %}
-                                    <span class="price-blue fs-4">₹{{ villa.Price }}</span>
-                                {% endif %}
+                        {% if villa.Original_Price and villa.Original_Price|float > 0 and villa.Price %}
+    {% set discount = ((villa.Original_Price|float - villa.Price|float) / villa.Original_Price|float * 100)|round %}
+    <span class="badge bg-danger">-{{ discount }}% OFF</span>
+{% endif %}
+
                             </div>
                         {% else %}
                             <div class="price-blue text-uppercase fs-5" style="letter-spacing: 1px;">
