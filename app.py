@@ -1,3 +1,6 @@
+import sys
+sys.setrecursionlimit(2000)
+
 import os
 import json
 import gspread
