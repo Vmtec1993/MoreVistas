@@ -14,6 +14,7 @@ creds_json = os.environ.get('GOOGLE_CREDS')
 sheet = None
 enquiry_sheet = None
 places_sheet = None 
+main_spreadsheet = None # Global variable for settings
 
 if creds_json:
     try:
@@ -65,30 +66,21 @@ def get_safe_data(target_sheet):
         print(f"Data Fetch Error: {e}")
         return []
 
-# --- 🌦️ Updated Weather Function ---
+# --- 🌦️ Weather Function ---
 def get_weather():
     try:
-        # API Key (Please wait 2 hours if new)
         api_key = "602d32574e40263f16952813df186b59"
         url = f"https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid={api_key}"
-        
-        # Timeout helps to not slow down the site if API is slow
         response = requests.get(url, timeout=10) 
-        
         if response.status_code == 200:
             d = response.json()
-            weather_data = {
+            return {
                 'temp': round(d['main']['temp']), 
                 'desc': d['weather'][0]['description'].title(), 
                 'icon': d['weather'][0]['icon']
             }
-            print(f"✅ Weather Data Fetched: {weather_data['temp']}°C")
-            return weather_data
-        else:
-            print(f"❌ Weather API Error: {response.status_code}")
-            return None
-    except Exception as e:
-        print(f"⚠️ Weather Fetch Error: {e}")
+        return None
+    except:
         return None
 
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
@@ -106,10 +98,24 @@ def send_telegram_alert(message):
 
 @app.route('/')
 def index():
-    weather_info = get_weather() # Store in variable
+    weather_info = get_weather()
     villas = get_safe_data(sheet)
     tourist_places = get_safe_data(places_sheet) 
     
+    # --- 🆕 Settings Sheet से Runner Text लाना ---
+    runner_text = "Welcome to MoreVistas Lonavala | Luxury Villas" # Default Text
+    if main_spreadsheet:
+        try:
+            settings_sheet = main_spreadsheet.worksheet("Settings")
+            settings_data = settings_sheet.get_all_records()
+            # Key: 'Offer_Text' वाली वैल्यू निकालना
+            for row in settings_data:
+                if str(row.get('Key')).strip() == 'Offer_Text':
+                    runner_text = row.get('Value', runner_text)
+                    break
+        except:
+            pass # अगर शीट नहीं मिली तो डिफॉल्ट टेक्स्ट चलेगा
+
     for v in villas:
         v['Status'] = v.get('Status', 'Available')
         v['Guests'] = v.get('Guests', '12')
@@ -119,8 +125,9 @@ def index():
         
     return render_template('index.html', 
                            villas=villas, 
-                           weather=weather_info, # Pass data
-                           tourist_places=tourist_places)
+                           weather=weather_info, 
+                           tourist_places=tourist_places,
+                           runner_text=runner_text) # HTML को भेजा गया
 
 @app.route('/explore')
 def explore():
@@ -142,7 +149,6 @@ def villa_details(villa_id):
     
     if villa:
         villa['Rules'] = villa.get('Rules', 'Call for house rules.')
-        
         villa_images = []
         for i in range(1, 21):
             key = f"Image_URL_{i}"
@@ -184,7 +190,6 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries)
 
 if __name__ == "__main__":
-    # Render handles the PORT
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    
+        
