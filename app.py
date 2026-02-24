@@ -42,37 +42,26 @@ def init_sheets():
 
 init_sheets()
 
-# --- Utility Function ---
 def get_rows(target_sheet):
     if not target_sheet: return []
     try:
         data = target_sheet.get_all_values()
         if not data or len(data) < 1: return []
         headers = [h.strip() for h in data[0]]
-        clean_data = []
+        final_list = []
         for row in data[1:]:
-            # Dictionary matching headers to row values
             item = dict(zip(headers, row))
-            
-            # Extra Logic: 'Price on Request' को सपोर्ट करने के लिए
-            # अगर Price खाली या 0 है, तो उसे None कर देते हैं ताकि HTML पहचान सके
-            p_val = str(item.get('Price', '')).lower().strip()
-            if p_val in ['', 'nan', '0', 'none']:
-                item['Price'] = None
-                
-            clean_data.append(item)
-        return clean_data
-    except:
-        return []
-
-# --- Routes ---
+            # Price Clean-up: अगर कीमत खाली है तो उसे None कर दो ताकि HTML एरर न दे
+            p = str(item.get('Price', '')).lower().strip()
+            if p in ['', 'nan', '0', 'none']: item['Price'] = None
+            final_list.append(item)
+        return final_list
+    except: return []
 
 @app.route('/')
 def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
-    
-    # Weather
     weather = None
     try:
         w_url = "https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid=602d32574e40263f16952813df186b59"
@@ -80,7 +69,6 @@ def index():
         weather = {'temp': round(r['main']['temp']), 'desc': r['weather'][0]['description'].title()}
     except: pass
 
-    # Offer Text
     runner_text = "Welcome to MoreVistas Lonavala | Call 8830024994"
     if settings_sheet:
         try:
@@ -98,29 +86,22 @@ def villa_details(villa_id):
     villas = get_rows(sheet)
     villa = next((v for v in villas if str(v.get('Villa_ID')).strip() == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
-    
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}') and str(villa.get(f'Image_URL_{i}')).lower() != 'nan']
     if not imgs: imgs = [villa.get('Image_URL')]
-    
     return render_template('villa_details.html', villa=villa, villa_images=imgs)
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
     villas = get_rows(sheet)
     villa = next((v for v in villas if str(v.get('Villa_ID')).strip() == str(villa_id).strip()), None)
-    
     if request.method == 'POST':
         name, phone = request.form.get('name'), request.form.get('phone')
-        dates, guests = request.form.get('stay_dates'), request.form.get('guests')
         v_name = villa.get('Villa_Name', 'Villa') if villa else "Villa"
-        
         if enquiry_sheet:
-            enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
-            
-        alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
+            enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, request.form.get('stay_dates'), request.form.get('guests'), v_name])
+        alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}"
         requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
         return render_template('success.html', name=name)
-    
     return render_template('enquiry.html', villa=villa)
 
 @app.route('/explore')
