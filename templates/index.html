@@ -34,11 +34,11 @@
 
 <div class="offer-runner">
     <div class="runner-text">
-        <span class="text-primary mx-3">✨ WELCOME TO MOREVISTAS LONAVALA</span> |
+        <span class="text-primary mx-3">✨ {{ runner_text }}</span> |
         {% for villa in villas %}
             {% if villa.Offer and villa.Offer|string != 'nan' %} 🔥 {{ villa.Villa_Name }}: {{ villa.Offer }} | {% endif %}
         {% endfor %}
-        📞 BOOKING: 8830024994 | 🏠 LUXURY VILLAS BEST PRICE
+        📞 BOOKING: 8830024994
     </div>
 </div>
 
@@ -125,52 +125,4 @@
                 <h6 class="fw-bold mt-2">24/7 Support</h6>
                 <p class="small text-muted">Dedicated local manager for your stay.</p>
             </div>
-            <div class="col-md-4">
-                <i class="bi bi-cash-stack text-primary fs-2"></i>
-                <h6 class="fw-bold mt-2">Best Price Guarantee</h6>
-                <p class="small text-muted">No booking fees. Direct owner rates.</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold m-0">Popular Attractions</h4>
-            <a href="/explore" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">View All</a>
-        </div>
-        <div class="row g-3">
-            {% for place in tourist_places[:4] %} 
-            <div class="col-6 col-md-3">
-                <div class="place-card shadow-sm">
-                    <img src="{{ place.Image_URL if place.Image_URL and place.Image_URL|string != 'nan' else 'https://images.unsplash.com/photo-1590050752117-23a9d7fc9922?auto=format&fit=crop&w=300' }}" alt="{{ place.Location }}">
-                    <div class="place-info">
-                        <h6 class="fw-bold mb-1 text-truncate">{{ place.Location or place.Name or 'Tourist Spot' }}</h6>
-                        <p class="text-muted small mb-2">{{ place.Distance or 'Lonavala' }}</p>
-                        {% if place.Map_Link %}
-                            <a href="{{ place.Map_Link }}" target="_blank" class="btn btn-link btn-sm p-0 text-primary fw-bold text-decoration-none" style="font-size: 0.75rem;">
-                                MAP <i class="bi bi-geo-alt"></i>
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-
-<footer class="final-footer">
-    <div class="container">
-        <h2 class="text-white fw-bold mb-2">More<span class="text-primary">Vistas</span></h2>
-        <p class="small opacity-50">Lonavala's Most Trusted Villa Partner</p>
-        <div class="py-4">
-            <a href="https://wa.me/918830024994" class="text-white mx-3 fs-3"><i class="bi bi-whatsapp"></i></a>
-            <a href="#" class="text-white mx-3 fs-3"><i class="bi bi-instagram"></i></a>
-        </div>
-        <div class="footer-bottom">
-            <p class="mb-0 opacity-50 small">© 2026 MoreVistas. All Rights Reserved.</p>
-        </div>
-    </div>
-</footer>
-
-{% endblock %}
+            
