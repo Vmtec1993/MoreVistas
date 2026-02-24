@@ -66,6 +66,16 @@ def get_safe_data(target_sheet):
         for row in data[1:]:
             record = {headers[i]: row[i] if i < len(row) else "" for i, h in enumerate(headers)}
             if not record.get('Image_URL'): record['Image_URL'] = record.get('Image_URL_1', '')
+            
+            # --- 🚀 Price Cleaning Logic for Blue Theme ---
+            p_val = str(record.get('Price', '')).lower().strip()
+            if p_val in ['', 'nan', '0', 'none']:
+                record['Price'] = None
+            
+            op_val = str(record.get('Original_Price', '')).lower().strip()
+            if op_val in ['', 'nan', '0', 'none']:
+                record['Original_Price'] = None
+                
             clean_data.append(record)
         return clean_data
     except: return []
@@ -100,15 +110,24 @@ def index():
                         break
             except: pass
 
-        for v in villas:
-            v['Villa_Name'] = v.get('Villa_Name', 'Luxury Villa')
-            v['BHK'] = v.get('BHK', '3')
-            v['Guests'] = v.get('Guests', '12')
-            v['Offer'] = v.get('Offer', '')
-
         return render_template('index.html', villas=villas, weather=weather_info, runner_text=runner_text, tourist_places=tourist_places)
     except Exception as e:
+        print(f"Index Error: {e}")
         return f"Error: {e}", 500
+
+@app.route('/villa/<villa_id>')
+def villa_details(villa_id):
+    try:
+        villas = get_safe_data(sheet)
+        villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
+        if villa:
+            # Multi-image logic
+            villa_images = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}') and str(villa.get(f'Image_URL_{i}')).lower() != 'nan']
+            if not villa_images: villa_images = [villa.get('Image_URL')]
+            return render_template('villa_details.html', villa=villa, villa_images=villa_images)
+        return "Villa Not Found", 404
+    except Exception as e:
+        return f"Detail Page Error: {e}", 500
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
@@ -122,13 +141,11 @@ def enquiry(villa_id):
         guests = request.form.get('guests', '1')
         villa_name = villa.get('Villa_Name', 'Unknown Villa')
         
-        # 1. Google Sheet Update
         if enquiry_sheet:
             try:
                 enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, villa_name])
             except: pass
         
-        # 2. Telegram Alert (Re-added)
         alert_msg = (
             f"🚀 *New Villa Enquiry!*\n\n"
             f"🏡 *Villa:* {villa_name}\n"
@@ -139,12 +156,9 @@ def enquiry(villa_id):
             f"⏰ *Received:* {datetime.now().strftime('%H:%M %p')}"
         )
         send_telegram_alert(alert_msg)
-        
         return render_template('success.html', name=name)
     
     return render_template('enquiry.html', villa=villa)
-
-# ... (बाकी Routes: Explore, About, Contact, Villa_Details वैसे ही रहेंगे)
 
 @app.route('/explore')
 def explore(): return render_template('explore.html', tourist_places=get_safe_data(places_sheet))
@@ -155,17 +169,7 @@ def about(): return render_template('about.html')
 @app.route('/contact')
 def contact(): return render_template('contact.html')
 
-@app.route('/villa/<villa_id>')
-def villa_details(villa_id):
-    villas = get_safe_data(sheet)
-    villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
-    if villa:
-        villa_images = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}') and str(villa.get(f'Image_URL_{i}')).lower() != 'nan']
-        if not villa_images: villa_images = [villa.get('Image_URL')]
-        return render_template('villa_details.html', villa=villa, villa_images=villa_images)
-    return "Villa Not Found", 404
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    
+                
