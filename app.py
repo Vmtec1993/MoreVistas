@@ -13,7 +13,7 @@ app.secret_key = "morevistas_secure_2026"
 creds_json = os.environ.get('GOOGLE_CREDS')
 sheet = None
 enquiry_sheet = None
-places_sheet = None  # 👈 Places sheet ke liye variable
+places_sheet = None 
 
 if creds_json:
     try:
@@ -25,13 +25,11 @@ if creds_json:
         SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
         main_spreadsheet = client.open_by_key(SHEET_ID)
         
-        sheet = main_spreadsheet.sheet1  # Villas Data
+        sheet = main_spreadsheet.sheet1 
         
-        # ✅ Places Sheet load karne ka logic
         try:
             places_sheet = main_spreadsheet.worksheet("Places")
         except:
-            print("Places sheet not found in Spreadsheet")
             places_sheet = None
 
         try:
@@ -42,7 +40,6 @@ if creds_json:
     except Exception as e:
         print(f"Critical Sheet Error: {e}")
 
-# --- ✅ SAFE DATA LOADER ---
 def get_safe_data(target_sheet):
     try:
         if not target_sheet: return []
@@ -68,7 +65,6 @@ def get_safe_data(target_sheet):
         print(f"Data Fetch Error: {e}")
         return []
 
-# --- Weather Alert ---
 def get_weather():
     try:
         url = "https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid=b8ee20104f767837862a93361e68787c"
@@ -81,7 +77,6 @@ def get_weather():
     except:
         return None
 
-# --- Telegram Setup ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
 
@@ -99,7 +94,6 @@ def send_telegram_alert(message):
 def index():
     weather = get_weather()
     villas = get_safe_data(sheet)
-    # ✅ Places ka data load kiya
     tourist_places = get_safe_data(places_sheet) 
     
     for v in villas:
@@ -107,11 +101,20 @@ def index():
         v['Guests'] = v.get('Guests', '12')
         v['Offer'] = v.get('Offer', '')
         v['BHK'] = v.get('BHK', '3')
+        v['Rules'] = v.get('Rules', 'No specific rules mentioned.')
         
     return render_template('index.html', 
                            villas=villas, 
                            weather=weather, 
-                           tourist_places=tourist_places) # 👈 Template ko bheja
+                           tourist_places=tourist_places)
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
@@ -119,6 +122,8 @@ def villa_details(villa_id):
     villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
     
     if villa:
+        villa['Rules'] = villa.get('Rules', 'Call for house rules.')
+        
         villa_images = []
         for i in range(1, 21):
             key = f"Image_URL_{i}"
@@ -134,35 +139,15 @@ def villa_details(villa_id):
 def enquiry(villa_id):
     villas = get_safe_data(sheet)
     villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
-    
     if request.method == 'POST':
-        name = request.form.get('name')
-        phone = request.form.get('phone')
-        check_in = request.form.get('check_in')
-        check_out = request.form.get('check_out')
-        guests = request.form.get('guests')
-        msg = request.form.get('message', 'No message')
-        
+        name, phone, check_in, check_out, guests, msg = request.form.get('name'), request.form.get('phone'), request.form.get('check_in'), request.form.get('check_out'), request.form.get('guests'), request.form.get('message', 'No message')
         if enquiry_sheet:
             try:
-                enquiry_sheet.append_row([
-                    datetime.now().strftime("%d-%m-%Y %H:%M"), 
-                    name, phone, check_in, check_out, guests, msg, villa.get('Villa_Name')
-                ])
-            except:
-                pass
-
-        alert_text = (
-            f"🔔 *New Booking Enquiry!*\n\n"
-            f"🏡 *Villa:* {villa.get('Villa_Name')}\n"
-            f"👤 *Name:* {name}\n"
-            f"📞 *Phone:* {phone}\n"
-            f"📅 *Stay:* {check_in} to {check_out}\n"
-            f"👥 *Guests:* {guests}"
-        )
+                enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, check_in, check_out, guests, msg, villa.get('Villa_Name')])
+            except: pass
+        alert_text = f"🔔 *New Booking Enquiry!*\n\n🏡 *Villa:* {villa.get('Villa_Name')}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Stay:* {check_in} to {check_out}\n👥 *Guests:* {guests}"
         send_telegram_alert(alert_text)
         return render_template('success.html', name=name)
-
     return render_template('enquiry.html', villa=villa)
 
 @app.route('/admin-login', methods=['GET', 'POST'])
@@ -176,19 +161,9 @@ def admin_login():
 @app.route('/admin-dashboard')
 def admin_dashboard():
     if not session.get('admin_logged_in'): return redirect(url_for('admin_login'))
-    villas = get_safe_data(sheet)
-    enquiries = get_safe_data(enquiry_sheet)[::-1]
+    villas, enquiries = get_safe_data(sheet), get_safe_data(enquiry_sheet)[::-1]
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries)
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
-    
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
-        
