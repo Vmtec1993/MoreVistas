@@ -2,43 +2,19 @@
 {% block content %}
 
 <style>
-    /* Runner & Weather */
     .offer-runner { background: #000; color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap; }
     .runner-text { display: inline-block; animation: scroll-text 20s linear infinite; font-weight: 700; text-transform: uppercase; }
     @keyframes scroll-text { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    
-    /* Weather and Score Cards */
-    .weather-card { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%); border-radius: 15px; border: 1px solid rgba(0,0,0,0.05); height: 100%; }
-    .score-card { background: #fdfcfb; border-radius: 15px; border: 1px solid rgba(0,0,0,0.05); overflow: hidden; height: 100%; }
-    .blink { animation: blinker 1.5s linear infinite; }
-    @keyframes blinker { 50% { opacity: 0; } }
-
-    /* Villa Cards */
+    .weather-card { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%); border-radius: 15px; height: 100%; }
     .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; margin-bottom: 25px; }
     .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
-    .discount-tag { position: absolute; top: 15px; right: 15px; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; z-index: 10; }
-    
-    /* Why Stay Box */
-    .info-box { background: #f8f9fa; border-radius: 25px; padding: 40px 20px; margin: 30px 0; text-align: center; border: 1px solid #eee; }
-    
-    /* 📍 Tourist Place Cards */
-    .place-card { background: #fff; border: 1px solid #eee; border-radius: 15px; overflow: hidden; transition: 0.3s; height: 100%; }
-    .place-card img { width: 100%; height: 140px; object-fit: cover; }
-    .place-info { padding: 12px; text-align: center; }
-    .place-card:hover { border-color: #0d6efd; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-
-    /* Footer */
+    .discount-tag { position: absolute; top: 15px; right: 15px; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; z-index: 10; }
     .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
-    .footer-bottom { background: #141414; padding: 30px 0; margin-top: 40px; border-top: 1px solid #222; }
 </style>
 
 <div class="offer-runner">
     <div class="runner-text">
-        <span class="text-primary mx-3">✨ {{ runner_text }}</span> |
-        {% for villa in villas %}
-            {% if villa.Offer and villa.Offer|string != 'nan' %} 🔥 {{ villa.Villa_Name }}: {{ villa.Offer }} | {% endif %}
-        {% endfor %}
-        📞 BOOKING: 8830024994
+        ✨ {{ runner_text }} | 📞 BOOKING: 8830024994
     </div>
 </div>
 
@@ -46,31 +22,13 @@
     <div class="row g-3">
         <div class="col-md-6">
             <div class="weather-card shadow-sm p-3 d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center">
-                    <img src="{% if weather %}https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png{% else %}https://openweathermap.org/img/wn/02d@2x.png{% endif %}" style="width: 50px;">
-                    <div class="ms-2">
-                        <h6 class="fw-bold mb-0" style="font-size: 0.9rem;">Lonavala Weather</h6>
-                        <p class="mb-0 small text-muted text-capitalize" style="font-size: 0.75rem;">{{ weather.desc if weather else 'Pleasant' }}</p>
-                    </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Lonavala Weather</h6>
+                    <p class="mb-0 small text-muted">{{ weather.desc if weather else 'Pleasant' }}</p>
                 </div>
                 <div class="text-end">
                     <h4 class="fw-bold mb-0 text-primary">{{ weather.temp if weather else '24' }}°C</h4>
-                    <span class="badge bg-success" style="font-size: 0.6rem;">LIVE STATUS</span>
                 </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="score-card shadow-sm border-0">
-                <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center py-2" style="font-size: 0.7rem;">
-                    <span>🏏 LIVE MATCH SCORE</span>
-                    <span class="badge bg-danger blink" style="font-size: 0.5rem;">LIVE</span>
-                </div>
-                <iframe 
-                    src="https://www.cricketscore.com/widgets/scorecard/" 
-                    style="width:100%; height:80px; border:none;" 
-                    scrolling="no">
-                </iframe>
             </div>
         </div>
     </div>
@@ -82,47 +40,28 @@
         <div class="col-md-4">
             <div class="card h-100 villa-card shadow-sm">
                 <div style="height: 250px; position: relative;">
-                    <img src="{{ villa.Image_URL or villa.Image_URL_1 }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://placehold.co/600x400?text=Villa+Image'">
-                    {% set current = (villa.Price or 0) | float %}
-                    {% set original = (villa.Original_Price or 0) | float %}
-                    {% if original > current and current > 0 %}
-                        <div class="discount-tag">{{ (((original - current) / original) * 100) | round | int }}% OFF</div>
-                    {% endif %}
+                    <img src="{{ villa.Image_URL }}" class="w-100 h-100" style="object-fit: cover;">
                 </div>
                 <div class="card-body p-4">
-                    <h5 class="fw-bold mb-1">{{ villa.Villa_Name }}</h5>
-                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
-                    <div class="d-flex gap-4 mb-3 small fw-bold">
-                        <span><i class="bi bi-people-fill text-primary"></i> {{ villa.Guests or '12' }} Guests</span>
-                        <span><i class="bi bi-door-open-fill text-primary"></i> {{ villa.BHK or '3' }} BHK</span>
-                    </div>
-                    <div class="pt-3 border-top d-flex align-items-center justify-content-between">
-                        <div>
-                            {% if current > 0 %}
-                                <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fs-6 fw-normal">/nt</small></h5>
-                            {% else %}
-                                <span class="badge bg-light text-primary border">Price on Request</span>
-                            {% endif %}
-                        </div>
-                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Explore</a>
-                    </div>
+                    <h5 class="fw-bold">{{ villa.Villa_Name }}</h5>
+                    <p class="text-muted small">Lonavala, MH</p>
+                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark btn-sm rounded-pill px-4">Explore</a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+</div>
 
-    <div class="info-box shadow-sm">
-        <h3 class="fw-bold mb-4">Why <span class="text-primary">Stay With Us</span>?</h3>
-        <div class="row g-3">
-            <div class="col-md-4">
-                <i class="bi bi-shield-check text-primary fs-2"></i>
-                <h6 class="fw-bold mt-2">Verified Luxury</h6>
-                <p class="small text-muted">Every villa is personally checked for quality.</p>
-            </div>
-            <div class="col-md-4">
-                <i class="bi bi-headset text-primary fs-2"></i>
-                <h6 class="fw-bold mt-2">24/7 Support</h6>
-                <p class="small text-muted">Dedicated local manager for your stay.</p>
-            </div>
-            
+<footer class="final-footer">
+    <div class="container pb-4">
+        <h2 class="text-white fw-bold">More<span class="text-primary">Vistas</span></h2>
+        <div class="py-3">
+            <a href="https://wa.me/918830024994" class="text-white mx-3 fs-3"><i class="bi bi-whatsapp"></i></a>
+            <a href="tel:+918830024994" class="text-white mx-3 fs-3"><i class="bi bi-telephone-fill"></i></a>
+        </div>
+        <p class="mb-0 opacity-50 small">© 2026 MoreVistas. All Rights Reserved.</p>
+    </div>
+</footer>
+
+{% endblock %} ```
