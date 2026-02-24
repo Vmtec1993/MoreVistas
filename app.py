@@ -101,12 +101,19 @@ def index():
         v['Guests'] = v.get('Guests', '12')
         v['Offer'] = v.get('Offer', '')
         v['BHK'] = v.get('BHK', '3')
+        # Rules handle formatting
         v['Rules'] = v.get('Rules', 'No specific rules mentioned.')
         
     return render_template('index.html', 
                            villas=villas, 
                            weather=weather, 
                            tourist_places=tourist_places)
+
+# ✅ Added Explore Route
+@app.route('/explore')
+def explore():
+    tourist_places = get_safe_data(places_sheet)
+    return render_template('explore.html', tourist_places=tourist_places)
 
 @app.route('/about')
 def about():
