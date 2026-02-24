@@ -10,12 +10,16 @@
     .villa-card { transition: 0.3s; border-radius: 20px; overflow: hidden; border: none; background: #fff; }
     .villa-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
     
-    .location-icon { color: #ff4d4d; margin-right: 5px; } /* Red Location Icon Fixed */
+    .location-icon { color: #ff4d4d; margin-right: 5px; } 
     .feature-icon { font-size: 2rem; color: #0d6efd; margin-bottom: 15px; }
     
     .final-footer { background: #111; color: #fff; padding: 70px 0 30px; margin-top: 80px; border-top: 5px solid #0d6efd; }
     .footer-link { color: #aaa; text-decoration: none; transition: 0.3s; }
     .footer-link:hover { color: #0d6efd; padding-left: 5px; }
+
+    /* New Blue Theme Price & Timer Styles */
+    .price-blue { color: #007bff; font-weight: 800; }
+    .timer-container { background: #f0f7ff; border: 1px solid #cfe2ff; color: #007bff; }
 </style>
 
 <div class="offer-runner">
@@ -53,7 +57,36 @@
                     {% endif %}
                 </div>
                 <div class="card-body p-4">
+                    
+                    <div class="timer-container d-flex justify-content-between align-items-center mb-3 p-2 rounded-3 small fw-bold">
+                        <span><i class="bi bi-clock-history me-1"></i> Offer Ends:</span>
+                        <div class="countdown-display" id="timer-{{ villa.Villa_ID }}">
+                            <span class="hours">00</span>h : <span class="minutes">00</span>m : <span class="seconds">00</span>s
+                        </div>
+                    </div>
+
                     <h5 class="fw-bold mb-1">{{ villa.Villa_Name }}</h5>
+
+                    <div class="mb-2">
+                        {% if villa.Price and villa.Price|string != '' and villa.Price|string != '0' %}
+                            <div class="d-flex align-items-center">
+                                {% if villa.Original_Price and villa.Original_Price|string != '' %}
+                                    <span class="text-decoration-line-through me-2 opacity-50" style="color: #007bff; font-size: 0.9rem;">₹{{ villa.Original_Price }}</span>
+                                    <span class="price-blue fs-4">₹{{ villa.Price }}</span>
+                                    
+                                    {% set discount = ((villa.Original_Price|float - villa.Price|float) / villa.Original_Price|float * 100)|round %}
+                                    <span class="badge ms-2" style="background-color: #007bff;">{{ discount }}% OFF</span>
+                                {% else %}
+                                    <span class="price-blue fs-4">₹{{ villa.Price }}</span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="price-blue text-uppercase fs-5" style="letter-spacing: 1px;">
+                                Price on Request
+                            </div>
+                        {% endif %}
+                    </div>
+
                     <p class="small text-muted mb-2">
                         <i class="bi bi-geo-alt-fill location-icon"></i>Lonavala, Maharashtra
                     </p>
@@ -67,7 +100,7 @@
         </div>
         {% endfor %}
     </div>
-
+    
     <div class="my-5 py-5 border-top">
         <h3 class="text-center fw-bold mb-5">Why Book with MoreVistas?</h3>
         <div class="row g-4 text-center">
@@ -88,22 +121,6 @@
             </div>
         </div>
     </div>
-
-    {% if tourist_places %}
-    <h4 class="fw-bold mb-4 mt-5">Nearby Attractions</h4>
-    <div class="row g-3">
-        {% for place in tourist_places[:8] %}
-        <div class="col-md-3 col-6">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                <img src="{{ place.Image_URL }}" class="card-img-top" style="height: 120px; object-fit: cover;">
-                <div class="p-2 text-center bg-white">
-                    <span class="small fw-bold text-dark">{{ place.Place_Name }}</span>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 </div>
 
 <footer class="final-footer">
@@ -113,14 +130,12 @@
                 <h2 class="fw-bold mb-3">More<span class="text-primary">Vistas</span></h2>
                 <p class="small text-muted" style="line-height: 1.8;">
                     MoreVistas Lonavala is a premium villa rental agency dedicated to providing elite staycation experiences. 
-                    Your comfort and luxury are our top priorities.
                 </p>
                 <div class="mt-4">
                     <a href="https://wa.me/918830024994" class="btn btn-success btn-sm rounded-pill px-3 me-2"><i class="bi bi-whatsapp me-2"></i>WhatsApp</a>
                     <a href="tel:+918830024994" class="btn btn-outline-light btn-sm rounded-pill px-3"><i class="bi bi-telephone me-2"></i>Call Now</a>
                 </div>
             </div>
-
             <div class="col-md-2 offset-md-1">
                 <h6 class="fw-bold mb-4">Quick Links</h6>
                 <ul class="list-unstyled">
@@ -130,31 +145,13 @@
                     <li><a href="/contact" class="footer-link small">Contact Us</a></li>
                 </ul>
             </div>
-
-            <div class="col-md-2">
-                <h6 class="fw-bold mb-4">Categories</h6>
-                <ul class="list-unstyled">
-                    <li><a href="#" class="footer-link small">Luxury Pool Villas</a></li>
-                    <li><a href="#" class="footer-link small">3 BHK Collection</a></li>
-                    <li><a href="#" class="footer-link small">Pet-Friendly Stays</a></li>
-                    <li><a href="#" class="footer-link small">Corporate Outings</a></li>
-                </ul>
-            </div>
-
             <div class="col-md-3">
                 <h6 class="fw-bold mb-4">Head Office</h6>
-                <p class="small text-muted"><i class="bi bi-geo-alt text-primary me-2"></i> Lonavala, Maharashtra - 410401</p>
-                <p class="small text-muted"><i class="bi bi-envelope text-primary me-2"></i> bookings@morevistas.com</p>
+                <p class="small text-muted"><i class="bi bi-geo-alt text-primary me-2"></i> Lonavala, Maharashtra</p>
                 <div class="mt-3">
-                    <img src="https://img.icons8.com/color/48/000000/visa.png" width="30" class="me-2 opacity-75">
-                    <img src="https://img.icons8.com/color/48/000000/mastercard.png" width="30" class="me-2 opacity-75">
-                    <img src="https://img.icons8.com/color/48/000000/google-pay.png" width="30" class="opacity-75">
+                    <img src="https://img.icons8.com/color/48/000000/google-pay.png" width="30">
                 </div>
             </div>
-        </div>
-        <hr class="my-5 opacity-25">
-        <div class="text-center">
-            <p class="small text-muted mb-0">© 2026 MoreVistas Lonavala. Managed with Excellence.</p>
         </div>
     </div>
 </footer>
@@ -171,6 +168,31 @@ function filterVillas() {
         }
     });
 }
+
+function startGlobalTimer() {
+    function update() {
+        let now = new Date();
+        let night = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+        let diff = night - now;
+
+        let h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        let m = Math.floor((diff / (1000 * 60)) % 60);
+        let s = Math.floor((diff / 1000) % 60);
+
+        h = h < 10 ? "0" + h : h;
+        m = m < 10 ? "0" + m : m;
+        s = s < 10 ? "0" + s : s;
+
+        document.querySelectorAll(".countdown-display").forEach(display => {
+            display.querySelector(".hours").innerText = h;
+            display.querySelector(".minutes").innerText = m;
+            display.querySelector(".seconds").innerText = s;
+        });
+        setTimeout(update, 1000);
+    }
+    update();
+}
+startGlobalTimer();
 </script>
 
 {% endblock %}
