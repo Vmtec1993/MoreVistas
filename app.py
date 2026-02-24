@@ -9,6 +9,10 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = "morevistas_secure_2026"
 
+# --- CONFIG ---
+TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
+TELEGRAM_CHAT_ID = "6746178673"
+
 # --- Google Sheets Setup ---
 creds_json = os.environ.get('GOOGLE_CREDS')
 sheet = None
@@ -38,6 +42,16 @@ def init_sheets():
             print(f"Sheet Init Error: {e}")
 
 init_sheets()
+
+# --- 🛠️ Functions ---
+
+def send_telegram_alert(message):
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        params = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
+        requests.get(url, params=params, timeout=5)
+    except Exception as e:
+        print(f"Telegram Error: {e}")
 
 def get_safe_data(target_sheet):
     try:
@@ -93,17 +107,50 @@ def index():
     except Exception as e:
         return f"Error: {e}", 500
 
+@app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
+def enquiry(villa_id):
+    villas = get_safe_data(sheet)
+    villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
+    
+    if request.method == 'POST':
+        name = request.form.get('name', 'Guest')
+        phone = request.form.get('phone', '')
+        dates = request.form.get('stay_dates', 'Not selected')
+        guests = request.form.get('guests', '1')
+        villa_name = villa.get('Villa_Name', 'Unknown Villa')
+        
+        # 1. Google Sheet Update
+        if enquiry_sheet:
+            try:
+                enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, villa_name])
+            except: pass
+        
+        # 2. Telegram Alert (Re-added)
+        alert_msg = (
+            f"🚀 *New Villa Enquiry!*\n\n"
+            f"🏡 *Villa:* {villa_name}\n"
+            f"👤 *Name:* {name}\n"
+            f"📞 *Phone:* {phone}\n"
+            f"📅 *Dates:* {dates}\n"
+            f"👥 *Guests:* {guests}\n"
+            f"⏰ *Received:* {datetime.now().strftime('%H:%M %p')}"
+        )
+        send_telegram_alert(alert_msg)
+        
+        return render_template('success.html', name=name)
+    
+    return render_template('enquiry.html', villa=villa)
+
+# ... (बाकी Routes: Explore, About, Contact, Villa_Details वैसे ही रहेंगे)
+
 @app.route('/explore')
-def explore():
-    return render_template('explore.html', tourist_places=get_safe_data(places_sheet))
+def explore(): return render_template('explore.html', tourist_places=get_safe_data(places_sheet))
 
 @app.route('/about')
-def about():
-    return render_template('about.html')
+def about(): return render_template('about.html')
 
 @app.route('/contact')
-def contact():
-    return render_template('contact.html')
+def contact(): return render_template('contact.html')
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
@@ -115,23 +162,7 @@ def villa_details(villa_id):
         return render_template('villa_details.html', villa=villa, villa_images=villa_images)
     return "Villa Not Found", 404
 
-@app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
-def enquiry(villa_id):
-    villas = get_safe_data(sheet)
-    villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
-    if request.method == 'POST':
-        name = request.form.get('name', 'Guest')
-        phone = request.form.get('phone', '')
-        dates = request.form.get('stay_dates', 'Not selected')
-        guests = request.form.get('guests', '1')
-        
-        if enquiry_sheet:
-            try:
-                enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, villa.get('Villa_Name', 'Unknown')])
-            except: pass
-        return render_template('success.html', name=name)
-    return render_template('enquiry.html', villa=villa)
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+    
