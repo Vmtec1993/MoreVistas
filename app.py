@@ -72,7 +72,6 @@ def index():
     villas = []
     if sheet:
         try:
-            # head=1 fixes duplicate header issues
             villas = sheet.get_all_records(head=1)
             for v in villas:
                 v['Status'] = v.get('Status', 'Available')
@@ -157,16 +156,19 @@ def villa_details(villa_id):
                 if main_img and str(main_img).strip() != "" and str(main_img).lower() != 'nan':
                     villa_images.append(main_img)
 
-                # Check Image_URL_2 to 20
-                for i in range(2, 21):
+                # Check Image_URL_1 to 20 (आपके शीट के हिसाब से 1 से शुरू हो रहा है)
+                for i in range(1, 21):
                     col_name = f"Image_URL_{i}"
                     img_url = villa.get(col_name)
                     if img_url and str(img_url).strip() != "" and str(img_url).lower() != 'nan': 
-                        villa_images.append(img_url)
+                        # Duplicate रोकने के लिए चेक
+                        if img_url not in villa_images:
+                            villa_images.append(img_url)
                 
                 return render_template('villa_details.html', villa=villa, villa_images=villa_images)
-        except:
-            pass
+        except Exception as e:
+            print(f"Details Error: {e}")
+            
     return "Villa info not found", 404
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
@@ -200,4 +202,4 @@ def enquiry(villa_id):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000)) 
     app.run(host='0.0.0.0', port=port)
-    
+            
