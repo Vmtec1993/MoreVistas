@@ -65,16 +65,30 @@ def get_safe_data(target_sheet):
         print(f"Data Fetch Error: {e}")
         return []
 
+# --- 🌦️ Updated Weather Function ---
 def get_weather():
     try:
-        url = "https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid=b8ee20104f767837862a93361e68787c"
-        d = requests.get(url, timeout=5).json()
-        return {
-            'temp': round(d['main']['temp']), 
-            'desc': d['weather'][0]['description'].title(), 
-            'icon': d['weather'][0]['icon']
-        }
-    except:
+        # API Key (Please wait 2 hours if new)
+        api_key = "b8ee20104f767837862a93361e68787c"
+        url = f"https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid={api_key}"
+        
+        # Timeout helps to not slow down the site if API is slow
+        response = requests.get(url, timeout=10) 
+        
+        if response.status_code == 200:
+            d = response.json()
+            weather_data = {
+                'temp': round(d['main']['temp']), 
+                'desc': d['weather'][0]['description'].title(), 
+                'icon': d['weather'][0]['icon']
+            }
+            print(f"✅ Weather Data Fetched: {weather_data['temp']}°C")
+            return weather_data
+        else:
+            print(f"❌ Weather API Error: {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"⚠️ Weather Fetch Error: {e}")
         return None
 
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
@@ -92,7 +106,7 @@ def send_telegram_alert(message):
 
 @app.route('/')
 def index():
-    weather = get_weather()
+    weather_info = get_weather() # Store in variable
     villas = get_safe_data(sheet)
     tourist_places = get_safe_data(places_sheet) 
     
@@ -101,15 +115,13 @@ def index():
         v['Guests'] = v.get('Guests', '12')
         v['Offer'] = v.get('Offer', '')
         v['BHK'] = v.get('BHK', '3')
-        # Rules handle formatting
         v['Rules'] = v.get('Rules', 'No specific rules mentioned.')
         
     return render_template('index.html', 
                            villas=villas, 
-                           weather=weather, 
+                           weather=weather_info, # Pass data
                            tourist_places=tourist_places)
 
-# ✅ Added Explore Route
 @app.route('/explore')
 def explore():
     tourist_places = get_safe_data(places_sheet)
@@ -172,7 +184,7 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries)
 
 if __name__ == "__main__":
-    # Render automatically sets a PORT environment variable
+    # Render handles the PORT
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-
+    
