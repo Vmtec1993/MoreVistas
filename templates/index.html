@@ -2,33 +2,31 @@
 {% block content %}
 
 <style>
-    /* 1. Top Runner Styling */
+    /* Runner & Weather */
     .offer-runner { background: #000; color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap; }
     .runner-text { display: inline-block; animation: scroll-text 15s linear infinite; font-weight: 700; text-transform: uppercase; }
     @keyframes scroll-text { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    .app-link { color: #0d6efd !important; text-decoration: none; font-weight: 800; margin: 0 20px; }
+    .weather-card { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%); border-radius: 15px; border: 1px solid rgba(0,0,0,0.05); }
 
-    /* Weather Widget */
-    .weather-card {
-        background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
-        border-radius: 15px; color: #333; border: 1px solid rgba(0,0,0,0.05);
-    }
-
-    /* Villa Card Styles */
-    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; margin-bottom: 25px; }
+    /* Villa Cards */
+    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; margin-bottom: 25px; }
     .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     .discount-tag { position: absolute; top: 15px; right: 15px; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; z-index: 10; }
-    .offer-badge { background: #ff4d4d; color: white; padding: 4px 15px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-block; margin-bottom: 5px; }
-    .timer-text { font-size: 0.75rem; font-weight: 700; color: #ff4d4d; margin-top: 2px; display: block; }
+    
+    /* Why Stay & Tourist Points */
+    .info-box { background: #f8f9fa; border-radius: 25px; padding: 40px 20px; margin: 30px 0; text-align: center; border: 1px solid #eee; }
+    .point-badge { background: #fff; border: 1px solid #dee2e6; border-radius: 50px; padding: 8px 20px; display: inline-block; margin: 5px; font-size: 0.85rem; font-weight: 600; }
+
+    /* Footer */
+    .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
+    .footer-bottom { background: #141414; padding: 30px 0; margin-top: 40px; border-top: 1px solid #222; }
 </style>
 
 <div class="offer-runner">
     <div class="runner-text">
-        <a href="https://drive.google.com/file/d/12cErjJSSzXthfBtjItHf5vLwod7rIdbj/view?usp=drivesdk" class="app-link"><i class="bi bi-android2"></i> 📲 DOWNLOAD APP</a> |
+        <a href="#" class="text-info text-decoration-none mx-3">📲 DOWNLOAD OUR APP</a> |
         {% for villa in villas %}
-            {% if villa.Offer and villa.Offer|string != 'nan' %}
-               🔥 {{ villa.Villa_Name }}: {{ villa.Offer }} | 
-            {% endif %}
+            {% if villa.Offer and villa.Offer|string != 'nan' %} 🔥 {{ villa.Villa_Name }}: {{ villa.Offer }} | {% endif %}
         {% endfor %}
         📞 CALL: 8830024994
     </div>
@@ -46,6 +44,7 @@
         </div>
         <div class="text-end">
             <h3 class="fw-bold mb-0 text-primary">{{ weather.temp }}°C</h3>
+            <span class="badge bg-primary small">LIVE</span>
         </div>
     </div>
 </div>
@@ -57,12 +56,10 @@
         <div class="col-md-4">
             <div class="card h-100 villa-card shadow-sm">
                 <div style="height: 250px; position: relative;">
-                    <img src="{{ villa.Image_URL or villa.Image_URL_1 or 'https://via.placeholder.com/400x300?text=MoreVistas' }}" 
-                         class="w-100 h-100" style="object-fit: cover;"
-                         onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+                    <img src="{{ villa.Image_URL or villa.Image_URL_1 }}" class="w-100 h-100" style="object-fit: cover;">
                     
-                    {% set current = (villa.get('Price') or 0) | float %}
-                    {% set original = (villa.get('Original_Price') or 0) | float %}
+                    {% set current = (villa.Price or 0) | float %}
+                    {% set original = (villa.Original_Price or 0) | float %}
                     {% if original > current and current > 0 %}
                         <div class="discount-tag">{{ (((original - current) / original) * 100) | round | int }}% OFF</div>
                     {% endif %}
@@ -77,50 +74,67 @@
                         <span><i class="bi bi-door-open-fill text-primary"></i> {{ villa.BHK or '3' }} BHK</span>
                     </div>
 
-                    <div class="pt-3 border-top">
-                        <div class="text-center mb-3">
-                            {% if villa.Offer and villa.Offer|string != 'nan' %}
-                                <div class="offer-badge"><i class="bi bi-fire"></i> {{ villa.Offer }}</div>
-                                {% if villa.Offer_End %}
-                                    <span class="timer-text card-timer" data-expire="{{ villa.Offer_End }}">Loading...</span>
-                                {% endif %}
+                    <div class="pt-3 border-top d-flex align-items-center justify-content-between">
+                        <div>
+                            {% if current > 0 %}
+                                <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fs-6 fw-normal">/nt</small></h5>
+                            {% else %}
+                                <span class="badge bg-light text-primary border">Price on Request</span>
                             {% endif %}
                         </div>
-
-                        <div class="d-flex align-items-center justify-content-between">
-                            <h5 class="m-0 fw-bold text-primary">₹{{ villa.Price | int }}<small class="text-muted fw-normal fs-6">/night</small></h5>
-                            <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Explore</a>
-                        </div>
+                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Explore</a>
                     </div>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+
+    <div class="info-box shadow-sm">
+        <h3 class="fw-bold mb-4">Why <span class="text-primary">Stay With Us</span>?</h3>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <i class="bi bi-shield-check text-primary fs-2"></i>
+                <h6 class="fw-bold mt-2">Verified Luxury</h6>
+                <p class="small text-muted">Every villa is personally checked.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-headset text-primary fs-2"></i>
+                <h6 class="fw-bold mt-2">24/7 Support</h6>
+                <p class="small text-muted">Local staff available at your call.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-cash-stack text-primary fs-2"></i>
+                <h6 class="fw-bold mt-2">Best Price</h6>
+                <p class="small text-muted">Direct rates, no hidden fees.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 text-center">
+        <h4 class="fw-bold mb-3">Lonavala Tourist Points</h4>
+        <div class="d-flex flex-wrap justify-content-center">
+            <span class="point-badge shadow-sm">Bhushi Dam</span>
+            <span class="point-badge shadow-sm">Tiger Point</span>
+            <span class="point-badge shadow-sm">Lonavala Lake</span>
+            <span class="point-badge shadow-sm">Celebrity Wax Museum</span>
+            <span class="point-badge shadow-sm">Karla Caves</span>
+        </div>
+    </div>
 </div>
 
-<script>
-    function startCardTimers() {
-        const timers = document.querySelectorAll('.card-timer');
-        timers.forEach(timer => {
-            const expireDate = timer.getAttribute('data-expire');
-            const countTo = new Date(expireDate).getTime();
-            const x = setInterval(function() {
-                const now = new Date().getTime();
-                const diff = countTo - now;
-                if (isNaN(countTo) || diff < 0) {
-                    timer.innerHTML = "OFFER EXPIRED";
-                    clearInterval(x);
-                } else {
-                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((diff % (1000 * 60)) / 1000);
-                    timer.innerHTML = "Ends in: " + h + "h " + m + "m " + s + "s";
-                }
-            }, 1000);
-        });
-    }
-    document.addEventListener('DOMContentLoaded', startCardTimers);
-</script>
+<footer class="final-footer">
+    <div class="container">
+        <h2 class="text-white fw-bold mb-2">More<span class="text-primary">Vistas</span></h2>
+        <p class="small opacity-50">Lonavala's Most Trusted Villa Partner</p>
+        <div class="py-4">
+            <a href="https://wa.me/918830024994" class="text-white mx-3 fs-3"><i class="bi bi-whatsapp"></i></a>
+            <a href="#" class="text-white mx-3 fs-3"><i class="bi bi-instagram"></i></a>
+        </div>
+        <div class="footer-bottom">
+            <p class="mb-0 opacity-50 small">© 2026 MoreVistas. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
 
 {% endblock %}
