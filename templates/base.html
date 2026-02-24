@@ -1,148 +1,181 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoreVistas - Luxury Villas in Lonavala</title>
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    /* 🏷️ Discount Tag Style */
+    .detail-discount-tag {
+        position: absolute; top: 15px; right: 15px; z-index: 30;
+        background: #007bff; color: white; padding: 6px 12px;
+        border-radius: 10px; font-weight: 800; font-size: 0.9rem;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    /* Sticky Mobile Footer */
+    @media (max-width: 767px) {
+        .sticky-booking-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: white; padding: 12px 20px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            z-index: 1000; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        body { padding-bottom: 80px; } 
+    }
+    @media (min-width: 768px) { .sticky-booking-bar { display: none; } }
+
+    .carousel-item img { height: 400px; object-fit: cover; }
+    @media (max-width: 768px) { .carousel-item img { height: 300px; } }
+
+    /* Footer Custom */
+    .final-footer { background: #111; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; border-top: 5px solid #007bff; }
+    .footer-bottom { background: #000; padding: 30px 0; margin-top: 40px; }
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    /* Blue Price Theme */
+    .price-blue { color: #007bff; font-weight: 800; }
+    .rule-item { border-left: 3px solid #007bff; padding-left: 15px; margin-bottom: 12px; }
+</style>
 
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #fcfcfc;
-            color: #2d3436;
-            scroll-behavior: smooth;
-        }
+<div class="container py-4">
+    <div id="villaSlider" class="carousel slide shadow-sm position-relative" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden;">
+        {% set current = (villa.Price or 0) | float %}
+        {% set original = (villa.Original_Price or 0) | float %}
+        {% if original > current and current > 0 %}
+            {% set disc = (((original - current) / original) * 100) | round | int %}
+            <div class="detail-discount-tag">{{ disc }}% OFF</div>
+        {% endif %}
 
-        /* ✅ Loader Styling */
-        #loader-wrapper {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; z-index: 99999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease;
-        }
-        .spinner {
-            width: 70px; height: 70px;
-            border: 5px solid rgba(13, 110, 253, 0.1);
-            border-left-color: #0d6efd;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loader-text { color: white; margin-top: 20px; font-weight: bold; letter-spacing: 3px; font-size: 0.8rem; }
-
-        /* Navbar Styling */
-        .navbar {
-            background-color: rgba(255, 255, 255, 0.95) !important;
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding: 12px 0;
-        }
-        
-        .navbar-brand img { height: 60px; width: auto; transition: 0.3s; }
-        .navbar-brand:hover img { transform: scale(1.05); }
-
-        .nav-link {
-            font-weight: 600;
-            color: #2d3436 !important;
-            margin: 0 12px;
-            position: relative;
-        }
-        
-        /* Active Link Underline */
-        .nav-link.active { color: #0d6efd !important; }
-        .nav-link::after {
-            content: ''; position: absolute; width: 0; height: 2px;
-            bottom: -5px; left: 0; background-color: #0d6efd;
-            transition: 0.3s;
-        }
-        .nav-link:hover::after { width: 100%; }
-
-        /* ✅ Back to Top Button */
-        #backToTop {
-            position: fixed; bottom: 30px; right: 30px;
-            width: 45px; height: 45px; background: #0d6efd;
-            color: white; border-radius: 50%; display: none;
-            align-items: center; justify-content: center;
-            cursor: pointer; z-index: 1000; border: none;
-            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
-            transition: 0.3s;
-        }
-        #backToTop:hover { transform: translateY(-5px); background: #0056b3; }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #0d6efd, #0056b3);
-            border: none; box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
-        }
-    </style>
-    {% block head %}{% endblock %}
-</head>
-<body>
-
-    <div id="loader-wrapper">
-        <div class="spinner"></div>
-        <div class="loader-text">MOREVISTAS LUXURY</div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{{ villa.Image_URL or villa.Image_URL_1 }}" class="d-block w-100">
+            </div>
+            {% if villa_images %}
+                {% for img_url in villa_images %}
+                    {% if img_url != villa.Image_URL and img_url != villa.Image_URL_1 %}
+                    <div class="carousel-item">
+                        <img src="{{ img_url }}" class="d-block w-100">
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#villaSlider" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+        <button class="carousel-control-next" type="button" data-bs-target="#villaSlider" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
     </div>
 
-    <button id="backToTop" title="Go to top"><i class="bi bi-arrow-up"></i></button>
-
-    <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container">
-            <a class="navbar-brand text-dark" href="/">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="me-2" onerror="this.style.display='none'">
-                <span class="fw-800">More<span class="text-primary">Vistas</span></span>
-            </a>
-            
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <i class="bi bi-list fs-1"></i>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link {% if request.path == '/about' %}active{% endif %}" href="/about">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link {% if request.path == '/contact' %}active{% endif %}" href="/contact">Contact</a></li>
-                    <li class="nav-item ms-lg-3">
-                        <a href="https://wa.me/918830024994" class="btn btn-primary rounded-pill px-4 shadow-sm">
-                            <i class="bi bi-whatsapp me-2"></i>Book via WhatsApp
-                        </a>
-                    </li>
-                </ul>
+    <div class="mt-4 px-2">
+        <div class="p-3 mb-4 rounded-4 text-center" style="background: #f0f7ff; border: 1px solid #cfe2ff;">
+            <p class="small fw-bold text-primary mb-2"><i class="bi bi-clock-history me-1"></i> LIMITED TIME OFFER ENDS IN:</p>
+            <div class="d-flex justify-content-center gap-3 text-primary fw-bold fs-4">
+                <div><span class="hours">00</span><small style="font-size: 0.7rem; display: block;">Hrs</small></div>
+                <div>:</div>
+                <div><span class="minutes">00</span><small style="font-size: 0.7rem; display: block;">Min</small></div>
+                <div>:</div>
+                <div><span class="seconds">00</span><small style="font-size: 0.7rem; display: block;">Sec</small></div>
             </div>
         </div>
-    </nav>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+                <h2 class="fw-bold m-0 text-dark">{{ villa.Villa_Name }}</h2>
+                <div class="mt-1">
+                    <span class="badge {% if villa.Status == 'Available' %}bg-success{% else %}bg-warning text-dark{% endif %} rounded-pill small">
+                        {{ villa.Status | default('Available') }}
+                    </span>
+                    <small class="text-muted ms-2"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</small>
+                </div>
+            </div>
+        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <div class="d-flex gap-2 my-3 overflow-auto pb-2" style="white-space: nowrap;">
+            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-people text-primary"></i> Up to {{ villa.Guests | default('12') }} Guests</div>
+            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-door-open text-primary"></i> {{ villa.BHK | default('3') }} BHK</div>
+            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-droplet text-primary"></i> {{ villa.Bathrooms | default('2') }} Baths</div>
+        </div>
 
-    <script>
-        // 1. Loader Logic
-        window.addEventListener("load", function() {
-            const loader = document.getElementById("loader-wrapper");
-            setTimeout(() => {
-                loader.style.opacity = "0";
-                setTimeout(() => { loader.style.display = "none"; }, 500);
-            }, 600);
-        });
+        <div class="card border-0 rounded-4 p-4 mb-4 d-none d-md-block shadow-sm" style="background: #fcfcfc; border: 1px solid #f0f7ff !important;">
+            <div class="row align-items-center">
+                <div class="col-7">
+                    {% if villa.Price and villa.Price|string != '' and villa.Price|string != '0' %}
+                        <span class="text-muted small d-block">Special Nightly Rate</span>
+                        <div class="d-flex align-items-baseline">
+                            {% if villa.Original_Price %}
+                                <h4 class="text-decoration-line-through me-3 opacity-50" style="color: #007bff;">₹{{ villa.Original_Price }}</h4>
+                            {% endif %}
+                            <h2 class="fw-bold mb-0" style="color: #007bff;">₹{{ villa.Price }} <small class="text-muted fs-6 fw-normal">/night</small></h2>
+                        </div>
+                    {% else %}
+                        <h2 class="fw-bold text-uppercase mb-0" style="color: #007bff; letter-spacing: 1px;">Price on Request</h2>
+                    {% endif %}
+                </div>
+                <div class="col-5">
+                    <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow">Reserve This Villa</a>
+                </div>
+            </div>
+        </div>
 
-        // 2. Back to Top Logic
-        const btt = document.getElementById("backToTop");
-        window.onscroll = function() {
-            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-                btt.style.display = "flex";
-            } else {
-                btt.style.display = "none";
-            }
-        };
-        btt.onclick = function() {
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        };
-    </script>
-</body>
-</html>
+        <h5 class="fw-bold mt-4">About this villa</h5>
+        <p class="text-muted" style="line-height: 1.6;">{{ villa.Description | default('Experience the ultimate luxury stay in Lonavala with MoreVistas.') }}</p>
+        
+        <div class="mt-4 mb-5">
+            <h6 class="fw-bold mb-3"><i class="bi bi-stars text-warning"></i> Premium Amenities</h6>
+            <div class="d-flex flex-wrap gap-2">
+                {% if villa.Amenities %}
+                    {% for item in villa.Amenities.split(',') %}
+                    <span class="badge bg-white text-dark border fw-normal p-2 px-3 shadow-sm rounded-3 small">
+                        <i class="bi bi-check2-circle text-success me-1"></i> {{ item.strip() }}
+                    </span>
+                    {% endfor %}
+                {% else %}
+                    <span class="text-muted small">Standard luxury amenities included.</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-4 p-4 rounded-4" style="background: #f8f9fa; border: 1px solid #eee;">
+            <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-shield-check text-primary me-2"></i>Villa Guidelines</h5>
+            <div class="row">
+                {% if villa.Rules %}
+                    {% for rule in villa.Rules.split('.') %}
+                        {% if rule.strip() %}
+                        <div class="col-md-6">
+                            <div class="rule-item small text-muted">
+                                {{ rule.strip() }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12"><p class="text-muted small">Standard house rules apply.</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sticky-booking-bar">
+    <div>
+        {% if villa.Price and villa.Price|string != '' %}
+            <h5 class="fw-bold mb-0 text-primary">₹{{ villa.Price }}</h5>
+            <small class="text-muted">Per Night</small>
+        {% else %}
+            <h6 class="fw-bold mb-0 text-primary">Price on Request</h6>
+        {% endif %}
+    </div>
+    <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Book Now</a>
+</div>
+
+<footer class="final-footer">
+    <div class="container">
+        <h2 class='text-white fw-bold'>More<span class='text-primary'>Vistas</span></h2>
+        <p class="small opacity-50 mt-2">Premium Villa Stays in Lonavala</p>
+        <div class="social-icons mb-4 mt-4">
+            <a href="https://wa.me/918830024994" class="text-white mx-3 fs-3"><i class="bi bi-whatsapp text-success"></i></a>
+            <a href="tel:+918830024994" class="text-white mx-3 fs-3"><i class="bi bi-telephone"></i></a>
+        </div>
+        <div class="footer-bottom">
+            <p class="mb-0 opacity-50 small">© 2026 MoreVistas Lonavala. Built for Luxury.</p>
+        </div>
+    </div>
+</footer>
+
+{% endblock %}
