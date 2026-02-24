@@ -5,63 +5,115 @@
     .offer-runner { background: #000; color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap; }
     .runner-text { display: inline-block; animation: scroll-text 20s linear infinite; font-weight: 700; text-transform: uppercase; }
     @keyframes scroll-text { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    .weather-card { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%); border-radius: 15px; height: 100%; }
-    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; margin-bottom: 25px; }
-    .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
-    .discount-tag { position: absolute; top: 15px; right: 15px; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; z-index: 10; }
-    .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
+    
+    .villa-card { transition: 0.3s; border-radius: 20px; overflow: hidden; border: none; background: #fff; }
+    .location-icon { color: #ff4d4d; margin-right: 5px; }
+    .feature-icon { font-size: 1.5rem; color: #0d6efd; margin-bottom: 15px; }
+    
+    /* Filter Styles */
+    .filter-section { background: #f8f9fa; padding: 20px; border-radius: 15px; margin-bottom: 30px; }
 </style>
 
 <div class="offer-runner">
-    <div class="runner-text">
-        ✨ {{ runner_text }} | 📞 BOOKING: 8830024994
-    </div>
+    <div class="runner-text">✨ {{ runner_text }} | BOOK NOW: 8830024994 ✨</div>
 </div>
 
 <div class="container mt-4">
-    <div class="row g-3">
-        <div class="col-md-6">
-            <div class="weather-card shadow-sm p-3 d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="fw-bold mb-0">Lonavala Weather</h6>
-                    <p class="mb-0 small text-muted">{{ weather.desc if weather else 'Pleasant' }}</p>
-                </div>
-                <div class="text-end">
-                    <h4 class="fw-bold mb-0 text-primary">{{ weather.temp if weather else '24' }}°C</h4>
-                </div>
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="p-3 shadow-sm bg-white rounded-4 d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-cloud-sun text-primary"></i> Lonavala Weather</span>
+                <span class="fw-bold text-primary">{{ weather.temp if weather else '24' }}°C - {{ weather.desc if weather else 'Pleasant' }}</span>
             </div>
         </div>
+        
+        <div class="col-md-6">
+            <select class="form-select rounded-pill shadow-sm" id="bhkFilter" onchange="filterVillas()">
+                <option value="all">All Villas (Filter by BHK)</option>
+                <option value="2">2 BHK</option>
+                <option value="3">3 BHK</option>
+                <option value="4">4+ BHK</option>
+            </select>
+        </div>
     </div>
-</div>
 
-<div class="container my-5">
-    <div class="row g-4">
+    <h3 class="fw-bold mb-4">Our Luxury Villas</h3>
+    <div class="row g-4" id="villaContainer">
         {% for villa in villas %}
-        <div class="col-md-4">
+        <div class="col-md-4 villa-item" data-bhk="{{ villa.BHK }}">
             <div class="card h-100 villa-card shadow-sm">
-                <div style="height: 250px; position: relative;">
+                <div style="height: 230px; position: relative;">
                     <img src="{{ villa.Image_URL }}" class="w-100 h-100" style="object-fit: cover;">
+                    {% if villa.Offer %}
+                    <span class="badge bg-danger position-absolute top-0 end-0 m-3 p-2">{{ villa.Offer }}</span>
+                    {% endif %}
                 </div>
                 <div class="card-body p-4">
-                    <h5 class="fw-bold">{{ villa.Villa_Name }}</h5>
-                    <p class="text-muted small">Lonavala, MH</p>
-                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark btn-sm rounded-pill px-4">Explore</a>
+                    <h5 class="fw-bold mb-1">{{ villa.Villa_Name }}</h5>
+                    <p class="small text-muted mb-2">
+                        <i class="bi bi-geo-alt-fill location-icon"></i>Lonavala, MH
+                    </p>
+                    <div class="d-flex justify-content-between mb-3 small fw-bold">
+                        <span><i class="bi bi-people"></i> {{ villa.Guests }} Guests</span>
+                        <span class="text-primary"><i class="bi bi-door-open"></i> {{ villa.BHK }} BHK</span>
+                    </div>
+                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark w-100 rounded-pill">Explore Details</a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+
+    <div class="my-5 py-5 border-top">
+        <h3 class="text-center fw-bold mb-5">Why Stay with MoreVistas?</h3>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <i class="bi bi-shield-check feature-icon"></i>
+                <h5>Verified Properties</h5>
+                <p class="text-muted small">Every villa is personally checked for quality and safety.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-headset feature-icon"></i>
+                <h5>24/7 Support</h5>
+                <p class="text-muted small">Our local team is always there to help during your stay.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-stars feature-icon"></i>
+                <h5>Best Prices</h5>
+                <p class="text-muted small">Direct booking ensures you get the most luxury for less.</p>
+            </div>
+        </div>
+    </div>
+
+    {% if tourist_places %}
+    <h3 class="fw-bold mb-4 mt-5">Nearby Attractions</h3>
+    <div class="row g-3">
+        {% for place in tourist_places %}
+        <div class="col-md-3 col-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                <img src="{{ place.Image_URL }}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                <div class="p-2 text-center">
+                    <span class="small fw-bold">{{ place.Place_Name }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 
-<footer class="final-footer">
-    <div class="container pb-4">
-        <h2 class="text-white fw-bold">More<span class="text-primary">Vistas</span></h2>
-        <div class="py-3">
-            <a href="https://wa.me/918830024994" class="text-white mx-3 fs-3"><i class="bi bi-whatsapp"></i></a>
-            <a href="tel:+918830024994" class="text-white mx-3 fs-3"><i class="bi bi-telephone-fill"></i></a>
-        </div>
-        <p class="mb-0 opacity-50 small">© 2026 MoreVistas. All Rights Reserved.</p>
-    </div>
-</footer>
+<script>
+function filterVillas() {
+    let bhk = document.getElementById('bhkFilter').value;
+    let items = document.querySelectorAll('.villa-item');
+    items.forEach(item => {
+        if (bhk === 'all' || item.getAttribute('data-bhk') === bhk) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+</script>
 
-{% endblock %} ```
+{% endblock %}
