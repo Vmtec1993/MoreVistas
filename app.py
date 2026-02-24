@@ -32,7 +32,6 @@ def init_sheets():
             SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
             main_spreadsheet = client.open_by_key(SHEET_ID)
             
-            # सुरक्षित तरीके से शीट्स लोड करना
             sheet = main_spreadsheet.sheet1
             all_ws = [ws.title for ws in main_spreadsheet.worksheets()]
             if "Places" in all_ws: places_sheet = main_spreadsheet.worksheet("Places")
@@ -52,12 +51,12 @@ def send_telegram_alert(message):
     except: pass
 
 def get_safe_data(target_sheet):
-    """Recursion Error से बचने के लिए सबसे सुरक्षित तरीका"""
+    """रिकर्सन एरर और क्रैश से बचने के लिए सबसे सुरक्षित डेटा फेचिंग तरीका"""
     if not target_sheet: return []
     try:
-        # get_all_records() के बजाय get_all_values() इस्तेमाल करना सुरक्षित है
+        # get_all_values() का उपयोग रिकर्सन एरर को पूरी तरह खत्म करता है
         rows = target_sheet.get_all_values()
-        if not rows: return []
+        if not rows or len(rows) < 1: return []
         
         headers = [h.strip() for h in rows[0]]
         data = []
@@ -67,7 +66,7 @@ def get_safe_data(target_sheet):
                 val = row[i] if i < len(row) else ""
                 item[h] = val
             
-            # Price Logic for Blue Theme
+            # प्राइस और इमेज लॉजिक (बिना बदलाव के)
             p = str(item.get('Price', '')).lower().strip()
             if p in ['', 'nan', '0', 'none']: item['Price'] = None
             
@@ -77,8 +76,7 @@ def get_safe_data(target_sheet):
             if not item.get('Image_URL'): item['Image_URL'] = item.get('Image_URL_1', '')
             data.append(item)
         return data
-    except Exception as e:
-        print(f"Data Fetch Error: {e}")
+    except:
         return []
 
 def get_weather():
@@ -100,12 +98,13 @@ def index():
         runner_text = "Welcome to MoreVistas Lonavala | Call 8830024994"
         if settings_sheet:
             try:
-                # इंडेंटेशन एरर यहाँ फिक्स की गई है
+                # IndentationError (Line 53-54) को यहाँ फिक्स किया गया है
                 sets = settings_sheet.get_all_values()
-                for r in sets:
-                    if len(r) >= 2 and r[0] == 'Offer_Text':
-                        runner_text = r[1]
-                        break
+                if sets:
+                    for r in sets:
+                        if len(r) >= 2 and str(r[0]).strip() == 'Offer_Text':
+                            runner_text = r[1]
+                            break
             except: pass
             
         return render_template('index.html', villas=villas, weather=weather, runner_text=runner_text, tourist_places=places)
@@ -118,7 +117,6 @@ def villa_details(villa_id):
     villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
     
-    # मल्टी-इमेज लॉजिक
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}') and str(villa.get(f'Image_URL_{i}')).lower() != 'nan']
     if not imgs: imgs = [villa.get('Image_URL')]
     
@@ -155,4 +153,4 @@ def contact(): return render_template('contact.html')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-                
+                            
