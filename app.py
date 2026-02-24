@@ -7,7 +7,7 @@ import requests
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "morevistas_secure_2026" # Admin session ke liye zaroori hai
+app.secret_key = "morevistas_secure_2026" # Admin session maintain karne ke liye
 
 # --- Google Sheets Setup ---
 creds_json = os.environ.get('GOOGLE_CREDS')
@@ -23,47 +23,58 @@ if creds_json:
         
         SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
         main_spreadsheet = client.open_by_key(SHEET_ID)
-        sheet = main_spreadsheet.sheet1  # Villas Data
+        sheet = main_spreadsheet.sheet1  # Villas Data Sheet
         
         try:
+            # Check karein agar 'Enquiries' naam ki alag sheet hai
             enquiry_sheet = main_spreadsheet.worksheet("Enquiries")
         except:
             enquiry_sheet = sheet
     except Exception as e:
         print(f"Critical Sheet Error: {e}")
 
-# --- ✅ SAFE DATA LOADER (Images Load Karne ke liye) ---
+# --- ✅ SAFE DATA LOADER (Ye Images aur Data ko gayab hone se bachata hai) ---
 def get_safe_data(target_sheet):
-    """Sheet se data nikalne ka sabse safe tarika taki images gayab na hon"""
     try:
         if not target_sheet: return []
         data = target_sheet.get_all_values()
-        if not data: return []
-        headers = [h.strip() for h in data[0]] # Space saaf karne ke liye
+        if not data or len(data) < 1: return []
+        
+        headers = [h.strip() for h in data[0]] # Column names se extra space hatana
         rows = data[1:]
         clean_data = []
+        
         for row in rows:
             record = {}
             for i, h in enumerate(headers):
-                record[h] = row[i] if i < len(row) else ""
+                val = row[i] if i < len(row) else ""
+                record[h] = val
             
-            # Agar Image_URL khali hai to Image_URL_1 check kare
-            if not record.get('Image_URL') or record.get('Image_URL') == '':
+            # 🖼️ Image Logic: Agar Image_URL khali hai to Image_URL_1 ko fallback banayein
+            if not record.get('Image_URL') or record.get('Image_URL').strip() == "":
                 record['Image_URL'] = record.get('Image_URL_1', '')
                 
             clean_data.append(record)
         return clean_data
-    except: return []
+    except Exception as e:
+        print(f"Data Fetch Error: {e}")
+        return []
 
-# --- Weather Alert ---
+# --- Weather Alert (Lonavala Live Temperature) ---
 def get_weather():
     try:
+        # OpenWeather API using your key
         url = "https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid=b8ee20104f767837862a93361e68787c"
         d = requests.get(url, timeout=5).json()
-        return {'temp': round(d['main']['temp']), 'desc': d['weather'][0]['description'].title(), 'icon': d['weather'][0]['icon']}
-    except: return None
+        return {
+            'temp': round(d['main']['temp']), 
+            'desc': d['weather'][0]['description'].title(), 
+            'icon': d['weather'][0]['icon']
+        }
+    except:
+        return None
 
-# --- Telegram Setup ---
+# --- Telegram Setup (Alerts ke liye) ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
 
@@ -72,26 +83,30 @@ def send_telegram_alert(message):
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
         params = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
         requests.get(url, params=params, timeout=10)
-    except: pass
+    except:
+        pass
 
-# --- Routes ---
+# --- 🏠 Routes ---
 
 @app.route('/')
 def index():
     weather = get_weather()
     villas = get_safe_data(sheet)
+    # Default values handle karna taki page crash na ho
     for v in villas:
         v['Status'] = v.get('Status', 'Available')
         v['Guests'] = v.get('Guests', '12')
         v['Offer'] = v.get('Offer', '')
+        v['BHK'] = v.get('BHK', '3')
     return render_template('index.html', villas=villas, weather=weather)
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     villas = get_safe_data(sheet)
     villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
+    
     if villa:
-        # Gallery images logic (Image_URL_1 to Image_URL_20)
+        # 📸 Gallery Images Logic (Check Image_URL_1 up to Image_URL_20)
         villa_images = []
         for i in range(1, 21):
             key = f"Image_URL_{i}"
@@ -111,21 +126,36 @@ def enquiry(villa_id):
     if request.method == 'POST':
         name = request.form.get('name')
         phone = request.form.get('phone')
-        check_in, check_out = request.form.get('check_in'), request.form.get('check_out')
-        guests, msg = request.form.get('guests'), request.form.get('message', 'No message')
+        check_in = request.form.get('check_in')
+        check_out = request.form.get('check_out')
+        guests = request.form.get('guests')
+        msg = request.form.get('message', 'No message')
         
+        # Google Sheet mein data save karna
         if enquiry_sheet:
             try:
-                enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, check_in, check_out, guests, msg])
-            except: pass
+                enquiry_sheet.append_row([
+                    datetime.now().strftime("%d-%m-%Y %H:%M"), 
+                    name, phone, check_in, check_out, guests, msg, villa.get('Villa_Name')
+                ])
+            except:
+                pass
 
-        alert_text = f"🔔 *New Booking!*\n🏡 *Villa:* {villa.get('Villa_Name')}\n👤 *Name:* {name}\n📞 *Phone:* {phone}"
+        # Telegram Alert bhejna
+        alert_text = (
+            f"🔔 *New Booking Enquiry!*\n\n"
+            f"🏡 *Villa:* {villa.get('Villa_Name')}\n"
+            f"👤 *Name:* {name}\n"
+            f"📞 *Phone:* {phone}\n"
+            f"📅 *Stay:* {check_in} to {check_out}\n"
+            f"👥 *Guests:* {guests}"
+        )
         send_telegram_alert(alert_text)
         return render_template('success.html', name=name)
 
     return render_template('enquiry.html', villa=villa)
 
-# --- Admin Routes ---
+# --- 🔐 Admin Routes ---
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
@@ -138,11 +168,13 @@ def admin_login():
 def admin_dashboard():
     if not session.get('admin_logged_in'): return redirect(url_for('admin_login'))
     villas = get_safe_data(sheet)
-    enquiries = get_safe_data(enquiry_sheet)[::-1] # Newest first
+    enquiries = get_safe_data(enquiry_sheet)[::-1] # Newest enquiries first
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries)
 
+# --- 🚀 Render Deployment Fix ---
 if __name__ == "__main__":
-    # Render के लिए पोर्ट को 10000 पर फिक्स करना ज़रूरी है
+    # Render hamesha PORT environment variable provide karta hai
+    # Iske bina 'No open ports' wala error aata hai
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
-    
+        
