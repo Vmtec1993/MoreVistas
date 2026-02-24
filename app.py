@@ -142,7 +142,7 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries)
 
 if __name__ == "__main__":
-    # Render port configuration
+    # Render के लिए पोर्ट को 10000 पर फिक्स करना ज़रूरी है
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
     
