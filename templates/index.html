@@ -21,40 +21,22 @@
         background: #fff; border: 1px solid #eee; border-radius: 15px;
         overflow: hidden; transition: 0.3s; height: 100%;
     }
-    .place-card img {
-        width: 100%; height: 120px; object-fit: cover;
-    }
+    .place-card img { width: 100%; height: 140px; object-fit: cover; }
     .place-info { padding: 12px; text-align: center; }
     .place-card:hover { border-color: #0d6efd; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-
-    /* 📲 Floating Download Button */
-    .app-download-float {
-        position: fixed; bottom: 30px; right: 20px; z-index: 9999;
-        background: #fff; padding: 10px; border-radius: 50px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: 0.3s;
-        display: flex; align-items: center; text-decoration: none; border: 2px solid #000;
-    }
-    .app-download-float:hover { transform: scale(1.1); background: #f8f9fa; }
-    .app-download-float img { width: 30px; margin-right: 8px; }
-    .app-download-float span { font-size: 12px; font-weight: bold; color: #000; margin-right: 5px; }
 
     /* Footer */
     .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
     .footer-bottom { background: #141414; padding: 30px 0; margin-top: 40px; border-top: 1px solid #222; }
 </style>
 
-<a href="/static/app-release.apk" class="app-download-float" download>
-    <img src="https://cdn-icons-png.flaticon.com/512/888/888841.png" alt="App">
-    <span>GET APP</span>
-</a>
-
 <div class="offer-runner">
     <div class="runner-text">
-        <a href="#" class="text-info text-decoration-none mx-3">📲 DOWNLOAD OUR APP FOR BEST DISCOUNTS</a> |
+        <span class="text-primary mx-3">✨ WELCOME TO MOREVISTAS LONAVALA</span> |
         {% for villa in villas %}
             {% if villa.Offer and villa.Offer|string != 'nan' %} 🔥 {{ villa.Villa_Name }}: {{ villa.Offer }} | {% endif %}
         {% endfor %}
-        📞 BOOKING: 8830024994
+        📞 BOOKING: 8830024994 | 🏠 LUXURY VILLAS STARTING FROM ₹7999
     </div>
 </div>
 
@@ -82,7 +64,7 @@
         <div class="col-md-4">
             <div class="card h-100 villa-card shadow-sm">
                 <div style="height: 250px; position: relative;">
-                    <img src="{{ villa.Image_URL or villa.Image_URL_1 }}" class="w-100 h-100" style="object-fit: cover;">
+                    <img src="{{ villa.Image_URL or villa.Image_URL_1 }}" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='https://placehold.co/600x400?text=Villa+Image'">
                     {% set current = (villa.Price or 0) | float %}
                     {% set original = (villa.Original_Price or 0) | float %}
                     {% if original > current and current > 0 %}
@@ -118,42 +100,36 @@
             <div class="col-md-4">
                 <i class="bi bi-shield-check text-primary fs-2"></i>
                 <h6 class="fw-bold mt-2">Verified Luxury</h6>
-                <p class="small text-muted">Every villa is personally checked.</p>
+                <p class="small text-muted">Every villa is personally checked for quality.</p>
             </div>
             <div class="col-md-4">
                 <i class="bi bi-headset text-primary fs-2"></i>
                 <h6 class="fw-bold mt-2">24/7 Support</h6>
-                <p class="small text-muted">Local staff available at your call.</p>
+                <p class="small text-muted">Dedicated local manager for your stay.</p>
             </div>
             <div class="col-md-4">
                 <i class="bi bi-cash-stack text-primary fs-2"></i>
-                <h6 class="fw-bold mt-2">Best Price</h6>
-                <p class="small text-muted">Direct rates, no hidden fees.</p>
+                <h6 class="fw-bold mt-2">Best Price Guarantee</h6>
+                <p class="small text-muted">No booking fees. Direct owner rates.</p>
             </div>
         </div>
     </div>
 
     <div class="mt-5">
-        <h4 class="fw-bold mb-4 text-center">Popular Attractions Nearby</h4>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold m-0">Popular Attractions</h4>
+            <a href="/explore" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">View All</a>
+        </div>
         <div class="row g-3">
-            {% for place in tourist_places %}
-            <div class="col-6 col-md-3">
+            {% for place in tourist_places[:4] %} <div class="col-6 col-md-3">
                 <div class="place-card shadow-sm">
-                    {% if place.Image_URL %}
-                        <img src="{{ place.Image_URL }}" alt="{{ place.Location }}">
-                    {% else %}
-                        <div style="height:120px; background:#eee; display:flex; align-items:center; justify-content:center;">
-                            <i class="bi bi-image text-muted"></i>
-                        </div>
-                    {% endif %}
+                    <img src="{{ place.Image_URL if place.Image_URL and place.Image_URL|string != 'nan' else 'https://images.unsplash.com/photo-1590050752117-23a9d7fc9922?auto=format&fit=crop&w=300' }}" alt="{{ place.Location }}">
                     <div class="place-info">
-                        <h6 class="fw-bold mb-1">{{ place.Location }}</h6>
-                        {% if place.Distance %}
-                            <p class="text-muted small mb-2">{{ place.Distance }}</p>
-                        {% endif %}
-                        {% if place.Map_Link and place.Map_Link|string != 'nan' %}
-                            <a href="{{ place.Map_Link }}" target="_blank" class="btn btn-link btn-sm p-0 text-primary fw-bold text-decoration-none">
-                                View Map <i class="bi bi-arrow-right"></i>
+                        <h6 class="fw-bold mb-1 text-truncate">{{ place.Location or place.Name or 'Tourist Spot' }}</h6>
+                        <p class="text-muted small mb-2">{{ place.Distance or 'Lonavala' }}</p>
+                        {% if place.Map_Link %}
+                            <a href="{{ place.Map_Link }}" target="_blank" class="btn btn-link btn-sm p-0 text-primary fw-bold text-decoration-none" style="font-size: 0.75rem;">
+                                MAP <i class="bi bi-geo-alt"></i>
                             </a>
                         {% endif %}
                     </div>
