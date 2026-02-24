@@ -42,14 +42,26 @@ def init_sheets():
 
 init_sheets()
 
-# --- Utility Function (To replace the broken get_all_records) ---
+# --- Utility Function ---
 def get_rows(target_sheet):
     if not target_sheet: return []
     try:
         data = target_sheet.get_all_values()
-        if not data: return []
-        headers = data[0]
-        return [dict(zip(headers, row)) for row in data[1:]]
+        if not data or len(data) < 1: return []
+        headers = [h.strip() for h in data[0]]
+        clean_data = []
+        for row in data[1:]:
+            # Dictionary matching headers to row values
+            item = dict(zip(headers, row))
+            
+            # Extra Logic: 'Price on Request' को सपोर्ट करने के लिए
+            # अगर Price खाली या 0 है, तो उसे None कर देते हैं ताकि HTML पहचान सके
+            p_val = str(item.get('Price', '')).lower().strip()
+            if p_val in ['', 'nan', '0', 'none']:
+                item['Price'] = None
+                
+            clean_data.append(item)
+        return clean_data
     except:
         return []
 
@@ -57,7 +69,6 @@ def get_rows(target_sheet):
 
 @app.route('/')
 def index():
-    # पुराने वर्किंग लॉजिक के साथ
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
     
@@ -122,8 +133,6 @@ def about(): return render_template('about.html')
 def contact(): return render_template('contact.html')
 
 if __name__ == "__main__":
-    # Render के लिए पोर्ट 10000 या PORT environment variable जरूरी है
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
-
     
