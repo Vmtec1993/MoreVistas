@@ -72,7 +72,6 @@ def index():
     villas = []
     if sheet:
         try:
-            # head=1 ensures we read data even if there are duplicate columns in Sheet
             villas = sheet.get_all_records(head=1)
             for v in villas:
                 v['Status'] = v.get('Status', 'Available')
@@ -111,10 +110,14 @@ def admin_dashboard():
     enquiries = []
     villas = []
     if sheet:
-        villas = sheet.get_all_records(head=1)
+        try:
+            villas = sheet.get_all_records(head=1)
+        except: pass
     if enquiry_sheet:
-        enquiries = enquiry_sheet.get_all_records(head=1)
-        enquiries.reverse()
+        try:
+            enquiries = enquiry_sheet.get_all_records(head=1)
+            enquiries.reverse()
+        except: pass
     return render_template('admin_dashboard.html', enquiries=enquiries, villas=villas)
 
 @app.route('/update-status/<villa_id>/<new_status>')
@@ -153,15 +156,16 @@ def villa_details(villa_id):
                 villa['Status'] = villa.get('Status', 'Available')
                 villa_images = []
                 
-                # Check for Image_URL_1 to Image_URL_20
+                # Check Image_URL and Image_URL_1 to 20
                 for i in range(1, 21):
-                    col_name = f"Image_URL_{i}"
-                    img_url = villa.get(col_name)
-                    if not img_url:
-                        # Also check without underscore if Image_URL_1 is Image_URL
-                        if i == 1: col_name = "Image_URL"
-                        img_url = villa.get(col_name)
-                        
+                    # Trying common column names
+                    col_names = [f"Image_URL_{i}", f"Image_URL_{i}", "Image_URL" if i==1 else None]
+                    img_url = None
+                    for name in col_names:
+                        if name and name in villa:
+                            img_url = villa.get(name)
+                            break
+                    
                     if img_url and str(img_url).strip() != "" and str(img_url).lower() != 'nan': 
                         if img_url not in villa_images:
                             villa_images.append(img_url)
@@ -201,6 +205,7 @@ def enquiry(villa_id):
     return "Error", 500
 
 if __name__ == "__main__":
+    # Render uses port 10000 by default
     port = int(os.environ.get("PORT", 10000)) 
     app.run(host='0.0.0.0', port=port)
-        
+                
