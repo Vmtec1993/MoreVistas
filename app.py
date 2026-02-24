@@ -122,7 +122,8 @@ def about(): return render_template('about.html')
 def contact(): return render_template('contact.html')
 
 if __name__ == "__main__":
-    # Render PORT fix
-    port = int(os.environ.get("PORT", 5000))
+    # Render के लिए पोर्ट 10000 या PORT environment variable जरूरी है
+    port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
+
     
