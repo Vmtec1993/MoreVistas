@@ -4,9 +4,14 @@
 <style>
     /* Runner & Weather */
     .offer-runner { background: #000; color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap; }
-    .runner-text { display: inline-block; animation: scroll-text 15s linear infinite; font-weight: 700; text-transform: uppercase; }
+    .runner-text { display: inline-block; animation: scroll-text 20s linear infinite; font-weight: 700; text-transform: uppercase; }
     @keyframes scroll-text { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    .weather-card { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%); border-radius: 15px; border: 1px solid rgba(0,0,0,0.05); }
+    
+    /* Weather and Score Cards */
+    .weather-card { background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%); border-radius: 15px; border: 1px solid rgba(0,0,0,0.05); height: 100%; }
+    .score-card { background: #fdfcfb; border-radius: 15px; border: 1px solid rgba(0,0,0,0.05); overflow: hidden; height: 100%; }
+    .blink { animation: blinker 1.5s linear infinite; }
+    @keyframes blinker { 50% { opacity: 0; } }
 
     /* Villa Cards */
     .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; margin-bottom: 25px; }
@@ -16,11 +21,8 @@
     /* Why Stay Box */
     .info-box { background: #f8f9fa; border-radius: 25px; padding: 40px 20px; margin: 30px 0; text-align: center; border: 1px solid #eee; }
     
-    /* 📍 Tourist Place Cards Fix */
-    .place-card {
-        background: #fff; border: 1px solid #eee; border-radius: 15px;
-        overflow: hidden; transition: 0.3s; height: 100%;
-    }
+    /* 📍 Tourist Place Cards */
+    .place-card { background: #fff; border: 1px solid #eee; border-radius: 15px; overflow: hidden; transition: 0.3s; height: 100%; }
     .place-card img { width: 100%; height: 140px; object-fit: cover; }
     .place-info { padding: 12px; text-align: center; }
     .place-card:hover { border-color: #0d6efd; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
@@ -36,27 +38,43 @@
         {% for villa in villas %}
             {% if villa.Offer and villa.Offer|string != 'nan' %} 🔥 {{ villa.Villa_Name }}: {{ villa.Offer }} | {% endif %}
         {% endfor %}
-        📞 BOOKING: 8830024994 | 🏠 LUXURY VILLAS STARTING FROM ₹7999
+        📞 BOOKING: 8830024994 | 🏠 LUXURY VILLAS BEST PRICE
     </div>
 </div>
 
-{% if weather %}
 <div class="container mt-4">
-    <div class="weather-card shadow-sm p-3 d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center">
-            <img src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" style="width: 60px;">
-            <div class="ms-2">
-                <h6 class="fw-bold mb-0">Lonavala Weather</h6>
-                <p class="mb-0 small text-muted text-capitalize">{{ weather.desc }}</p>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="weather-card shadow-sm p-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <img src="{% if weather %}https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png{% else %}https://openweathermap.org/img/wn/02d@2x.png{% endif %}" style="width: 50px;">
+                    <div class="ms-2">
+                        <h6 class="fw-bold mb-0" style="font-size: 0.9rem;">Lonavala Weather</h6>
+                        <p class="mb-0 small text-muted text-capitalize" style="font-size: 0.75rem;">{{ weather.desc if weather else 'Pleasant' }}</p>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <h4 class="fw-bold mb-0 text-primary">{{ weather.temp if weather else '24' }}°C</h4>
+                    <span class="badge bg-success" style="font-size: 0.6rem;">LIVE STATUS</span>
+                </div>
             </div>
         </div>
-        <div class="text-end">
-            <h3 class="fw-bold mb-0 text-primary">{{ weather.temp }}°C</h3>
-            <span class="badge bg-success small">LIVE STATUS</span>
+
+        <div class="col-md-6">
+            <div class="score-card shadow-sm border-0">
+                <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center py-2" style="font-size: 0.7rem;">
+                    <span>🏏 LIVE MATCH SCORE</span>
+                    <span class="badge bg-danger blink" style="font-size: 0.5rem;">LIVE</span>
+                </div>
+                <iframe 
+                    src="https://www.cricketscore.com/widgets/scorecard/" 
+                    style="width:100%; height:80px; border:none;" 
+                    scrolling="no">
+                </iframe>
+            </div>
         </div>
     </div>
 </div>
-{% endif %}
 
 <div class="container my-5">
     <div class="row g-4">
@@ -121,7 +139,8 @@
             <a href="/explore" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">View All</a>
         </div>
         <div class="row g-3">
-            {% for place in tourist_places[:4] %} <div class="col-6 col-md-3">
+            {% for place in tourist_places[:4] %} 
+            <div class="col-6 col-md-3">
                 <div class="place-card shadow-sm">
                     <img src="{{ place.Image_URL if place.Image_URL and place.Image_URL|string != 'nan' else 'https://images.unsplash.com/photo-1590050752117-23a9d7fc9922?auto=format&fit=crop&w=300' }}" alt="{{ place.Location }}">
                     <div class="place-info">
