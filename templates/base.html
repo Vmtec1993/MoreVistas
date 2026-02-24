@@ -14,6 +14,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #fcfcfc;
             color: #2d3436;
+            scroll-behavior: smooth;
         }
 
         /* ✅ Loader Styling */
@@ -21,88 +22,92 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000000; z-index: 99999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
         }
         .spinner {
             width: 70px; height: 70px;
-            border: 5px solid rgba(13, 110, 253, 0.2);
+            border: 5px solid rgba(13, 110, 253, 0.1);
             border-left-color: #0d6efd;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loader-text { color: white; margin-top: 20px; font-weight: bold; letter-spacing: 2px; }
-
-        /* ✅ Floating Share Button Style */
-        .morevistas-share-float {
-            position: fixed; bottom: 85px; right: 20px;
-            background: #0d6efd; color: white;
-            width: 55px; height: 55px; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 22px; box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);
-            z-index: 998; cursor: pointer; transition: all 0.3s ease;
-            border: 2px solid white;
-        }
+        .loader-text { color: white; margin-top: 20px; font-weight: bold; letter-spacing: 3px; font-size: 0.8rem; }
 
         /* Navbar Styling */
         .navbar {
-            background-color: rgba(255, 255, 255, 0.98) !important;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #eee;
-            padding: 10px 0;
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 12px 0;
         }
         
-        .navbar-brand img {
-            height: 70px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .navbar-brand {
-            font-weight: 800; font-size: 1.6rem; letter-spacing: -0.5px;
-            display: flex; align-items: center;
-        }
+        .navbar-brand img { height: 60px; width: auto; transition: 0.3s; }
+        .navbar-brand:hover img { transform: scale(1.05); }
 
         .nav-link {
-            font-weight: 600; color: #2d3436 !important;
-            margin: 0 10px; transition: 0.3s;
+            font-weight: 600;
+            color: #2d3436 !important;
+            margin: 0 12px;
+            position: relative;
         }
-        .nav-link:hover { color: #0d6efd !important; }
+        
+        /* Active Link Underline */
+        .nav-link.active { color: #0d6efd !important; }
+        .nav-link::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: -5px; left: 0; background-color: #0d6efd;
+            transition: 0.3s;
+        }
+        .nav-link:hover::after { width: 100%; }
+
+        /* ✅ Back to Top Button */
+        #backToTop {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 45px; height: 45px; background: #0d6efd;
+            color: white; border-radius: 50%; display: none;
+            align-items: center; justify-content: center;
+            cursor: pointer; z-index: 1000; border: none;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+            transition: 0.3s;
+        }
+        #backToTop:hover { transform: translateY(-5px); background: #0056b3; }
 
         .btn-primary {
-            background-color: #0d6efd; border: none;
-            font-weight: 600; border-radius: 10px; padding: 10px 25px;
+            background: linear-gradient(45deg, #0d6efd, #0056b3);
+            border: none; box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
         }
     </style>
+    {% block head %}{% endblock %}
 </head>
 <body>
 
     <div id="loader-wrapper">
         <div class="spinner"></div>
-        <div class="loader-text">LOADING LUXURY VILLAS...</div>
+        <div class="loader-text">MOREVISTAS LUXURY</div>
     </div>
 
-    <div class="morevistas-share-float" onclick="shareFullSite()">
-        <i class="bi bi-share-fill"></i>
-    </div>
+    <button id="backToTop" title="Go to top"><i class="bi bi-arrow-up"></i></button>
 
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand text-dark" href="/">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MoreVistas Logo" class="me-2" onerror="this.style.display='none'">
-                More<span class="text-primary">Vistas</span>
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="me-2" onerror="this.style.display='none'">
+                <span class="fw-800">More<span class="text-primary">Vistas</span></span>
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="bi bi-list fs-1"></i>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.path == '/about' %}active{% endif %}" href="/about">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.path == '/contact' %}active{% endif %}" href="/contact">Contact</a></li>
                     <li class="nav-item ms-lg-3">
-                        <a href="https://wa.me/918830024994" class="btn btn-primary btn-sm rounded-pill px-4">
-                            <i class="bi bi-whatsapp me-2"></i>Book Now
+                        <a href="https://wa.me/918830024994" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                            <i class="bi bi-whatsapp me-2"></i>Book via WhatsApp
                         </a>
                     </li>
                 </ul>
@@ -117,41 +122,27 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // ✅ Page Loader Script
+        // 1. Loader Logic
         window.addEventListener("load", function() {
             const loader = document.getElementById("loader-wrapper");
             setTimeout(() => {
                 loader.style.opacity = "0";
                 setTimeout(() => { loader.style.display = "none"; }, 500);
-            }, 500);
+            }, 600);
         });
 
-        // ✅ Function 1: Share Full Site
-        function shareFullSite() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'MoreVistas - Luxury Villas',
-                    text: 'Explore these stunning luxury villas in Lonavala!',
-                    url: window.location.href
-                });
+        // 2. Back to Top Logic
+        const btt = document.getElementById("backToTop");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                btt.style.display = "flex";
             } else {
-                alert("Link Copied: " + window.location.href);
+                btt.style.display = "none";
             }
-        }
-
-        // ✅ Function 2: Share Specific Villa (Used in index.html)
-        function shareSingleVilla(name, id) {
-            const villaUrl = window.location.origin + '/villa/' + id;
-            if (navigator.share) {
-                navigator.share({
-                    title: name,
-                    text: 'Look at this beautiful villa on MoreVistas: ' + name,
-                    url: villaUrl
-                });
-            } else {
-                window.open(`https://wa.me/?text=Check out ${name}: ${villaUrl}`, '_blank');
-            }
-        }
+        };
+        btt.onclick = function() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
     </script>
 </body>
 </html>
