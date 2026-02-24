@@ -172,5 +172,7 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
+    # Render automatically sets a PORT environment variable
+    port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
