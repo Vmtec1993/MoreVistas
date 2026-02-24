@@ -4,29 +4,39 @@
 <style>
     /* 🏷️ Discount Tag Style */
     .detail-discount-tag {
-        position: absolute; top: 20px; right: 20px; z-index: 99;
-        background: #e63946; color: white; padding: 8px 15px;
-        border-radius: 12px; font-weight: 800; font-size: 1rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-    
-    /* Carousel height and smooth transition */
-    #villaSlider { border-radius: 25px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-    #villaSlider img { height: 450px; object-fit: cover; }
-    
-    @media (max-width: 768px) {
-        #villaSlider img { height: 300px; }
+        position: absolute; top: 15px; right: 15px; z-index: 30;
+        background: #28a745; color: white; padding: 6px 12px;
+        border-radius: 10px; font-weight: 800; font-size: 0.9rem;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
-    /* 🖤 Luxury Footer Styling */
-    .final-footer { background: #111; color: #ffffff; padding: 50px 0 20px; text-align: center; margin-top: 60px; border-top: 4px solid #D4AF37; }
-    .social-icons a { color: white; font-size: 2rem; margin: 0 15px; transition: 0.3s; display: inline-block; text-decoration: none; }
-    .social-icons a:hover { transform: scale(1.2); color: #D4AF37; }
-    .footer-bottom { border-top: 1px solid #333; padding-top: 20px; margin-top: 30px; font-size: 0.8rem; color: #888; }
+    /* Sticky Mobile Footer */
+    @media (max-width: 767px) {
+        .sticky-booking-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: white; padding: 12px 20px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            z-index: 1000; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        body { padding-bottom: 80px; } /* Space for sticky bar */
+    }
+    @media (min-width: 768px) { .sticky-booking-bar { display: none; } }
+
+    /* Carousel height fix */
+    .carousel-item img { height: 400px; object-fit: cover; }
+    @media (max-width: 768px) { .carousel-item img { height: 300px; } }
+
+    /* 🖤 Social Footer */
+    .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
+    .footer-logo-img { height: 75px; width: auto; margin-bottom: 20px; }
+    .social-icons a { color: white; font-size: 1.8rem; margin: 0 15px; transition: 0.3s; display: inline-block; }
+    .social-icons a:hover { transform: translateY(-5px); }
+    .footer-bottom { background: #141414; padding: 30px 0; margin-top: 40px; border-top: 1px solid #222; }
 </style>
 
 <div class="container py-4">
-    <div id="villaSlider" class="carousel slide position-relative" data-bs-ride="carousel">
+    <div id="villaSlider" class="carousel slide shadow-sm position-relative" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden;">
         
         {% set current = (villa.Price or 0) | float %}
         {% set original = (villa.Original_Price or 0) | float %}
@@ -36,19 +46,20 @@
         {% endif %}
 
         <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{{ villa.Image_URL or villa.Image_URL_1 }}" class="d-block w-100">
+            </div>
+            
             {% if villa_images %}
-                {% for img_link in villa_images %}
-                <div class="carousel-item {% if loop.first %}active{% endif %}">
-                    <img src="{{ img_link }}" class="d-block w-100" alt="Villa Image">
-                </div>
+                {% for img_url in villa_images %}
+                    {% if img_url != villa.Image_URL and img_url != villa.Image_URL_1 %}
+                    <div class="carousel-item">
+                        <img src="{{ img_url }}" class="d-block w-100">
+                    </div>
+                    {% endif %}
                 {% endfor %}
-            {% else %}
-                <div class="carousel-item active">
-                    <img src="{{ villa.Image_URL }}" class="d-block w-100" alt="Villa Image">
-                </div>
             {% endif %}
         </div>
-        
         <button class="carousel-control-prev" type="button" data-bs-target="#villaSlider" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
         <button class="carousel-control-next" type="button" data-bs-target="#villaSlider" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
     </div>
@@ -56,107 +67,103 @@
     <div class="mt-4 px-2">
         <div class="d-flex justify-content-between align-items-start mb-2">
             <div>
-                <h1 class="fw-bold m-0 text-dark">{{ villa.Villa_Name }}</h1>
-                <div class="mt-2">
-                    <span class="badge {% if villa.Status == 'Available' %}bg-success{% else %}bg-warning text-dark{% endif %} rounded-pill px-3 py-2">
-                        <i class="bi bi-check-circle-fill"></i> {{ villa.Status | default('Available') }}
+                <h2 class="fw-bold m-0 text-dark">{{ villa.Villa_Name }}</h2>
+                <div class="mt-1">
+                    <span class="badge {% if villa.Status == 'Available' %}bg-success{% else %}bg-warning text-dark{% endif %} rounded-pill small">
+                        {{ villa.Status | default('Available') }}
                     </span>
-                    <small class="text-muted ms-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, Maharashtra</small>
+                    <small class="text-muted ms-2"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala</small>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Lonavala+{{ villa.Villa_Name|urlencode }}" target="_blank" class="ms-2 small text-decoration-none text-primary"><i class="bi bi-map"></i> View Map</a>
                 </div>
             </div>
             
             {% if villa.Offer_End and villa.Offer_End|string != 'nan' and villa.Offer_End != '' %}
-            <div class="text-end">
-                <div class="badge bg-danger mb-1 shadow-sm px-3">Limited Offer!</div>
-                <div class="text-danger fw-bold" style="font-size: 0.9rem;">
-                    <i class="bi bi-hourglass-split"></i> <span id="sheet-timer" data-expire="{{ villa.Offer_End }}">Calculating...</span>
+            <div class="text-center">
+                <div class="badge bg-danger mb-1 shadow-sm">Ends Soon!</div>
+                <div class="text-danger fw-bold" style="font-size: 0.75rem;">
+                    <i class="bi bi-clock-history"></i> <span id="sheet-timer" data-expire="{{ villa.Offer_End }}">Loading...</span>
                 </div>
             </div>
             {% endif %}
         </div>
 
-        <div class="card border-0 bg-white shadow-sm rounded-4 p-4 my-4">
+        <div class="d-flex gap-2 my-3 overflow-auto pb-2" style="white-space: nowrap;">
+            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-people text-primary"></i> Up to {{ villa.Guests | default('12') }} Guests</div>
+            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-door-open text-primary"></i> {{ villa.BHK | default('3') }} BHK</div>
+            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-droplet text-primary"></i> {{ villa.Bathrooms | default('2') }} Baths</div>
+        </div>
+
+        <div class="card border-0 bg-light rounded-4 p-3 mb-4 d-none d-md-block">
             <div class="row align-items-center">
-                <div class="col-md-7">
-                    <p class="text-muted mb-1">Exclusive Price</p>
-                    <div class="d-flex align-items-center gap-2">
-                        {% if villa.Original_Price and villa.Original_Price|string != 'nan' %}
-                        <h5 class="text-decoration-line-through text-muted mb-0">₹{{ villa.Original_Price }}</h5>
-                        {% endif %}
-                        <h2 class="fw-bold text-primary mb-0">₹{{ villa.Price }} <small class="text-muted fs-6 fw-normal">/night</small></h2>
-                    </div>
+                <div class="col-7">
+                    <span class="text-muted small d-block">Starting from</span>
+                    <h3 class="fw-bold text-primary mb-0">₹{{ villa.Price }} <small class="text-muted fs-6 fw-normal">/night</small></h3>
                 </div>
-                <div class="col-md-5 mt-3 mt-md-0">
-                    <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow">Book My Villa</a>
+                <div class="col-5">
+                    <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm">Reserve Now</a>
                 </div>
             </div>
         </div>
 
-        <div class="row mt-4 g-3">
-            <div class="col-4 text-center">
-                <div class="p-3 bg-light rounded-4">
-                    <i class="bi bi- house-door text-primary fs-3"></i>
-                    <p class="small mb-0 mt-1">{{ villa.BHK }} BHK</p>
-                </div>
-            </div>
-            <div class="col-4 text-center">
-                <div class="p-3 bg-light rounded-4">
-                    <i class="bi bi-people text-primary fs-3"></i>
-                    <p class="small mb-0 mt-1">{{ villa.Guests }} Guests</p>
-                </div>
-            </div>
-            <div class="col-4 text-center">
-                <div class="p-3 bg-light rounded-4">
-                    <i class="bi bi-water text-primary fs-3"></i>
-                    <p class="small mb-0 mt-1">Pool</p>
-                </div>
+        <h5 class="fw-bold mt-4">About this villa</h5>
+        <p class="text-muted small" style="line-height: 1.6;">{{ villa.Description | default('Experience the ultimate luxury stay in Lonavala with this premium villa.') }}</p>
+        
+        <div class="mt-4">
+            <h6 class="fw-bold mb-3"><i class="bi bi-stars text-warning"></i> Premium Amenities</h6>
+            <div class="d-flex flex-wrap gap-2">
+                {% if villa.Amenities %}
+                    {% for item in villa.Amenities.split(',') %}
+                    <span class="badge bg-white text-dark border fw-normal p-2 px-3 shadow-sm rounded-3 small">
+                        <i class="bi bi-check2-circle text-success me-1"></i> {{ item.strip() }}
+                    </span>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
+<div class="sticky-booking-bar">
+    <div>
+        <h5 class="fw-bold text-primary mb-0">₹{{ villa.Price }}</h5>
+        <small class="text-muted">Per Night</small>
+    </div>
+    <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary rounded-pill px-4 fw-bold">Book Now</a>
+</div>
+
 <footer class="final-footer">
     <div class="container">
-        <h4 class="fw-bold mb-4">Connect With MOREVISTAS</h4>
-        <div class="social-icons mb-4">
-            <a href="https://wa.me/91XXXXXXXXXX" target="_blank"><i class="bi bi-whatsapp"></i></a>
+        <h2 class='text-white fw-bold'>More<span class='text-primary'>Vistas</span></h2>
+        <div class="social-icons mb-4 mt-3">
+            <a href="https://wa.me/918830024994" target="_blank"><i class="bi bi-whatsapp"></i></a>
             <a href="#" target="_blank"><i class="bi bi-instagram"></i></a>
             <a href="#" target="_blank"><i class="bi bi-facebook"></i></a>
         </div>
-        <p class="px-3 text-muted">Luxury stays, unforgettable memories. Experience Lonavala like never before.</p>
         <div class="footer-bottom">
-            <p>© 2026 MoreVistas Lonavala. Built for Excellence.</p>
+            <p class="mb-0 opacity-50 small">© 2026 MoreVistas Lonavala. All Rights Reserved.</p>
         </div>
     </div>
 </footer>
 
 <script>
-    function startTimer() {
+    function startSheetTimer() {
         const timerElement = document.getElementById('sheet-timer');
         if (!timerElement) return;
-
-        const expireDateStr = timerElement.getAttribute('data-expire');
-        const expireDate = new Date(expireDateStr).getTime();
-
+        const countTo = new Date(timerElement.getAttribute('data-expire')).getTime();
         const x = setInterval(function() {
             const now = new Date().getTime();
-            const distance = expireDate - now;
-
-            if (distance < 0) {
+            const diff = countTo - now;
+            if (isNaN(countTo) || diff < 0) {
+                timerElement.innerHTML = "OFFER ENDED";
                 clearInterval(x);
-                timerElement.innerHTML = "Offer Expired";
                 return;
             }
-
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            timerElement.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+            timerElement.innerHTML = h + "h " + m + "m " + s + "s";
         }, 1000);
     }
-    document.addEventListener('DOMContentLoaded', startTimer);
+    document.addEventListener('DOMContentLoaded', startSheetTimer);
 </script>
-
 {% endblock %}
