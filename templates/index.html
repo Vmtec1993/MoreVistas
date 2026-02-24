@@ -1,45 +1,37 @@
 {% extends 'base.html' %}
-
-{% block head %}
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-{% endblock %}
-
 {% block content %}
 
 <style>
     /* 1. Top Runner Styling */
-    .offer-runner { background: #000; color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap; border-bottom: 2px solid #D4AF37; }
-    .runner-text { display: inline-block; animation: scroll-text 20s linear infinite; font-weight: 700; text-transform: uppercase; }
+    .offer-runner { background: #000; color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap; }
+    .runner-text { display: inline-block; animation: scroll-text 15s linear infinite; font-weight: 700; text-transform: uppercase; }
     @keyframes scroll-text { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
     .app-link { color: #0d6efd !important; text-decoration: none; font-weight: 800; margin: 0 20px; }
 
-    /* ✅ Weather Widget Glassmorphism Style */
+    /* ✅ New: Weather Widget Glassmorphism Style */
     .weather-card {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        color: #1a1a1a;
-        transition: 0.3s;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        padding: 15px;
+        background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+        border-radius: 15px;
+        color: #333;
+        border: 1px solid rgba(0,0,0,0.05);
     }
 
     /* Villa Card Styles */
-    .villa-card { transition: 0.4s; border-radius: 25px !important; border: none; overflow: hidden; background: #fff; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    .villa-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important; }
-    
-    /* Sold Out Ribbon */
-    .sold-out-ribbon {
-        position: absolute; width: 150px; padding: 5px 0;
-        background-color: #ff4d4d; color: #fff; font-size: 11px; font-weight: 800;
-        text-align: center; text-transform: uppercase; transform: rotate(-45deg);
-        left: -35px; top: 20px; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    .sold-out-overlay { filter: grayscale(0.8); opacity: 0.7; pointer-events: none; }
-
+    .villa-card { transition: 0.4s; border-radius: 20px !important; border: none; overflow: hidden; background: #fff; position: relative; margin-bottom: 25px; }
+    .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     .discount-tag { position: absolute; top: 15px; right: 15px; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; z-index: 10; }
+    .offer-badge { background: #ff4d4d; color: white; padding: 4px 15px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-block; margin-bottom: 5px; }
+    .timer-text { font-size: 0.75rem; font-weight: 700; color: #ff4d4d; margin-top: 2px; display: block; }
+
+    /* Why Stay Section */
+    .why-stay-box { background: #f8f9fa; border-radius: 25px; padding: 50px 20px; margin: 40px 0; border: 1px solid #eee; text-align: center; }
+    .why-icon { font-size: 2.5rem; color: #0d6efd; margin-bottom: 15px; display: block; }
+
+    /* Footer Styling */
+    .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
+    .footer-logo-img { height: 75px; width: auto; margin-bottom: 20px; }
+    .social-icons a { color: white; font-size: 1.8rem; margin: 0 15px; display: inline-block; }
+    .footer-bottom { background: #141414; padding: 30px 0; margin-top: 40px; border-top: 1px solid #222; }
 </style>
 
 <div class="offer-runner">
@@ -50,44 +42,43 @@
                🔥 {{ villa.Villa_Name }}: {{ villa.Offer }} | 
             {% endif %}
         {% endfor %}
-        📞 CALL: 8830024994
+        📞 CALL: 8830024994 |
+        <a href="https://drive.google.com/file/d/12cErjJSSzXthfBtjItHf5vLwod7rIdbj/view?usp=drivesdk" class="app-link">BOOK FASTER ON OUR APP <i class="bi bi-android2"></i></a>
     </div>
 </div>
 
 {% if weather %}
 <div class="container mt-4">
-    <div class="weather-card d-flex align-items-center justify-content-between">
+    <div class="weather-card shadow-sm p-3 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
             <img src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" alt="weather" style="width: 50px;">
             <div class="ms-2">
                 <h6 class="fw-bold mb-0">Lonavala Weather</h6>
-                <p class="mb-0 small text-muted">{{ weather.desc }}</p>
+                <p class="mb-0 small text-muted text-capitalize">{{ weather.desc }}</p>
             </div>
         </div>
         <div class="text-end">
             <h3 class="fw-bold mb-0 text-primary">{{ weather.temp }}°C</h3>
-            <span class="badge bg-primary text-white rounded-pill" style="font-size: 0.6rem;">LIVE</span>
+            <span class="badge bg-primary rounded-pill" style="font-size: 0.6rem;">LIVE</span>
         </div>
     </div>
 </div>
 {% endif %}
 
-
 <div class="container my-5">
     <div class="row g-4">
         {% for villa in villas %}
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 villa-card {% if villa.get('Status') == 'Sold Out' %}sold-out-overlay{% endif %}">
-                <div style="height: 240px; position: relative;">
-                    {% if villa.get('Status') == 'Sold Out' %}
-                        <div class="sold-out-ribbon">Sold Out</div>
-                    {% endif %}
-                    
-                    <img src="{{ villa.get('Image_URL', '') }}" class="w-100 h-100" style="object-fit: cover;" loading="lazy">
+        <div class="col-md-4">
+            <div class="card h-100 villa-card shadow-sm">
+                <div style="height: 250px; position: relative;">
+                    <img src="{{ villa.Image_URL or villa.Image_URL_1 or villa.get('image_url') }}" 
+                         class="w-100 h-100" style="object-fit: cover;"
+                         onerror="this.src='https://via.placeholder.com/400x300?text=Image+Coming+Soon'">
                     
                     {% set current = (villa.get('Price') or 0) | float %}
                     {% set original = (villa.get('Original_Price') or 0) | float %}
-                    {% if villa.get('Status') != 'Sold Out' and original > current and current > 0 %}
+                    
+                    {% if original > current and current > 0 %}
                         {% set disc = (((original - current) / original) * 100) | round | int %}
                         <div class="discount-tag">{{ disc }}% OFF</div>
                     {% endif %}
@@ -97,27 +88,36 @@
                     <h5 class="fw-bold mb-1">{{ villa.get('Villa_Name') }}</h5>
                     <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
                     
-                    <div class="d-flex gap-3 mb-3 small fw-bold">
-                        <span class="bg-light p-2 rounded"><i class="bi bi-people-fill text-primary"></i> {{ villa.get('Guests') }} Guests</span>
-                        <span class="bg-light p-2 rounded"><i class="bi bi-door-open-fill text-primary"></i> {{ villa.get('BHK') }} BHK</span>
+                    <div class="d-flex gap-4 mb-3 small fw-bold">
+                        <span><i class="bi bi-people-fill text-primary"></i> {{ villa.get('Guests', '12') }} Guests</span>
+                        <span><i class="bi bi-door-open-fill text-primary"></i> {{ villa.get('BHK', '3') }} BHK</span>
                     </div>
 
-                    <div class="pt-3 border-top d-flex align-items-center justify-content-between">
-                        <div>
-                            {% if current > 0 %}
-                                <small class="text-decoration-line-through text-muted d-block">₹{{ original | int }}</small>
-                                <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fw-normal fs-6">/nt</small></h5>
-                            {% else %}
-                                <span class="text-primary fw-bold">Contact for Price</span>
+                    <div class="pt-3 border-top">
+                        <div class="text-center mb-3">
+                            {% set offer = villa.get('Offer', '') | string %}
+                            {% if offer and offer != 'nan' and offer != '' %}
+                                <div class="offer-badge"><i class="bi bi-fire"></i> {{ offer }}</div>
+                                {% if villa.Offer_End and villa.Offer_End|string != 'nan' %}
+                                    <span class="timer-text card-timer" data-expire="{{ villa.Offer_End }}">Ends in: Loading...</span>
+                                {% endif %}
                             {% endif %}
                         </div>
-                        <div class="d-flex gap-2">
-                            {% if villa.get('Status') == 'Sold Out' %}
-                                <button class="btn btn-secondary rounded-pill btn-sm" disabled>Sold Out</button>
-                            {% else %}
-                                <a href="/villa/{{ villa.get('Villa_ID') }}" class="btn btn-dark rounded-pill px-3 btn-sm fw-bold">View</a>
-                                <button onclick="shareVilla('{{ villa.get('Villa_Name') }}')" class="btn btn-outline-dark btn-sm rounded-circle"><i class="bi bi-share"></i></button>
-                            {% endif %}
+
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                {% if current > 0 %}
+                                    <div class="d-flex flex-column">
+                                        {% if original > current %}
+                                            <small class="text-decoration-line-through text-muted">₹{{ original | int }}</small>
+                                        {% endif %}
+                                        <h5 class="m-0 fw-bold text-primary">₹{{ current | int }}<small class="text-muted fw-normal fs-6">/night</small></h5>
+                                    </div>
+                                {% else %}
+                                    <div class="px-3 py-1 bg-light border rounded text-primary fw-bold small">Price on Request</div>
+                                {% endif %}
+                            </div>
+                            <a href="/villa/{{ villa.get('Villa_ID') }}" class="btn btn-dark rounded-pill px-4 btn-sm fw-bold">Explore</a>
                         </div>
                     </div>
                 </div>
@@ -125,28 +125,57 @@
         </div>
         {% endfor %}
     </div>
-</div>
 
-<div class="container mb-5">
-    <div class="explore-promo text-center p-5 shadow-lg" style="background: linear-gradient(45deg, #1a1a1a, #333); border-radius: 30px; color: white;">
-        <h2 class="fw-bold mb-3">Exploring Lonavala?</h2>
-        <p class="mb-4">हमने आपके लिए बेस्ट टूरिस्ट पॉइंट्स की लिस्ट बनाई है।</p>
-        <a href="/explore-lonavala" class="btn btn-primary btn-lg rounded-pill px-5">See All Points <i class="bi bi-map ms-2"></i></a>
+    <div class="why-stay-box shadow-sm">
+        <h2 class="fw-bold mb-5">Why <span class="text-primary">Stay With Us</span>?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <i class="bi bi-patch-check-fill why-icon"></i>
+                <h5 class="fw-bold">Verified Luxury</h5>
+                <p class="text-muted small">Quality checked premium villas.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-headset why-icon"></i>
+                <h5 class="fw-bold">24/7 Support</h5>
+                <p class="text-muted small">Always here to help you.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-shield-lock-fill why-icon"></i>
+                <h5 class="fw-bold">Best Price</h5>
+                <p class="text-muted small">Lowest rates guaranteed.</p>
+            </div>
+        </div>
     </div>
 </div>
 
-<script>
-    function shareVilla(name) {
-        if (navigator.share) {
-            navigator.share({
-                title: name,
-                text: 'Check out this amazing villa in Lonavala: ' + name,
-                url: window.location.href
-            });
-        } else {
-            alert('Sharing not supported on this browser.');
-        }
-    }
-</script>
+<footer class="final-footer">
+    <div class="container">
+        <div class="mb-5">
+            <a href="https://drive.google.com/file/d/12cErjJSSzXthfBtjItHf5vLwod7rIdbj/view?usp=drivesdk" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow">
+                <i class="bi bi-android2 me-2"></i> Download Our Android App
+            </a>
+        </div>
 
-{% endblock %}
+        <a href="/">
+            <h2 class='text-white fw-bold'>More<span class='text-primary'>Vistas</span></h2>
+        </a>
+        
+        <div class="social-icons mb-4 mt-3">
+            <a href="https://wa.me/918830024994" target="_blank"><i class="bi bi-whatsapp"></i></a>
+            <a href="#" target="_blank"><i class="bi bi-instagram"></i></a>
+            <a href="#" target="_blank"><i class="bi bi-facebook"></i></a>
+        </div>
+
+        <div class="footer-bottom">
+            <p class="mb-0 opacity-50 small">© 2026 MoreVistas. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function startCardTimers() {
+        const timers = document.querySelectorAll('.card-timer');
+        timers.forEach(timer => {
+            const expireDate = timer.getAttribute('data-expire');
+            const countTo = new
+    
