@@ -10,6 +10,18 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
+    /* 📲 Floating Android Download Button (Fixed Icon) */
+    .app-download-float {
+        position: fixed; bottom: 100px; right: 20px; z-index: 9999;
+        background: #fff; padding: 10px 15px; border-radius: 50px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: 0.3s;
+        display: flex; align-items: center; text-decoration: none; border: 2px solid #3DDC84;
+    }
+    .app-download-float:hover { transform: scale(1.1); background: #f8f9fa; }
+    /* Android Green Icon */
+    .app-download-float img { width: 25px; margin-right: 10px; }
+    .app-download-float span { font-size: 12px; font-weight: bold; color: #000; }
+
     /* Sticky Mobile Footer */
     @media (max-width: 767px) {
         .sticky-booking-bar {
@@ -19,25 +31,25 @@
             z-index: 1000; display: flex;
             justify-content: space-between; align-items: center;
         }
-        body { padding-bottom: 80px; } /* Space for sticky bar */
+        body { padding-bottom: 80px; } 
     }
     @media (min-width: 768px) { .sticky-booking-bar { display: none; } }
 
-    /* Carousel height fix */
     .carousel-item img { height: 400px; object-fit: cover; }
     @media (max-width: 768px) { .carousel-item img { height: 300px; } }
 
-    /* 🖤 Social Footer */
+    /* Footer */
     .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
-    .footer-logo-img { height: 75px; width: auto; margin-bottom: 20px; }
-    .social-icons a { color: white; font-size: 1.8rem; margin: 0 15px; transition: 0.3s; display: inline-block; }
-    .social-icons a:hover { transform: translateY(-5px); }
     .footer-bottom { background: #141414; padding: 30px 0; margin-top: 40px; border-top: 1px solid #222; }
 </style>
 
+<a href="/static/app-release.apk" class="app-download-float" download>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android">
+    <span>GET ANDROID APP</span>
+</a>
+
 <div class="container py-4">
     <div id="villaSlider" class="carousel slide shadow-sm position-relative" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden;">
-        
         {% set current = (villa.Price or 0) | float %}
         {% set original = (villa.Original_Price or 0) | float %}
         {% if original > current and current > 0 %}
@@ -49,7 +61,6 @@
             <div class="carousel-item active">
                 <img src="{{ villa.Image_URL or villa.Image_URL_1 }}" class="d-block w-100">
             </div>
-            
             {% if villa_images %}
                 {% for img_url in villa_images %}
                     {% if img_url != villa.Image_URL and img_url != villa.Image_URL_1 %}
@@ -73,7 +84,6 @@
                         {{ villa.Status | default('Available') }}
                     </span>
                     <small class="text-muted ms-2"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala</small>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Lonavala+{{ villa.Villa_Name|urlencode }}" target="_blank" class="ms-2 small text-decoration-none text-primary"><i class="bi bi-map"></i> View Map</a>
                 </div>
             </div>
             
@@ -106,8 +116,15 @@
         </div>
 
         <h5 class="fw-bold mt-4">About this villa</h5>
-        <p class="text-muted small" style="line-height: 1.6;">{{ villa.Description | default('Experience the ultimate luxury stay in Lonavala with this premium villa.') }}</p>
+        <p class="text-muted" style="line-height: 1.6;">{{ villa.Description | default('Experience the ultimate luxury stay in Lonavala.') }}</p>
         
+        <div class="mt-4 p-4 border rounded-4 bg-white shadow-sm">
+            <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-journal-check text-primary me-2"></i>House Rules</h5>
+            <div class="text-muted small" style="white-space: pre-wrap; line-height: 1.7;">
+                {{ villa.Rules | default('1. Keep the premises clean.\n2. No loud music after 10 PM.\n3. Valid ID proof required at check-in.') }}
+            </div>
+        </div>
+
         <div class="mt-4">
             <h6 class="fw-bold mb-3"><i class="bi bi-stars text-warning"></i> Premium Amenities</h6>
             <div class="d-flex flex-wrap gap-2">
@@ -137,10 +154,9 @@
         <div class="social-icons mb-4 mt-3">
             <a href="https://wa.me/918830024994" target="_blank"><i class="bi bi-whatsapp"></i></a>
             <a href="#" target="_blank"><i class="bi bi-instagram"></i></a>
-            <a href="#" target="_blank"><i class="bi bi-facebook"></i></a>
         </div>
         <div class="footer-bottom">
-            <p class="mb-0 opacity-50 small">© 2026 MoreVistas Lonavala. All Rights Reserved.</p>
+            <p class="mb-0 opacity-50 small">© 2026 MoreVistas Lonavala.</p>
         </div>
     </div>
 </footer>
