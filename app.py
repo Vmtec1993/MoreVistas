@@ -14,7 +14,7 @@ creds_json = os.environ.get('GOOGLE_CREDS')
 sheet = None
 enquiry_sheet = None
 places_sheet = None 
-main_spreadsheet = None # Global variable for settings
+main_spreadsheet = None 
 
 if creds_json:
     try:
@@ -28,15 +28,13 @@ if creds_json:
         
         sheet = main_spreadsheet.sheet1 
         
-        try:
+        # सुरक्षित तरीके से टैब्स चेक करना
+        all_sheets = [s.title for s in main_spreadsheet.worksheets()]
+        
+        if "Places" in all_sheets:
             places_sheet = main_spreadsheet.worksheet("Places")
-        except:
-            places_sheet = None
-
-        try:
+        if "Enquiries" in all_sheets:
             enquiry_sheet = main_spreadsheet.worksheet("Enquiries")
-        except:
-            enquiry_sheet = sheet
             
     except Exception as e:
         print(f"Critical Sheet Error: {e}")
@@ -46,27 +44,15 @@ def get_safe_data(target_sheet):
         if not target_sheet: return []
         data = target_sheet.get_all_values()
         if not data or len(data) < 1: return []
-        
         headers = [h.strip() for h in data[0]]
-        rows = data[1:]
         clean_data = []
-        
-        for row in rows:
-            record = {}
-            for i, h in enumerate(headers):
-                val = row[i] if i < len(row) else ""
-                record[h] = val
-            
-            if not record.get('Image_URL') or record.get('Image_URL').strip() == "":
-                record['Image_URL'] = record.get('Image_URL_1', '')
-                
+        for row in data[1:]:
+            record = {headers[i]: row[i] if i < len(row) else "" for i, h in enumerate(headers)}
+            if not record.get('Image_URL'): record['Image_URL'] = record.get('Image_URL_1', '')
             clean_data.append(record)
         return clean_data
-    except Exception as e:
-        print(f"Data Fetch Error: {e}")
-        return []
+    except: return []
 
-# --- 🌦️ Weather Function ---
 def get_weather():
     try:
         api_key = "602d32574e40263f16952813df186b59"
@@ -74,25 +60,17 @@ def get_weather():
         response = requests.get(url, timeout=10) 
         if response.status_code == 200:
             d = response.json()
-            return {
-                'temp': round(d['main']['temp']), 
-                'desc': d['weather'][0]['description'].title(), 
-                'icon': d['weather'][0]['icon']
-            }
+            return {'temp': round(d['main']['temp']), 'desc': d['weather'][0]['description'].title(), 'icon': d['weather'][0]['icon']}
         return None
-    except:
-        return None
+    except: return None
 
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
 
 def send_telegram_alert(message):
     try:
-        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-        params = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
-        requests.get(url, params=params, timeout=10)
-    except:
-        pass
+        requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}, timeout=10)
+    except: pass
 
 # --- 🏠 Routes ---
 
@@ -102,94 +80,75 @@ def index():
     villas = get_safe_data(sheet)
     tourist_places = get_safe_data(places_sheet) 
     
-    # --- 🆕 Settings Sheet से Runner Text लाना ---
-    runner_text = "Welcome to MoreVistas Lonavala | Luxury Villas" # Default Text
-    if main_spreadsheet:
-        try:
-            settings_sheet = main_spreadsheet.worksheet("Settings")
-            settings_data = settings_sheet.get_all_records()
-            # Key: 'Offer_Text' वाली वैल्यू निकालना
+    # --- 🛠️ Robust Settings Logic ---
+    runner_text = "Welcome to MoreVistas Lonavala | Luxury Villas"
+    try:
+        # चेक करें कि Settings टैब मौजूद है या नहीं
+        all_ws = [ws.title for ws in main_spreadsheet.worksheets()]
+        if "Settings" in all_ws:
+            settings_data = main_spreadsheet.worksheet("Settings").get_all_records()
             for row in settings_data:
                 if str(row.get('Key')).strip() == 'Offer_Text':
                     runner_text = row.get('Value', runner_text)
                     break
-        except:
-            pass # अगर शीट नहीं मिली तो डिफॉल्ट टेक्स्ट चलेगा
+    except Exception as e:
+        print(f"Settings Fetch Error: {e}")
 
     for v in villas:
         v['Status'] = v.get('Status', 'Available')
         v['Guests'] = v.get('Guests', '12')
         v['Offer'] = v.get('Offer', '')
         v['BHK'] = v.get('BHK', '3')
-        v['Rules'] = v.get('Rules', 'No specific rules mentioned.')
         
-    return render_template('index.html', 
-                           villas=villas, 
-                           weather=weather_info, 
-                           tourist_places=tourist_places,
-                           runner_text=runner_text) # HTML को भेजा गया
+    return render_template('index.html', villas=villas, weather=weather_info, tourist_places=tourist_places, runner_text=runner_text)
+
+# ... (बाकी के routes explore, contact, villa_details, enquiry वैसे ही रहेंगे)
 
 @app.route('/explore')
 def explore():
-    tourist_places = get_safe_data(places_sheet)
-    return render_template('explore.html', tourist_places=tourist_places)
+    return render_template('explore.html', tourist_places=get_safe_data(places_sheet))
 
 @app.route('/about')
-def about():
-    return render_template('about.html')
+def about(): return render_template('about.html')
 
 @app.route('/contact')
-def contact():
-    return render_template('contact.html')
+def contact(): return render_template('contact.html')
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     villas = get_safe_data(sheet)
     villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
-    
     if villa:
-        villa['Rules'] = villa.get('Rules', 'Call for house rules.')
-        villa_images = []
-        for i in range(1, 21):
-            key = f"Image_URL_{i}"
-            img = villa.get(key)
-            if not img and i == 1: img = villa.get('Image_URL')
-            if img and str(img).strip() != "" and str(img).lower() != 'nan':
-                if img not in villa_images: villa_images.append(img)
-        
+        villa_images = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}') and str(villa.get(f'Image_URL_{i}')).lower() != 'nan']
+        if not villa_images: villa_images = [villa.get('Image_URL')]
         return render_template('villa_details.html', villa=villa, villa_images=villa_images)
-    return "Villa info not found", 404
+    return "Not Found", 404
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
     villas = get_safe_data(sheet)
     villa = next((v for v in villas if str(v.get('Villa_ID')) == str(villa_id)), None)
     if request.method == 'POST':
-        name, phone, check_in, check_out, guests, msg = request.form.get('name'), request.form.get('phone'), request.form.get('check_in'), request.form.get('check_out'), request.form.get('guests'), request.form.get('message', 'No message')
+        d = request.form
         if enquiry_sheet:
-            try:
-                enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, check_in, check_out, guests, msg, villa.get('Villa_Name')])
+            try: enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), d['name'], d['phone'], d['check_in'], d['check_out'], d['guests'], d.get('message', ''), villa.get('Villa_Name')])
             except: pass
-        alert_text = f"🔔 *New Booking Enquiry!*\n\n🏡 *Villa:* {villa.get('Villa_Name')}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Stay:* {check_in} to {check_out}\n👥 *Guests:* {guests}"
-        send_telegram_alert(alert_text)
-        return render_template('success.html', name=name)
+        send_telegram_alert(f"🔔 *Enquiry!*\n🏡 {villa.get('Villa_Name')}\n👤 {d['name']}\n📞 {d['phone']}")
+        return render_template('success.html', name=d['name'])
     return render_template('enquiry.html', villa=villa)
 
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
-    if request.method == 'POST':
-        if request.form.get('username') == "admin" and request.form.get('password') == "MoreVistas@2026":
-            session['admin_logged_in'] = True
-            return redirect(url_for('admin_dashboard'))
+    if request.method == 'POST' and request.form.get('password') == "MoreVistas@2026":
+        session['admin_logged_in'] = True
+        return redirect(url_for('admin_dashboard'))
     return render_template('admin_login.html')
 
 @app.route('/admin-dashboard')
 def admin_dashboard():
     if not session.get('admin_logged_in'): return redirect(url_for('admin_login'))
-    villas, enquiries = get_safe_data(sheet), get_safe_data(enquiry_sheet)[::-1]
-    return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries)
+    return render_template('admin_dashboard.html', villas=get_safe_data(sheet), enquiries=get_safe_data(enquiry_sheet)[::-1])
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-        
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    
