@@ -69,7 +69,7 @@ def get_safe_data(target_sheet):
 def get_weather():
     try:
         # API Key (Please wait 2 hours if new)
-        api_key = "b8ee20104f767837862a93361e68787c"
+        api_key = "602d32574e40263f16952813df186b59"
         url = f"https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid={api_key}"
         
         # Timeout helps to not slow down the site if API is slow
