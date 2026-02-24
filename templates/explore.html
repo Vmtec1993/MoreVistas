@@ -1,21 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container my-5">
-    <h2 class="fw-bold text-center mb-5">Explore <span class="text-primary">Lonavala</span></h2>
-    
+<div class="container py-5">
+    <h2 class="fw-bold mb-4 text-center">Tourist Attractions in Lonavala</h2>
     <div class="row g-4">
-        {% for place in places %}
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                <img src="{{ place.Photo_URL }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+        {% for place in tourist_places %}
+        <div class="col-md-4 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <img src="{{ place.Image_URL }}" class="card-img-top" style="height: 200px; object-fit: cover;">
                 <div class="card-body">
-                    <h5 class="fw-bold">{{ place.Name }}</h5>
-                    <p class="text-muted small">{{ place.Description }}</p>
+                    <h5 class="fw-bold">{{ place.Location }}</h5>
+                    <p class="text-muted small">{{ place.Description or 'A must-visit spot near your villa.' }}</p>
                     <div class="d-flex justify-content-between align-items-center mt-3">
-                        <span class="small"><i class="bi bi-geo-alt-fill text-danger"></i> {{ place.Location }}</span>
-                        <a href="{{ place.Map_Link }}" target="_blank" class="btn btn-sm btn-primary rounded-pill">
-                            Direction <i class="bi bi-arrow-up-right"></i>
-                        </a>
+                        <span class="small fw-bold text-primary"><i class="bi bi-geo-alt"></i> {{ place.Distance }}</span>
+                        <a href="{{ place.Map_Link }}" class="btn btn-dark btn-sm rounded-pill px-3">Direction</a>
                     </div>
                 </div>
             </div>
