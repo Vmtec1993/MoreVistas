@@ -13,9 +13,15 @@
     .villa-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; }
     .discount-tag { position: absolute; top: 15px; right: 15px; background: #28a745; color: white; padding: 5px 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; z-index: 10; }
     
-    /* Why Stay & Tourist Points */
+    /* Why Stay Box */
     .info-box { background: #f8f9fa; border-radius: 25px; padding: 40px 20px; margin: 30px 0; text-align: center; border: 1px solid #eee; }
-    .point-badge { background: #fff; border: 1px solid #dee2e6; border-radius: 50px; padding: 8px 20px; display: inline-block; margin: 5px; font-size: 0.85rem; font-weight: 600; }
+    
+    /* 📍 New Tourist Place Cards */
+    .place-card {
+        background: #fff; border: 1px solid #eee; border-radius: 15px;
+        padding: 15px; transition: 0.3s; text-align: center; height: 100%;
+    }
+    .place-card:hover { border-color: #0d6efd; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
 
     /* Footer */
     .final-footer { background: #1a1a1a; color: #ffffff; padding: 60px 0 0; text-align: center; margin-top: 60px; }
@@ -57,23 +63,19 @@
             <div class="card h-100 villa-card shadow-sm">
                 <div style="height: 250px; position: relative;">
                     <img src="{{ villa.Image_URL or villa.Image_URL_1 }}" class="w-100 h-100" style="object-fit: cover;">
-                    
                     {% set current = (villa.Price or 0) | float %}
                     {% set original = (villa.Original_Price or 0) | float %}
                     {% if original > current and current > 0 %}
                         <div class="discount-tag">{{ (((original - current) / original) * 100) | round | int }}% OFF</div>
                     {% endif %}
                 </div>
-
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-1">{{ villa.Villa_Name }}</h5>
                     <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</p>
-                    
                     <div class="d-flex gap-4 mb-3 small fw-bold">
                         <span><i class="bi bi-people-fill text-primary"></i> {{ villa.Guests or '12' }} Guests</span>
                         <span><i class="bi bi-door-open-fill text-primary"></i> {{ villa.BHK or '3' }} BHK</span>
                     </div>
-
                     <div class="pt-3 border-top d-flex align-items-center justify-content-between">
                         <div>
                             {% if current > 0 %}
@@ -111,14 +113,25 @@
         </div>
     </div>
 
-    <div class="mt-5 text-center">
-        <h4 class="fw-bold mb-3">Lonavala Tourist Points</h4>
-        <div class="d-flex flex-wrap justify-content-center">
-            <span class="point-badge shadow-sm">Bhushi Dam</span>
-            <span class="point-badge shadow-sm">Tiger Point</span>
-            <span class="point-badge shadow-sm">Lonavala Lake</span>
-            <span class="point-badge shadow-sm">Celebrity Wax Museum</span>
-            <span class="point-badge shadow-sm">Karla Caves</span>
+    <div class="mt-5">
+        <h4 class="fw-bold mb-4 text-center">Popular Attractions Nearby</h4>
+        <div class="row g-3">
+            {% for place in tourist_places %}
+            <div class="col-6 col-md-3">
+                <div class="place-card shadow-sm">
+                    <i class="bi bi-pin-map-fill text-danger fs-4 mb-2 d-block"></i>
+                    <h6 class="fw-bold mb-1">{{ place.Location }}</h6>
+                    {% if place.Distance %}
+                        <p class="text-muted small mb-2">{{ place.Distance }}</p>
+                    {% endif %}
+                    {% if place.Map_Link and place.Map_Link|string != 'nan' %}
+                        <a href="{{ place.Map_Link }}" target="_blank" class="btn btn-link btn-sm p-0 text-primary fw-bold text-decoration-none">
+                            View on Map <i class="bi bi-arrow-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
