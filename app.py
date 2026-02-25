@@ -32,7 +32,6 @@ def init_sheets():
             SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
             main_spreadsheet = client.open_by_key(SHEET_ID)
             
-            # Sheets initialization
             sheet = main_spreadsheet.sheet1
             all_ws = {ws.title: ws for ws in main_spreadsheet.worksheets()}
             
@@ -56,31 +55,39 @@ def get_rows(target_sheet):
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
-            # --- Price & Discount Logic ---
+            # --- Offer Logic Fix (Force Integer) ---
             try:
-                p_raw = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
-                op_raw = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
-                current = int(float(p_raw)) if p_raw and p_raw.lower() not in ['nan', ''] else 0
-                original = int(float(op_raw)) if op_raw and op_raw.lower() not in ['nan', ''] else 0
+                p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
+                op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
+                
+                # Convert to int safely
+                current = int(float(p_val)) if p_val and p_val.lower() != 'nan' else 0
+                original = int(float(op_val)) if op_val and op_val.lower() != 'nan' else 0
                 
                 item['Price'] = current
                 item['Original_Price'] = original
-                # Backend calculation for safety
-                if original > current > 0:
+                
+                if original > current and current > 0:
                     item['discount_perc'] = int(((original - current) / original) * 100)
                 else:
                     item['discount_perc'] = 0
             except:
-                item['Price'] = 0
                 item['discount_perc'] = 0
-            
+
+            # --- Rules Pre-processing ---
+            # Hum yahan check kar rahe hain taaki main page par bhi error na aaye
+            raw_rules = item.get('Rules', '')
+            if '|' in raw_rules:
+                item['Rules_List'] = [r.strip() for r in raw_rules.split('|')]
+            else:
+                item['Rules_List'] = [raw_rules.strip()] if raw_rules else []
+
             item['Status'] = str(item.get('Status', 'Available')).strip()
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
-            # Rules fallback inside get_rows for global access
-            item['Rules_Raw'] = item.get('Rules', 'Check-in: 1 PM | Check-out: 11 AM')
             final_list.append(item)
         return final_list
-    except:
+    except Exception as e:
+        print(f"Error in get_rows: {e}")
         return []
 
 # --- Routes ---
@@ -89,17 +96,7 @@ def get_rows(target_sheet):
 def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
-    
     runner_text = "Welcome to MoreVistas Lonavala | Call 8830024994"
-    if settings_sheet:
-        try:
-            s_data = settings_sheet.get_all_values()
-            for r in s_data:
-                if len(r) >= 2 and r[0] == 'Offer_Text':
-                    runner_text = r[1]
-                    break
-        except: pass
-
     return render_template('index.html', villas=villas, runner_text=runner_text, tourist_places=places)
 
 @app.route('/villa/<villa_id>')
@@ -108,12 +105,14 @@ def villa_details(villa_id):
     villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
     
-    # --- Rules Split Logic (Pipe separator |) ---
-    rules_raw = villa.get('Rules', 'Check-in: 1 PM | Check-out: 11 AM | ID Proof Required')
-    villa['Rules_List'] = [r.strip() for r in rules_raw.split('|')]
+    # Rules logic already handled in get_rows, but double checking here
+    rules_raw = villa.get('Rules', '')
+    if '|' in rules_raw:
+        villa['Rules_List'] = [r.strip() for r in rules_raw.split('|')]
+    else:
+        villa['Rules_List'] = [rules_raw.strip()] if rules_raw else ["ID Proof Required"]
 
-    # Image Gallery Logic
-    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}') and str(villa.get(f'Image_URL_{i}')).strip() != '']
+    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not imgs: imgs = [villa.get('Image_URL')]
     
     return render_template('villa_details.html', villa=villa, villa_images=imgs)
@@ -130,18 +129,13 @@ def enquiry(villa_id):
         guests = request.form.get('guests')
         v_name = villa.get('Villa_Name', 'Villa') if villa else "Villa"
         
-        # Save to Google Sheet
         if enquiry_sheet:
             try:
                 enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
-            except Exception as e: print(f"Sheet Write Error: {e}")
+            except: pass
             
-        # Telegram Alert
         alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
-        try:
-            requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
-        except Exception as e: print(f"Telegram Error: {e}")
-        
+        requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
         return render_template('success.html', name=name, villa_name=v_name)
     
     return render_template('enquiry.html', villa=villa)
@@ -151,14 +145,7 @@ def explore():
     places = get_rows(places_sheet)
     return render_template('explore.html', tourist_places=places)
 
-# Static Pages
-@app.route('/contact')
-def contact(): return render_template('contact.html')
-
-@app.route('/legal')
-def legal(): return render_template('legal.html')
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-    
+                
