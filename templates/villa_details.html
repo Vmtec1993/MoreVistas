@@ -15,6 +15,14 @@
     .original-price-cut { text-decoration: line-through; color: #adb5bd; font-weight: 400; font-size: 1.2rem; margin-right: 10px; }
     .current-price-main { color: #0d6efd; font-weight: 800; font-size: 2rem; }
 
+    /* Colorful Name for Detail Page */
+    .villa-title-detail {
+        background: linear-gradient(45deg, #ff416c, #ff4b2b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 850;
+    }
+
     /* Sticky Mobile Footer */
     @media (max-width: 767px) {
         .sticky-booking-bar {
@@ -33,7 +41,6 @@
     @media (max-width: 768px) { .carousel-item img { height: 300px; } }
 
     .rule-item { border-left: 3px solid #0d6efd; padding-left: 15px; margin-bottom: 15px; background: #f8f9fa; padding-top: 10px; padding-bottom: 10px; border-radius: 0 10px 10px 0; }
-    
     .info-card { background: #f0f7ff; border: 1px solid #cfe2ff; border-radius: 15px; padding: 20px; }
 </style>
 
@@ -49,11 +56,11 @@
 
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="{{ villa.Image_URL or villa.Image_URL_1 }}" class="d-block w-100" alt="Main">
+                <img src="{{ villa.Image_URL }}" class="d-block w-100" alt="Main">
             </div>
             {% if villa_images %}
                 {% for img_url in villa_images %}
-                    {% if img_url != villa.Image_URL and img_url != villa.Image_URL_1 %}
+                    {% if img_url != villa.Image_URL %}
                     <div class="carousel-item">
                         <img src="{{ img_url }}" class="d-block w-100" alt="Gallery">
                     </div>
@@ -71,16 +78,16 @@
                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 me-2 small fw-bold">LUXURY STAY</span>
                 <small class="text-muted"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, Maharashtra</small>
             </div>
-            <h1 class="fw-extrabold text-dark mb-4" style="font-weight: 800;">{{ villa.Villa_Name }}</h1>
+            <h1 class="villa-title-detail display-5 mb-4">{{ villa.Villa_Name }}</h1>
 
             <div class="mb-5 py-3 border-top border-bottom">
                 {% if current > 0 %}
                     <span class="text-muted small d-block mb-1">Nightly Rate</span>
                     <div class="d-flex align-items-baseline">
                         {% if original > current %}
-                            <span class="original-price-cut">₹{{ "{:,}".format(original | int) }}</span>
+                            <span class="original-price-cut">₹{{ original | int }}</span>
                         {% endif %}
-                        <span class="current-price-main">₹{{ "{:,}".format(current | int) }}</span>
+                        <span class="current-price-main">₹{{ current | int }}</span>
                         <small class="text-muted ms-2 fs-6">/ night</small>
                     </div>
                 {% else %}
@@ -88,20 +95,56 @@
                 {% endif %}
             </div>
 
-            <div class="row g-3 mb-5">
-                <div class="col-4 col-md-3">
-                    <div class="text-center p-3 border rounded-4 bg-white shadow-sm">
+            <div class="row g-3 mb-5 text-center">
+                <div class="col-4">
+                    <div class="p-3 border rounded-4 bg-white shadow-sm h-100">
                         <i class="bi bi-people fs-3 text-primary"></i>
                         <div class="small fw-bold mt-1">{{ villa.Guests }} Guests</div>
                     </div>
                 </div>
-                <div class="col-4 col-md-3">
-                    <div class="text-center p-3 border rounded-4 bg-white shadow-sm">
+                <div class="col-4">
+                    <div class="p-3 border rounded-4 bg-white shadow-sm h-100">
                         <i class="bi bi-door-open fs-3 text-primary"></i>
                         <div class="small fw-bold mt-1">{{ villa.BHK }} BHK</div>
                     </div>
                 </div>
-                <div class="col-4 col-md-3">
-                    <div class="text-center p-3 border rounded-4 bg-white shadow-sm">
-                        <i class="bi bi-droplet fs-3 text-primary
-                            
+                <div class="col-4">
+                    <div class="p-3 border rounded-4 bg-white shadow-sm h-100">
+                        <i class="bi bi-droplet fs-3 text-primary"></i>
+                        <div class="small fw-bold mt-1">Pool</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card mb-5">
+                <h5 class="fw-bold"><i class="bi bi-info-circle-fill me-2"></i>About this Villa</h5>
+                <p class="text-muted mb-0">{{ villa.Description or 'Experience luxury and tranquility in this beautiful villa located in the heart of Lonavala.' }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-4 d-none d-md-block">
+            <div class="card border-0 shadow-lg rounded-4 p-4 sticky-top" style="top: 100px;">
+                <h5 class="fw-bold mb-3">Ready to Book?</h5>
+                <p class="small text-muted mb-4">Check availability and get the best seasonal offers for your dates.</p>
+                <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow">BOOK THIS VILLA</a>
+                <div class="text-center mt-3">
+                    <small class="text-muted"><i class="bi bi-shield-check me-1"></i> No payment required now</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sticky-booking-bar">
+    <div>
+        {% if current > 0 %}
+            <span class="fw-bold fs-5">₹{{ current | int }}</span>
+            <small class="text-muted">/night</small>
+        {% else %}
+            <span class="fw-bold fs-6">Price on Request</span>
+        {% endif %}
+    </div>
+    <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary rounded-pill px-4 fw-bold">ENQUIRE</a>
+</div>
+
+{% endblock %}
