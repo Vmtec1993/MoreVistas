@@ -15,11 +15,16 @@
     .highlight-badge { background: #f0f7ff; border: 1px solid #cfe2ff; border-radius: 15px; padding: 15px; text-align: center; height: 100%; }
     .rule-card { border-left: 4px solid #ff4757; background: #fff5f6; padding: 15px; border-radius: 0 15px 15px 0; margin-bottom: 10px; }
     
+    /* Price Detail Styles */
+    .detail-original-price { text-decoration: line-through; color: #adb5bd; font-size: 1.2rem; display: block; margin-bottom: -5px; }
+    .savings-badge { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; border: 1px dashed #2e7d32; }
+    .offer-banner { position: absolute; top: 20px; left: 20px; z-index: 10; background: #ff4757; color: white; padding: 8px 20px; border-radius: 50px; font-weight: 800; box-shadow: 0 4px 15px rgba(255,71,87,0.4); }
+
     /* Sticky Mobile Footer */
     @media (max-width: 767px) {
         .mobile-booking-bar {
             position: fixed; bottom: 0; left: 0; right: 0; background: white;
-            padding: 15px 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+            padding: 12px 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
             z-index: 1000; display: flex; justify-content: space-between; align-items: center;
         }
         body { padding-bottom: 80px; }
@@ -27,7 +32,11 @@
 </style>
 
 <div class="container py-4">
-    <div id="villaSlider" class="carousel slide shadow-lg" data-bs-ride="carousel" style="border-radius: 25px; overflow: hidden;">
+    <div id="villaSlider" class="carousel slide shadow-lg position-relative" data-bs-ride="carousel" style="border-radius: 25px; overflow: hidden;">
+        {% if villa.discount_perc > 0 %}
+            <div class="offer-banner">🔥 {{ villa.discount_perc }}% OFF TODAY</div>
+        {% endif %}
+        
         <div class="carousel-inner">
             <div class="carousel-item active">
                 <img src="{{ villa.Image_URL }}" class="d-block w-100" alt="Main Image">
@@ -112,21 +121,28 @@
             <div class="card border-0 shadow-lg rounded-4 p-4 sticky-top" style="top: 100px; z-index: 10;">
                 <h5 class="fw-bold">Book Your Stay</h5>
                 <hr>
+                
                 {% if villa.Price and villa.Price|float > 0 %}
                     <div class="mb-3">
-                        <span class="fs-2 fw-bold text-primary">₹{{ villa.Price }}</span>
-                        <span class="text-muted">/ night</span>
+                        {% if villa.Original_Price and villa.Original_Price|float > villa.Price|float %}
+                            <span class="detail-original-price">₹{{ villa.Original_Price|int }}</span>
+                            <div class="mb-2"><span class="savings-badge">You Save ₹{{ (villa.Original_Price|float - villa.Price|float)|int }}</span></div>
+                        {% endif %}
+                        <div class="d-flex align-items-baseline">
+                            <span class="fs-1 fw-bold text-primary">₹{{ villa.Price|int }}</span>
+                            <span class="text-muted ms-2">/ night</span>
+                        </div>
                     </div>
                 {% else %}
                     <h4 class="text-primary fw-bold mb-3">Price on Request</h4>
                 {% endif %}
 
                 <div class="bg-warning-subtle p-3 rounded-3 mb-4 text-center">
-                    <h6 class="fw-bold text-danger mb-1">⚡ Limited Weekend Availability</h6>
-                    <small>Securing your dates early is recommended.</small>
+                    <h6 class="fw-bold text-danger mb-1">⚡ Instant Confirmation</h6>
+                    <small>Only few dates left for this month!</small>
                 </div>
 
-                <a href="https://wa.me/918830024994?text=I%20am%20interested%20in%20{{ villa.Villa_Name }}" class="btn btn-success w-100 rounded-pill py-3 fw-bold mb-3">
+                <a href="https://wa.me/918830024994?text=Hi,%20I%20am%20interested%20in%20booking%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success w-100 rounded-pill py-3 fw-bold mb-3 shadow">
                     <i class="bi bi-whatsapp me-2"></i>BOOK ON WHATSAPP
                 </a>
                 
@@ -140,11 +156,15 @@
 
 <div class="mobile-booking-bar d-md-none">
     <div>
-        <span class="fw-bold fs-5 text-primary">₹{{ villa.Price if villa.Price else 'Request' }}</span>
-        <small class="text-muted d-block" style="font-size: 0.7rem;">Per Night</small>
+        {% if villa.Original_Price and villa.Original_Price|float > villa.Price|float %}
+            <small class="text-decoration-line-through text-muted">₹{{ villa.Original_Price|int }}</small>
+        {% endif %}
+        <div class="fw-bold fs-4 text-primary" style="margin-top: -5px;">
+            ₹{{ villa.Price|int if villa.Price else 'On Request' }}
+        </div>
     </div>
-    <a href="https://wa.me/918830024994" class="btn btn-success rounded-pill px-4 fw-bold shadow">
-        <i class="bi bi-whatsapp me-1"></i> BOOK
+    <a href="https://wa.me/918830024994?text=I%20want%20to%20book%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow">
+        <i class="bi bi-whatsapp me-1"></i> BOOK NOW
     </a>
 </div>
 
