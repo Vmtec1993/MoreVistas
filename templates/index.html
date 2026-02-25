@@ -2,145 +2,113 @@
 {% block content %}
 
 <style>
-    /* UI Enhancements */
-    .offer-runner { background: #000; color: #fff; padding: 10px 0; overflow: hidden; white-space: nowrap; }
-    .runner-text { display: inline-block; animation: scroll-text 25s linear infinite; font-weight: 700; text-transform: uppercase; }
-    @keyframes scroll-text { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    
-    .villa-card { transition: 0.3s; border-radius: 20px; overflow: hidden; border: none; background: #fff; height: 100%; }
-    .villa-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
-    
-    .location-icon { color: #ff4d4d; margin-right: 5px; } 
-    .feature-icon { font-size: 2rem; color: #0d6efd; margin-bottom: 15px; }
-    
-    /* Blue Theme Price & Timer Styles */
-    .price-blue { color: #007bff; font-weight: 800; font-size: 1.5rem; }
-    .timer-container { background: #f0f7ff; border: 1px solid #cfe2ff; color: #007bff; }
+    .price-request { color: #0d6efd; font-weight: 800; font-size: 1.2rem; }
+    .original-price { text-decoration: line-through; color: #6c757d; font-size: 0.9rem; margin-right: 8px; }
+    .current-price { color: #0d6efd; font-weight: 800; font-size: 1.4rem; }
+    .tourist-card { border-radius: 15px; transition: 0.3s; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .tourist-card:hover { transform: translateY(-5px); }
 </style>
 
-<div class="offer-runner">
-    <div class="runner-text">✨ {{ runner_text }} | BOOK NOW: 8830024994 | VERIFIED LUXURY VILLAS ✨</div>
+<div class="bg-dark text-white py-2 overflow-hidden">
+    <marquee scrollamount="5">✨ {{ runner_text }} | Contact: 8830024994 | Best Price Guaranteed ✨</marquee>
 </div>
 
 <div class="container mt-4">
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-6 mb-3">
-            <div class="p-3 shadow-sm bg-white rounded-4 d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-cloud-sun-fill text-warning me-2"></i> Lonavala Weather</span>
-                <span class="fw-bold text-primary">{{ weather.temp if weather else '24' }}°C - {{ weather.desc if weather else 'Pleasant' }}</span>
-            </div>
-        </div>
-        
+    <div class="row mb-5 align-items-center bg-white p-3 rounded-4 shadow-sm mx-1">
         <div class="col-md-6">
-            <select class="form-select rounded-pill shadow-sm py-2 px-4" id="bhkFilter" onchange="filterVillas()">
-                <option value="all">🔍 All Villas (Filter by BHK)</option>
-                <option value="2">2 BHK Villas</option>
-                <option value="3">3 BHK Villas</option>
-                <option value="4">4+ BHK Villas</option>
+            <h5 class="mb-0 fw-bold"><i class="bi bi-cloud-sun text-primary me-2"></i>Lonavala: {{ weather.temp if weather else '24' }}°C</h5>
+        </div>
+        <div class="col-md-6 mt-3 mt-md-0">
+            <select class="form-select rounded-pill border-primary" id="bhkFilter" onchange="filterVillas()">
+                <option value="all">🔍 All BHK Options</option>
+                <option value="2">2 BHK</option>
+                <option value="3">3 BHK</option>
+                <option value="4">4+ BHK</option>
             </select>
         </div>
     </div>
 
-    <h3 class="fw-bold mb-4">Our Luxury Collection</h3>
+    <h3 class="fw-bold mb-4">Luxury Villa Collection</h3>
     <div class="row g-4" id="villaContainer">
         {% for villa in villas %}
         <div class="col-md-4 villa-item" data-bhk="{{ villa.BHK }}">
-            <div class="card villa-card shadow-sm">
-                <div style="height: 230px; position: relative;">
-                    <img src="{{ villa.Image_URL }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ villa.Villa_Name }}">
-                    {% if villa.Offer and villa.Offer|string != 'nan' %}
-                    <span class="badge bg-danger position-absolute top-0 end-0 m-3 p-2 shadow">🔥 {{ villa.Offer }}</span>
-                    {% endif %}
-                </div>
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden villa-card">
+                <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover;">
                 <div class="card-body p-4">
+                    <h5 class="fw-bold mb-2">{{ villa.Villa_Name }}</h5>
                     
-                    <div class="timer-container d-flex justify-content-between align-items-center mb-3 p-2 rounded-3 small fw-bold">
-                        <span><i class="bi bi-clock-history me-1"></i> Offer Ends:</span>
-                        <div class="countdown-display">
-                            <span class="hours">00</span>h : <span class="minutes">00</span>m : <span class="seconds">00</span>s
-                        </div>
-                    </div>
-
-                    <h5 class="fw-bold mb-1">{{ villa.Villa_Name }}</h5>
-
                     <div class="mb-3">
-                        {% set current_p = villa.Price | float if villa.Price else 0 %}
-                        {% set original_p = villa.Original_Price | float if villa.Original_Price else 0 %}
-
-                        {% if current_p > 0 %}
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="price-blue">₹{{ villa.Price }}</span>
-                                {% if original_p > current_p %}
-                                    <span class="text-decoration-line-through text-muted small">₹{{ villa.Original_Price }}</span>
-                                    <span class="badge bg-danger p-1" style="font-size: 0.7rem;">
-                                        -{{ (((original_p - current_p) / original_p) * 100) | round | int }}%
-                                    </span>
+                        {% if villa.Price and villa.Price|float > 0 %}
+                            <div class="d-flex align-items-center">
+                                {% if villa.Original_Price and villa.Original_Price|float > villa.Price|float %}
+                                    <span class="original-price">₹{{ villa.Original_Price }}</span>
                                 {% endif %}
+                                <span class="current-price">₹{{ villa.Price }}</span>
+                                <small class="text-muted ms-1">/night</small>
                             </div>
                         {% else %}
-                            <div class="price-blue text-uppercase fs-6" style="letter-spacing: 1px;">
-                                Price on Request
-                            </div>
+                            <div class="price-request text-uppercase">Price on Request</div>
                         {% endif %}
                     </div>
 
-                    <p class="small text-muted mb-2">
-                        <i class="bi bi-geo-alt-fill location-icon"></i>Lonavala, Maharashtra
-                    </p>
-                    <div class="d-flex justify-content-between mb-3 small fw-bold text-dark bg-light p-2 rounded">
-                        <span><i class="bi bi-people-fill me-1"></i> {{ villa.Guests }} Guests</span>
-                        <span class="text-primary"><i class="bi bi-door-open-fill me-1"></i> {{ villa.BHK }} BHK</span>
+                    <div class="d-flex justify-content-between small fw-bold bg-light p-2 rounded-3 mb-3">
+                        <span><i class="bi bi-people me-1"></i>{{ villa.Guests }} Guests</span>
+                        <span class="text-primary"><i class="bi bi-door-open me-1"></i>{{ villa.BHK }} BHK</span>
                     </div>
-                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm">View Details</a>
+                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill fw-bold">View Villa Details</a>
                 </div>
             </div>
         </div>
         {% endfor %}
+    </div>
+
+    <div class="mt-5 py-5 border-top">
+        <h3 class="text-center fw-bold mb-5">Why Stay with MoreVistas?</h3>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <i class="bi bi-shield-check text-primary fs-1"></i>
+                <h5 class="fw-bold mt-3">Verified Properties</h5>
+                <p class="text-muted small">Every villa is personally inspected for quality and safety.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-headset text-primary fs-1"></i>
+                <h5 class="fw-bold mt-3">24/7 Concierge</h5>
+                <p class="text-muted small">Our team is always available to assist with your requirements.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-stars text-primary fs-1"></i>
+                <h5 class="fw-bold mt-3">Premium Experience</h5>
+                <p class="text-muted small">Luxury amenities and prime locations for a perfect getaway.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 py-5 border-top">
+        <h3 class="fw-bold mb-4">Explore Lonavala</h3>
+        <div class="row g-3">
+            {% for place in tourist_places %}
+            <div class="col-6 col-md-3">
+                <div class="card tourist-card h-100 p-2 text-center">
+                    <img src="{{ place.Image_URL }}" class="rounded-3 mb-2" style="height:120px; object-fit:cover;">
+                    <h6 class="fw-bold mb-0 small">{{ place.Place_Name }}</h6>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 
 <script>
 function filterVillas() {
     let bhk = document.getElementById('bhkFilter').value;
-    let items = document.querySelectorAll('.villa-item');
-    items.forEach(item => {
-        let villaBhk = item.getAttribute('data-bhk');
-        if (bhk === 'all') {
+    document.querySelectorAll('.villa-item').forEach(item => {
+        let vBhk = item.getAttribute('data-bhk');
+        if (bhk === 'all' || vBhk === bhk || (bhk === '4' && parseInt(vBhk) >= 4)) {
             item.style.display = 'block';
-        } else if (bhk === '4') {
-            if (parseInt(villaBhk) >= 4) item.style.display = 'block';
-            else item.style.display = 'none';
         } else {
-            if (villaBhk === bhk) item.style.display = 'block';
-            else item.style.display = 'none';
+            item.style.display = 'none';
         }
     });
 }
-
-function startGlobalTimer() {
-    function update() {
-        let now = new Date();
-        let night = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
-        let diff = night - now;
-
-        let h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        let m = Math.floor((diff / (1000 * 60)) % 60);
-        let s = Math.floor((diff / 1000) % 60);
-
-        h = h < 10 ? "0" + h : h;
-        m = m < 10 ? "0" + m : m;
-        s = s < 10 ? "0" + s : s;
-
-        document.querySelectorAll(".countdown-display").forEach(display => {
-            display.querySelector(".hours").innerText = h;
-            display.querySelector(".minutes").innerText = m;
-            display.querySelector(".seconds").innerText = s;
-        });
-    }
-    setInterval(update, 1000);
-    update();
-}
-startGlobalTimer();
 </script>
-
 {% endblock %}
