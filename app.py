@@ -147,6 +147,9 @@ def contact():
 def legal():
     return render_template('legal.html')
 
+# Is block ko update karein
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    # debug=False karein production ke liye
+    app.run(host='0.0.0.0', port=port, debug=False)
+
