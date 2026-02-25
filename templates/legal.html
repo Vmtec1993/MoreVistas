@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <h2 class="fw-800 mb-4 text-center">Legal <span class="text-primary">Policies</span></h2>
+            
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <nav>
+                    <div class="nav nav-tabs border-0 mb-4" id="nav-tab" role="tablist">
+                        <button class="nav-link active rounded-pill px-4 me-2 border-0 shadow-sm" id="nav-tc-tab" data-bs-toggle="tab" data-bs-target="#nav-tc" type="button">Terms & Conditions</button>
+                        <button class="nav-link rounded-pill px-4 border-0 shadow-sm" id="nav-privacy-tab" data-bs-toggle="tab" data-bs-target="#nav-privacy" type="button">Privacy Policy</button>
+                    </div>
+                </nav>
+                
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-tc" role="tabpanel">
+                        <h5 class="fw-bold text-primary">1. Booking & Payments</h5>
+                        <p class="text-muted small">50% advance payment is required to confirm the booking. The remaining balance must be cleared 72 hours before check-in.</p>
+                        
+                        <h5 class="fw-bold text-primary mt-4">2. Cancellation Policy</h5>
+                        <p class="text-muted small">Cancellations made 15 days before arrival will receive a 90% refund. No refunds for last-minute cancellations (under 7 days).</p>
+                        
+                        <h5 class="fw-bold text-primary mt-4">3. House Rules</h5>
+                        <p class="text-muted small">Illegal activities, drugs, and loud music after 10 PM are strictly prohibited. Security deposit is refundable post-inspection.</p>
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-privacy" role="tabpanel">
+                        <h5 class="fw-bold text-primary">Data Protection</h5>
+                        <p class="text-muted small">We only collect your name, phone, and email for booking purposes. Your data is never shared with third-party marketing agencies.</p>
+                        
+                        <h5 class="fw-bold text-primary mt-4">Secure Transactions</h5>
+                        <p class="text-muted small">All payments are processed through secure gateways. We do not store your credit card or bank details on our servers.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
