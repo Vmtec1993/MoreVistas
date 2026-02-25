@@ -136,7 +136,8 @@ def contact():
     return render_template('contact.html')
 
 if __name__ == "__main__":
-    # Render PORT handling
-    port = int(os.environ.get("PORT", 10000))
+    # Render के लिए 0.0.0.0 और पोर्ट सेट करना अनिवार्य है
+    port = int(os.environ.get("PORT", 5000)) 
     app.run(host='0.0.0.0', port=port)
+
         
