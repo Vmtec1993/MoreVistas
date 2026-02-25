@@ -7,18 +7,14 @@
     .runner-text { display: inline-block; animation: scroll-text 25s linear infinite; font-weight: 700; text-transform: uppercase; }
     @keyframes scroll-text { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
     
-    .villa-card { transition: 0.3s; border-radius: 20px; overflow: hidden; border: none; background: #fff; }
+    .villa-card { transition: 0.3s; border-radius: 20px; overflow: hidden; border: none; background: #fff; height: 100%; }
     .villa-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
     
     .location-icon { color: #ff4d4d; margin-right: 5px; } 
     .feature-icon { font-size: 2rem; color: #0d6efd; margin-bottom: 15px; }
     
-    .final-footer { background: #111; color: #fff; padding: 70px 0 30px; margin-top: 80px; border-top: 5px solid #0d6efd; }
-    .footer-link { color: #aaa; text-decoration: none; transition: 0.3s; }
-    .footer-link:hover { color: #0d6efd; padding-left: 5px; }
-
-    /* New Blue Theme Price & Timer Styles */
-    .price-blue { color: #007bff; font-weight: 800; }
+    /* Blue Theme Price & Timer Styles */
+    .price-blue { color: #007bff; font-weight: 800; font-size: 1.5rem; }
     .timer-container { background: #f0f7ff; border: 1px solid #cfe2ff; color: #007bff; }
 </style>
 
@@ -49,9 +45,9 @@
     <div class="row g-4" id="villaContainer">
         {% for villa in villas %}
         <div class="col-md-4 villa-item" data-bhk="{{ villa.BHK }}">
-            <div class="card h-100 villa-card shadow-sm">
+            <div class="card villa-card shadow-sm">
                 <div style="height: 230px; position: relative;">
-                    <img src="{{ villa.Image_URL }}" class="w-100 h-100" style="object-fit: cover;">
+                    <img src="{{ villa.Image_URL }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ villa.Villa_Name }}">
                     {% if villa.Offer and villa.Offer|string != 'nan' %}
                     <span class="badge bg-danger position-absolute top-0 end-0 m-3 p-2 shadow">🔥 {{ villa.Offer }}</span>
                     {% endif %}
@@ -60,22 +56,29 @@
                     
                     <div class="timer-container d-flex justify-content-between align-items-center mb-3 p-2 rounded-3 small fw-bold">
                         <span><i class="bi bi-clock-history me-1"></i> Offer Ends:</span>
-                        <div class="countdown-display" id="timer-{{ villa.Villa_ID }}">
+                        <div class="countdown-display">
                             <span class="hours">00</span>h : <span class="minutes">00</span>m : <span class="seconds">00</span>s
                         </div>
                     </div>
 
                     <h5 class="fw-bold mb-1">{{ villa.Villa_Name }}</h5>
 
-                    <div class="mb-2">
-                        {% if villa.Original_Price and villa.Original_Price|float > 0 and villa.Price %}
-    {% set discount = ((villa.Original_Price|float - villa.Price|float) / villa.Original_Price|float * 100)|round %}
-    <span class="badge bg-danger">-{{ discount }}% OFF</span>
-{% endif %}
+                    <div class="mb-3">
+                        {% set current_p = villa.Price | float if villa.Price else 0 %}
+                        {% set original_p = villa.Original_Price | float if villa.Original_Price else 0 %}
 
+                        {% if current_p > 0 %}
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="price-blue">₹{{ villa.Price }}</span>
+                                {% if original_p > current_p %}
+                                    <span class="text-decoration-line-through text-muted small">₹{{ villa.Original_Price }}</span>
+                                    <span class="badge bg-danger p-1" style="font-size: 0.7rem;">
+                                        -{{ (((original_p - current_p) / original_p) * 100) | round | int }}%
+                                    </span>
+                                {% endif %}
                             </div>
                         {% else %}
-                            <div class="price-blue text-uppercase fs-5" style="letter-spacing: 1px;">
+                            <div class="price-blue text-uppercase fs-6" style="letter-spacing: 1px;">
                                 Price on Request
                             </div>
                         {% endif %}
@@ -94,71 +97,22 @@
         </div>
         {% endfor %}
     </div>
-    
-    <div class="my-5 py-5 border-top">
-        <h3 class="text-center fw-bold mb-5">Why Book with MoreVistas?</h3>
-        <div class="row g-4 text-center">
-            <div class="col-md-4">
-                <i class="bi bi-patch-check-fill feature-icon"></i>
-                <h5 class="fw-bold">100% Verified</h5>
-                <p class="text-muted small px-3">We personally visit every villa to ensure luxury and safety standards.</p>
-            </div>
-            <div class="col-md-4">
-                <i class="bi bi-chat-heart-fill feature-icon"></i>
-                <h5 class="fw-bold">Concierge Service</h5>
-                <p class="text-muted small px-3">From private chefs to local tours, we handle everything for you.</p>
-            </div>
-            <div class="col-md-4">
-                <i class="bi bi-cash-coin feature-icon"></i>
-                <h5 class="fw-bold">Best Rate Policy</h5>
-                <p class="text-muted small px-3">Direct booking ensures you get the most premium stay at the best price.</p>
-            </div>
-        </div>
-    </div>
 </div>
-
-<footer class="final-footer">
-    <div class="container">
-        <div class="row g-4 text-start">
-            <div class="col-md-4">
-                <h2 class="fw-bold mb-3">More<span class="text-primary">Vistas</span></h2>
-                <p class="small text-muted" style="line-height: 1.8;">
-                    MoreVistas Lonavala is a premium villa rental agency dedicated to providing elite staycation experiences. 
-                </p>
-                <div class="mt-4">
-                    <a href="https://wa.me/918830024994" class="btn btn-success btn-sm rounded-pill px-3 me-2"><i class="bi bi-whatsapp me-2"></i>WhatsApp</a>
-                    <a href="tel:+918830024994" class="btn btn-outline-light btn-sm rounded-pill px-3"><i class="bi bi-telephone me-2"></i>Call Now</a>
-                </div>
-            </div>
-            <div class="col-md-2 offset-md-1">
-                <h6 class="fw-bold mb-4">Quick Links</h6>
-                <ul class="list-unstyled">
-                    <li><a href="/" class="footer-link small">Home</a></li>
-                    <li><a href="/about" class="footer-link small">About Us</a></li>
-                    <li><a href="/explore" class="footer-link small">Tourist Spots</a></li>
-                    <li><a href="/contact" class="footer-link small">Contact Us</a></li>
-                </ul>
-            </div>
-            <div class="col-md-3">
-                <h6 class="fw-bold mb-4">Head Office</h6>
-                <p class="small text-muted"><i class="bi bi-geo-alt text-primary me-2"></i> Lonavala, Maharashtra</p>
-                <div class="mt-3">
-                    <img src="https://img.icons8.com/color/48/000000/google-pay.png" width="30">
-                </div>
-            </div>
-        </div>
-    </div>
-</footer>
 
 <script>
 function filterVillas() {
     let bhk = document.getElementById('bhkFilter').value;
     let items = document.querySelectorAll('.villa-item');
     items.forEach(item => {
-        if (bhk === 'all' || item.getAttribute('data-bhk') === bhk) {
+        let villaBhk = item.getAttribute('data-bhk');
+        if (bhk === 'all') {
             item.style.display = 'block';
+        } else if (bhk === '4') {
+            if (parseInt(villaBhk) >= 4) item.style.display = 'block';
+            else item.style.display = 'none';
         } else {
-            item.style.display = 'none';
+            if (villaBhk === bhk) item.style.display = 'block';
+            else item.style.display = 'none';
         }
     });
 }
@@ -182,8 +136,8 @@ function startGlobalTimer() {
             display.querySelector(".minutes").innerText = m;
             display.querySelector(".seconds").innerText = s;
         });
-        setTimeout(update, 1000);
     }
+    setInterval(update, 1000);
     update();
 }
 startGlobalTimer();
