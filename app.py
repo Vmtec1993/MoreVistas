@@ -31,39 +31,46 @@ def init_sheets():
             
             SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
             main_spreadsheet = client.open_by_key(SHEET_ID)
-            sheet = main_spreadsheet.sheet1
             
-            all_ws = [ws.title for ws in main_spreadsheet.worksheets()]
-            if "Places" in all_ws: places_sheet = main_spreadsheet.worksheet("Places")
-            if "Enquiries" in all_ws: enquiry_sheet = main_spreadsheet.worksheet("Enquiries")
-            if "Settings" in all_ws: settings_sheet = main_spreadsheet.worksheet("Settings")
+            # Smartly getting worksheets
+            sheet = main_spreadsheet.sheet1
+            all_ws = {ws.title: ws for ws in main_spreadsheet.worksheets()}
+            
+            places_sheet = all_ws.get("Places")
+            enquiry_sheet = all_ws.get("Enquiries")
+            settings_sheet = all_ws.get("Settings")
+            
         except Exception as e:
-            print(f"Sheet Init Error: {e}")
+            print(f"⚠️ Sheet Init Error: {e}")
 
 init_sheets()
 
 def get_rows(target_sheet):
+    """Robust function to fetch and clean data from sheets"""
     if not target_sheet: return []
     try:
         data = target_sheet.get_all_values()
         if not data or len(data) < 1: return []
+        
         headers = [h.strip() for h in data[0]]
         final_list = []
         for row in data[1:]:
-            item = dict(zip(headers, row))
+            # Padding row to match headers length
+            padded_row = row + [''] * (len(headers) - len(row))
+            item = dict(zip(headers, padded_row))
             
-            # --- Price & Discount Calculation Fix ---
+            # --- Price & Discount Logic ---
             try:
                 p_raw = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_raw = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
                 
-                # Handling empty strings or 'nan'
-                current = float(p_raw) if p_raw and p_raw.lower() not in ['nan', ''] else 0
-                original = float(op_raw) if op_raw and op_raw.lower() not in ['nan', ''] else 0
+                current = int(float(p_raw)) if p_raw and p_raw.lower() not in ['nan', ''] else 0
+                original = int(float(op_raw)) if op_raw and op_raw.lower() not in ['nan', ''] else 0
                 
-                item['Price'] = int(current)
-                item['Original_Price'] = int(original)
+                item['Price'] = current
+                item['Original_Price'] = original
                 
+                # Discount percentage calculation
                 if original > current and current > 0:
                     item['discount_perc'] = int(((original - current) / original) * 100)
                 else:
@@ -73,12 +80,17 @@ def get_rows(target_sheet):
                 item['Original_Price'] = 0
                 item['discount_perc'] = 0
             
-            # --- Status Normalization ---
+            # --- Status & ID Normalization ---
             item['Status'] = str(item.get('Status', 'Available')).strip()
-            final_list.append(item)
+            item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
+            
+            # Filter out empty rows
+            if item.get('Villa_Name') or item.get('Place_Name'):
+                final_list.append(item)
+                
         return final_list
     except Exception as e:
-        print(f"Data Processing Error: {e}")
+        print(f"❌ Data Processing Error: {e}")
         return []
 
 # --- Routes ---
@@ -96,31 +108,32 @@ def index():
                 if len(r) >= 2 and r[0] == 'Offer_Text':
                     runner_text = r[1]
                     break
-        except:
-            pass
+        except: pass
 
     return render_template('index.html', villas=villas, runner_text=runner_text, tourist_places=places)
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     villas = get_rows(sheet)
-    # Finding villa by ID
-    villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
-    if not villa: return "Villa Not Found", 404
+    # Finding villa by string ID comparison
+    villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     
-    # Gallery images logic
-    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}') and str(villa.get(f'Image_URL_{i}')).lower() != 'nan' and str(villa.get(f'Image_URL_{i}')).strip() != '']
+    if not villa:
+        return "<h1>Villa Not Found</h1><p>Please go back to home page.</p>", 404
+    
+    # Dynamic Image Gallery
+    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) 
+            if villa.get(f'Image_URL_{i}') and str(villa.get(f'Image_URL_{i}')).lower() != 'nan' 
+            and str(villa.get(f'Image_URL_{i}')).strip() != '']
+    
     if not imgs: imgs = [villa.get('Image_URL')]
     
     return render_template('villa_details.html', villa=villa, villa_images=imgs)
 
-# --- Remaining Routes (Enquiry, Contact, etc.) ---
-# ... (Wahi raheinge jo aapne diye hain)
-
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
     villas = get_rows(sheet)
-    villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
+    villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     
     if request.method == 'POST':
         name = request.form.get('name')
@@ -132,8 +145,7 @@ def enquiry(villa_id):
         if enquiry_sheet:
             try:
                 enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
-            except:
-                pass
+            except: pass
             
         alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
         requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
@@ -144,7 +156,8 @@ def enquiry(villa_id):
 
 @app.route('/explore')
 def explore():
-    return render_template('explore.html', tourist_places=get_rows(places_sheet))
+    places = get_rows(places_sheet)
+    return render_template('explore.html', tourist_places=places)
 
 @app.route('/contact')
 def contact():
@@ -154,8 +167,9 @@ def contact():
 def legal():
     return render_template('legal.html')
 
-# --- Render Port Setup ---
+# --- Render Port & Host Setup ---
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
+    # host='0.0.0.0' is required for Render to detect the port
     app.run(host='0.0.0.0', port=port, debug=False)
     
