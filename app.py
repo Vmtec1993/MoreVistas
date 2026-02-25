@@ -56,7 +56,7 @@ def get_rows(target_sheet):
             if p in ['', 'nan', '0', 'none']: 
                 item['Price'] = None
             
-            # Status handling (ताकि HTML में सही से रीड हो सके)
+            # Status handling (Sold Out logic)
             item['Status'] = item.get('Status', 'Available').strip()
             final_list.append(item)
         return final_list
@@ -67,17 +67,10 @@ def get_rows(target_sheet):
 
 @app.route('/')
 def index():
+    # अब यहाँ Weather API कॉल करने की ज़रूरत नहीं है, index.html की JS इसे संभाल लेगी
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
-    weather = None
-    try:
-        # ऑटोमैटिक मौसम अपडेट
-        w_url = "https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid=602d32574e40263f16952813df186b59"
-        r = requests.get(w_url, timeout=3).json()
-        weather = {'temp': round(r['main']['temp']), 'desc': r['weather'][0]['description'].title()}
-    except:
-        weather = {'temp': '24', 'desc': 'Clear Sky'}
-
+    
     runner_text = "Welcome to MoreVistas Lonavala | Call 8830024994"
     if settings_sheet:
         try:
@@ -89,7 +82,7 @@ def index():
         except:
             pass
 
-    return render_template('index.html', villas=villas, weather=weather, runner_text=runner_text, tourist_places=places)
+    return render_template('index.html', villas=villas, runner_text=runner_text, tourist_places=places)
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
@@ -97,7 +90,7 @@ def villa_details(villa_id):
     villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
     
-    # इमेज हैंडलिंग
+    # इमेज हैंडलिंग (Image_URL_1 to 20)
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}') and str(villa.get(f'Image_URL_{i}')).lower() != 'nan']
     if not imgs: imgs = [villa.get('Image_URL')]
     
@@ -124,7 +117,6 @@ def enquiry(villa_id):
         alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
         requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
         
-        # WhatsApp Redirect का डेटा भेजना (अगर आप success.html यूज़ कर रहे हैं तो)
         return render_template('success.html', name=name, villa_name=v_name)
     
     return render_template('enquiry.html', villa=villa)
