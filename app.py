@@ -134,6 +134,11 @@ def about():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
+    
+    @app.route('/legal')
+def legal():
+    return render_template('legal.html')
+    
 
 if __name__ == "__main__":
     # Render के लिए 0.0.0.0 और पोर्ट सेट करना अनिवार्य है
