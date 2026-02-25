@@ -21,19 +21,23 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
     
-    /* Rules Vertical List Style - FIX */
+    /* Rules Vertical List Style - FIXED Professional Look */
     .rule-item-box { 
         display: block; 
         width: 100%;
         border-left: 5px solid #ff4757; 
-        background: #fff5f6; 
+        background: #fff; /* Changed to white for cleaner look */
         padding: 15px; 
+        border: 1px solid #eee;
+        border-left: 5px solid #ff4757;
         border-radius: 8px; 
         margin-bottom: 12px; 
         font-size: 0.95rem; 
         font-weight: 500;
         box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        transition: 0.3s;
     }
+    .rule-item-box:hover { transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
     
     .detail-original-price { text-decoration: line-through; color: #adb5bd; font-size: 1.1rem; }
     .savings-badge { background: #28a745; color: white; padding: 4px 12px; border-radius: 5px; font-size: 0.85rem; font-weight: bold; }
@@ -113,7 +117,7 @@
                     {% if villa.Rules_List %}
                         {% for rule in villa.Rules_List %}
                         <div class="rule-item-box">
-                            <i class="bi bi-info-circle-fill text-danger me-2"></i> {{ rule }}
+                            <i class="bi bi-dot fs-1 text-danger me-2"></i> {{ rule }}
                         </div>
                         {% endfor %}
                     {% else %}
