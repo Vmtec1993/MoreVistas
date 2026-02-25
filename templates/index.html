@@ -6,48 +6,31 @@
         <img src="https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg" 
              class="w-100 d-block holi-banner-img" 
              alt="Holi Luxury Villa Offer">
-
         <div class="position-absolute top-0 end-0 m-3">
-            <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm animate-pulse">
-                🎨 HOLI OFFER LIVE
-            </span>
+            <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm animate-pulse">🎨 HOLI OFFER LIVE</span>
         </div>
-
         <div class="position-absolute bottom-0 start-0 w-100 p-3 text-center" style="background: linear-gradient(transparent, rgba(0,0,0,0.6));">
-            <a href="#villaContainer" class="btn btn-light btn-lg rounded-pill fw-bold px-5 shadow-lg border-0 text-danger">
-                BOOK HOLI PARTY 🚀
-            </a>
+            <a href="#villaContainer" class="btn btn-light btn-lg rounded-pill fw-bold px-5 shadow-lg border-0 text-danger">BOOK HOLI PARTY 🚀</a>
         </div>
     </div>
 </div>
 
+<div class="container mb-4">
+    <div class="bg-white p-3 rounded-4 shadow-sm border d-flex align-items-center justify-content-center">
+        <div id="weather-icon" class="me-2 fs-3">☁️</div>
+        <div class="fw-bold fs-5 text-dark">Lonavala: <span id="temp">--</span>°C</div>
+        <div id="weather-desc" class="ms-3 text-muted small text-capitalize d-none d-md-block">Loading...</div>
+    </div>
+</div>
+
 <style>
-    /* Image height control for professional look */
-    .holi-banner-img { 
-        height: auto; 
-        max-height: 480px; 
-        min-height: 250px; 
-        object-fit: cover; 
-    }
-    
-    /* Subtle pulse for the top badge */
+    .holi-banner-img { height: auto; max-height: 480px; min-height: 250px; object-fit: cover; }
     .animate-pulse { animation: pulse-red 2s infinite; }
-    @keyframes pulse-red {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
-
-    /* Professional Button Hover */
-    .btn-light:hover {
-        background: #ff416c !important;
-        color: white !important;
-        transform: translateY(-2px);
-        transition: 0.3s;
-    }
-
-    /* Previous Styles Carry Forward */
-    .villa-title-main { background: linear-gradient(45deg, #ff416c, #ff4b2b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 850; }
+    @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    .villa-title-main { background: linear-gradient(45deg, #ff416c, #ff4b2b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 850; font-size: 1.3rem; }
+    .price-cut { text-decoration: line-through; color: #6c757d; font-size: 0.9rem; margin-right: 5px; }
+    .off-tag { background: #28a745; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+    .sold-out-overlay { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: bold; z-index: 5; border: 1px solid rgba(255,255,255,0.3); }
     .floating-wa { position: fixed; bottom: 30px; right: 20px; width: 65px; height: 65px; background-color: #25d366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; z-index: 1000; box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); }
 </style>
 
@@ -61,14 +44,40 @@
         {% for villa in villas %}
         <div class="col-md-4">
             <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
-                <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover;">
+                
+                {% if villa.Status|lower == 'sold out' %}
+                <div class="sold-out-overlay text-uppercase">🚫 Sold Out</div>
+                {% endif %}
+
+                <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(0.8);{% endif %}">
+                
                 <div class="card-body p-4 text-start">
                     <span class="villa-title-main">{{ villa.Villa_Name }}</span>
+                    
                     <div class="mt-2 mb-3">
-                        <span class="fs-4 fw-bold">₹{{ villa.Price|int if villa.Price else 'Request' }}</span>
-                        <small class="text-muted">/night</small>
+                        {% if villa.Price and villa.Price|int > 0 %}
+                            <div class="d-flex align-items-center mb-1">
+                                {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
+                                <span class="price-cut">₹{{ villa.Original_Price }}</span>
+                                <span class="off-tag">{{ (((villa.Original_Price|int - villa.Price|int) / villa.Original_Price|int) * 100)|int }}% OFF</span>
+                                {% endif %}
+                            </div>
+                            <span class="fs-4 fw-bold text-primary">₹{{ villa.Price|int }}</span><small class="text-muted">/night</small>
+                        {% else %}
+                            <span class="fs-5 fw-bold text-primary">Price on Request</span>
+                        {% endif %}
                     </div>
+
+                    <div class="d-flex justify-content-between p-2 bg-light rounded-3 small fw-bold mb-3">
+                        <span><i class="bi bi-people me-1"></i> {{ villa.Guests }} Guests</span>
+                        <span><i class="bi bi-door-open me-1"></i> {{ villa.BHK }} BHK</span>
+                    </div>
+
+                    {% if villa.Status|lower == 'sold out' %}
+                    <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Fully Booked</button>
+                    {% else %}
                     <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-outline-primary w-100 rounded-pill fw-bold">View Details</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -83,7 +92,7 @@
         <div class="col-6 col-md-3">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden text-center h-100">
                 <img src="{{ place.Image_URL }}" class="card-img-top" style="height:120px; object-fit:cover;">
-                <div class="p-2">
+                <div class="p-2 text-truncate">
                     <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">{{ place.Place_Name }}</h6>
                 </div>
             </div>
@@ -93,5 +102,19 @@
 </div>
 
 <a href="https://wa.me/918830024994" class="floating-wa shadow-lg"><i class="bi bi-whatsapp"></i></a>
+
+<script>
+    async function getLonavalaWeather() {
+        try {
+            const res = await fetch('https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid=ff33d264f24db26d13749072556f8794');
+            const data = await res.json();
+            document.getElementById('temp').innerText = Math.round(data.main.temp);
+            document.getElementById('weather-desc').innerText = data.weather[0].description;
+            const iconCode = data.weather[0].icon;
+            document.getElementById('weather-icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${iconCode}.png" width="40">`;
+        } catch (e) { console.log("Weather error"); }
+    }
+    getLonavalaWeather();
+</script>
 
 {% endblock %}
