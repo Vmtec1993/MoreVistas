@@ -14,11 +14,11 @@
 
     /* 🔥 Sold Out logic CSS */
     .sold-out-card {
-        pointer-events: none; /* क्लिक बंद */
+        pointer-events: none;
         opacity: 0.85;
     }
     .sold-out-card img {
-        filter: grayscale(100%); /* फोटो काली-सफेद */
+        filter: grayscale(100%);
     }
     .sold-badge {
         position: absolute;
@@ -33,6 +33,22 @@
         z-index: 5;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
+
+    /* Live Weather Pulse */
+    .live-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #2ecc71;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(0.9); opacity: 0.7; }
+        50% { transform: scale(1.2); opacity: 1; }
+        100% { transform: scale(0.9); opacity: 0.7; }
+    }
 </style>
 
 <div class="bg-dark text-white py-2 overflow-hidden">
@@ -42,7 +58,11 @@
 <div class="container mt-4">
     <div class="row mb-5 align-items-center bg-white p-3 rounded-4 shadow-sm mx-1">
         <div class="col-md-6">
-            <h5 class="mb-0 fw-bold"><i class="bi bi-cloud-sun text-primary me-2"></i>Lonavala: {{ weather.temp if weather else '24' }}°C</h5>
+            <h5 class="mb-0 fw-bold d-flex align-items-center">
+                <span class="live-dot"></span>
+                Lonavala: <span id="live-temp" class="text-primary ms-1">--</span>°C
+                <span id="weather-desc" class="text-muted fw-normal ms-2 small" style="text-transform: capitalize;">Checking...</span>
+            </h5>
         </div>
         <div class="col-md-6 mt-3 mt-md-0">
             <select class="form-select rounded-pill border-primary" id="bhkFilter" onchange="filterVillas()">
@@ -179,16 +199,40 @@
 </div>
 
 <script>
-function filterVillas() {
-    let bhk = document.getElementById('bhkFilter').value;
-    document.querySelectorAll('.villa-item').forEach(item => {
-        let vBhk = item.getAttribute('data-bhk');
-        if (bhk === 'all' || vBhk === bhk || (bhk === '4' && parseInt(vBhk) >= 4)) {
-            item.style.display = 'block';
-        } else {
-            item.style.display = 'none';
+    // Live Weather Function
+    async function fetchLiveWeather() {
+        const apiKey = "602d32574e40263f16952813df186b59";
+        const city = "Lonavala";
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.main) {
+                document.getElementById('live-temp').innerText = Math.round(data.main.temp);
+                document.getElementById('weather-desc').innerText = `• ${data.weather[0].description}`;
+            }
+        } catch (error) {
+            console.error("Weather error:", error);
+            document.getElementById('live-temp').innerText = "21"; // fallback
         }
-    });
-}
+    }
+
+    // BHK Filter Function
+    function filterVillas() {
+        let bhk = document.getElementById('bhkFilter').value;
+        document.querySelectorAll('.villa-item').forEach(item => {
+            let vBhk = item.getAttribute('data-bhk');
+            if (bhk === 'all' || vBhk === bhk || (bhk === '4' && parseInt(vBhk) >= 4)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // Initialize weather on load
+    window.onload = fetchLiveWeather;
 </script>
 {% endblock %}
+            
