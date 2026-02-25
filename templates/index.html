@@ -1,138 +1,88 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container-fluid p-0 mb-4">
+<div class="container-fluid p-0 mb-5">
     <div class="position-relative shadow-lg overflow-hidden">
         <img src="https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg" 
-             class="w-100 d-block" 
-             style="max-height: 400px; object-fit: cover; border-bottom: 5px solid #ff416c;" 
-             alt="Holi Special Offer">
+             class="w-100 d-block holi-banner-img" 
+             alt="Lonavala Luxury Holi Offer">
         
-        <div class="position-absolute bottom-0 start-50 translate-middle-x mb-3">
+        <div class="position-absolute top-50 start-0 translate-middle-y ms-md-5 ms-3 p-4 glass-box text-white rounded-4 shadow-lg border border-white border-opacity-25">
+            <span class="badge bg-warning text-dark mb-2 px-3 py-2 rounded-pill fw-bold">🎨 HOLI SPECIAL OFFER LIVE</span>
+            <h2 class="fw-bold display-6 mb-2">Celebrate Holi in <br><span class="text-warning">Your Private Pool</span></h2>
+            <p class="small mb-3 d-none d-md-block opacity-75">Experience Ultra-Luxury Villas in Lonavala. Limited slots for March 13-15.</p>
             <a href="#villaContainer" class="btn btn-danger btn-lg rounded-pill fw-bold px-5 shadow-lg animate-pulse">
-                BOOK HOLI PARTY 🎨
+                BOOK NOW 🚀
             </a>
         </div>
     </div>
 </div>
 
 <style>
-    /* Holi Banner Animation */
+    /* Premium Styling */
+    .holi-banner-img { height: auto; max-height: 550px; min-height: 300px; object-fit: cover; border-bottom: 6px solid #ff416c; filter: brightness(0.85); }
+    .glass-box { background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(12px); max-width: 450px; }
+    
     .animate-pulse { animation: pulse-red 2s infinite; }
     @keyframes pulse-red {
-        0% { transform: translate(-50%, 0) scale(1); box-shadow: 0 0 0 0 rgba(255, 65, 108, 0.7); }
-        70% { transform: translate(-50%, 0) scale(1.05); box-shadow: 0 0 0 15px rgba(255, 65, 108, 0); }
-        100% { transform: translate(-50%, 0) scale(1); box-shadow: 0 0 0 0 rgba(255, 65, 108, 0); }
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 65, 108, 0.7); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 65, 108, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 65, 108, 0); }
     }
 
-    /* Villa Name & Typography */
-    .villa-title-main {
-        background: linear-gradient(45deg, #ff416c, #ff4b2b);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 850; font-size: 1.3rem; display: block; margin-bottom: 5px !important;
-    }
-
-    /* Sold Out Badge */
-    .sold-badge {
-        position: absolute; top: 15px; right: 15px; 
-        background: rgba(220, 53, 69, 0.85);
-        backdrop-filter: blur(8px);
-        color: white; padding: 5px 15px; border-radius: 50px;
-        font-weight: 800; font-size: 0.75rem; z-index: 5;
-        letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2);
-    }
-
-    /* Floating WhatsApp Button */
-    .floating-wa {
-        position: fixed; bottom: 30px; right: 20px; 
-        width: 65px; height: 65px; background-color: #25d366;
-        color: white; border-radius: 50%; display: flex;
-        align-items: center; justify-content: center;
-        font-size: 32px; box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
-        z-index: 1000; transition: 0.3s; text-decoration: none;
-    }
-    .floating-wa:hover { transform: scale(1.1); color: white; }
-
-    /* Layout & Pricing */
-    .price-container { margin-top: 5px; min-height: 60px; display: flex; flex-direction: column; justify-content: center; }
-    .current-price { color: #0d6efd; font-weight: 800; font-size: 1.4rem; }
-    .original-price { text-decoration: line-through; color: #6c757d; font-size: 0.9rem; margin-right: 8px; }
-    .discount-badge { background-color: #28a745; color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+    .villa-title-main { background: linear-gradient(45deg, #1a2a6c, #b21f1f, #fdbb2d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 850; font-size: 1.4rem; }
     
-    .tourist-card { border-radius: 15px; transition: 0.3s; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    .live-dot { width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; display: inline-block; margin-right: 8px; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0% { transform: scale(0.9); opacity: 0.7; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.7; } }
+    .sold-badge { 
+        position: absolute; top: 15px; right: 15px; 
+        background: rgba(220, 53, 69, 0.8); backdrop-filter: blur(6px); 
+        color: white; padding: 6px 16px; border-radius: 50px; 
+        font-weight: 800; font-size: 0.75rem; z-index: 10; letter-spacing: 1px;
+    }
 </style>
 
-<div class="container mt-4 text-center">
+<div class="container text-center mt-5 mb-5">
     <h1 class="fw-bold display-5">
         Experience <span class="text-primary">Private Pool Luxury</span> in Lonavala
     </h1>
     <p class="text-muted fs-5">Perfect for Parties • Family Trips • Birthday Celebrations</p>
-    <a href="#villaContainer" class="btn btn-dark rounded-pill px-5 py-2 mt-2 shadow">Explore Villas</a>
+    <div class="d-flex justify-content-center gap-3 mt-3">
+        <a href="#villaContainer" class="btn btn-dark rounded-pill px-5 py-2 shadow">Explore Collection</a>
+    </div>
 </div>
 
 <div class="container mt-5">
-    <div class="row mb-5 align-items-center bg-white p-3 rounded-4 shadow-sm mx-1">
-        <div class="col-md-6">
-            <h5 class="mb-0 fw-bold d-flex align-items-center">
-                <span class="live-dot"></span>
-                Lonavala: <span id="live-temp" class="text-primary ms-1">--</span>°C
-                <span id="weather-desc" class="text-muted fw-normal ms-2 small">Checking...</span>
-            </h5>
-        </div>
-        <div class="col-md-6 mt-3 mt-md-0">
-            <select class="form-select rounded-pill border-primary" id="bhkFilter" onchange="filterVillas()">
-                <option value="all">🔍 All BHK Options</option>
-                <option value="2">2 BHK</option>
-                <option value="3">3 BHK</option>
-                <option value="4">4+ BHK</option>
-            </select>
-        </div>
-    </div>
-
     <div class="row g-4" id="villaContainer">
         {% for villa in villas %}
-        <div class="col-md-4 villa-item" data-bhk="{{ villa.BHK }}">
+        <div class="col-md-4">
             <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
-                
                 {% if villa.Status == 'Sold Out' %}
-                    <div class="sold-badge"><i class="bi bi-lock-fill me-1"></i> SOLD OUT</div>
+                    <div class="sold-badge">FULLY BOOKED</div>
                 {% endif %}
-
-                <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover;">
                 
-                <div class="card-body p-4">
+                <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:240px; object-fit:cover;">
+                
+                <div class="card-body p-4 text-start">
                     <span class="villa-title-main">{{ villa.Villa_Name }}</span>
                     
-                    <div class="price-container">
-                        {% if villa.Price and villa.Price|float > 0 %}
-                            <div class="d-flex align-items-center flex-wrap">
-                                {% if villa.Original_Price and villa.Original_Price|float > villa.Price|float %}
-                                    <span class="original-price">₹{{ villa.Original_Price|int }}</span>
-                                    <span class="discount-badge">{{ villa.discount_perc }}% OFF</span>
-                                {% endif %}
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <span class="current-price">₹{{ villa.Price|int }}</span>
-                                <small class="text-muted ms-1">/night</small>
-                            </div>
-                        {% else %}
-                            <div class="text-primary fw-bold text-uppercase">Price on Request</div>
+                    <div class="d-flex justify-content-between my-2 small fw-bold text-muted bg-light p-2 rounded-3">
+                        <span><i class="bi bi-people me-1 text-primary"></i>{{ villa.Guests }} Guests</span>
+                        <span><i class="bi bi-door-open me-1 text-primary"></i>{{ villa.BHK }} BHK</span>
+                    </div>
+
+                    <div class="price-section mt-3">
+                        <span class="fs-3 fw-bold text-dark">₹{{ villa.Price|int if villa.Price else 'Request' }}</span>
+                        <small class="text-muted">/night</small>
+                        
+                        {% if villa.Status != 'Sold Out' %}
+                        <div class="mt-1">
+                            <small class="text-danger fw-bold animate-flicker">
+                                ⚡ Only 2 slots left this weekend!
+                            </small>
+                        </div>
                         {% endif %}
                     </div>
-
-                    <div class="d-flex justify-content-between small fw-bold bg-light p-2 rounded-3 mb-3 mt-2">
-                        <span><i class="bi bi-people me-1"></i>{{ villa.Guests }} Guests</span>
-                        <span class="text-primary"><i class="bi bi-door-open me-1"></i>{{ villa.BHK }} BHK</span>
-                    </div>
-
-                    {% if villa.Status == 'Sold Out' %}
-                        <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Fully Booked</button>
-                    {% else %}
-                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill fw-bold py-2">View Details</a>
-                    {% endif %}
+                    
+                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill fw-bold mt-3 py-2">View Details</a>
                 </div>
             </div>
         </div>
@@ -140,36 +90,62 @@
     </div>
 </div>
 
-<a href="https://wa.me/918830024994" class="floating-wa shadow-lg">
-    <i class="bi bi-whatsapp"></i>
+<div class="container mt-5 pt-5 pb-5">
+    <div class="bg-white p-5 rounded-5 shadow-sm border text-center">
+        <h3 class="fw-bold mb-5">Why Book With <span class="text-primary">MoreVistas?</span></h3>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <i class="bi bi-patch-check-fill text-primary display-4 mb-3"></i>
+                <h6 class="fw-bold">100% Verified Villas</h6>
+                <p class="small text-muted">Aapki safety hamari priority. Every villa is personally audited.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-clock-history text-success display-4 mb-3"></i>
+                <h6 class="fw-bold">24/7 Support</h6>
+                <p class="small text-muted">Lonavala on-ground team ready to help you anytime.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-lightning-fill text-warning display-4 mb-3"></i>
+                <h6 class="fw-bold">Instant Booking</h6>
+                <p class="small text-muted">No hidden charges. Direct owner rates for best price.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <h3 class="fw-bold mb-4 text-center">Popular Near You 🌄</h3>
+    <div class="row g-3">
+        {% for place in tourist_places %}
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden text-center h-100">
+                <img src="{{ place.Image_URL }}" class="card-img-top" style="height:120px; object-fit:cover;">
+                <div class="p-2">
+                    <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">{{ place.Place_Name }}</h6>
+                    <small class="text-muted" style="font-size: 0.7rem;">📍 15 mins drive</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<a href="https://wa.me/918830024994" 
+   class="shadow-lg floating-wa"
+   target="_blank">
+   <i class="bi bi-whatsapp"></i>
 </a>
 
-<script>
-    async function fetchLiveWeather() {
-        const apiKey = "ff33d264f24db26d13749072556f8794"; 
-        const city = "Lonavala,IN";
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
-        const tempEl = document.getElementById('live-temp');
-        const descEl = document.getElementById('weather-desc');
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            if (data.main) {
-                tempEl.innerText = Math.round(data.main.temp);
-                descEl.innerText = `• ${data.weather[0].description}`;
-            }
-        } catch (e) { tempEl.innerText = "24"; descEl.innerText = "• Clear Sky"; }
+<style>
+    .floating-wa {
+        position: fixed; bottom: 30px; right: 20px; width: 65px; height: 65px;
+        background-color: #25d366; color: white; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 32px; z-index: 1000; transition: 0.3s; text-decoration: none;
     }
-    function filterVillas() {
-        let bhk = document.getElementById('bhkFilter').value;
-        document.querySelectorAll('.villa-item').forEach(item => {
-            let vBhk = item.getAttribute('data-bhk');
-            if (bhk === 'all' || vBhk === bhk || (bhk === '4' && parseInt(vBhk) >= 4)) {
-                item.style.display = 'block';
-            } else { item.style.display = 'none'; }
-        });
-    }
-    window.onload = fetchLiveWeather;
-</script>
+    .floating-wa:hover { transform: scale(1.1); color: white; }
+    .animate-flicker { animation: flicker 1.5s infinite; }
+    @keyframes flicker { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+</style>
 
 {% endblock %}
