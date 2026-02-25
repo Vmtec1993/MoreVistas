@@ -51,12 +51,28 @@ def get_rows(target_sheet):
         final_list = []
         for row in data[1:]:
             item = dict(zip(headers, row))
-            # Price Clean-up
-            p = str(item.get('Price', '')).lower().strip()
-            if p in ['', 'nan', '0', 'none']: 
-                item['Price'] = None
             
-            # Status handling (Sold Out logic)
+            # --- Price & Discount Calculation ---
+            try:
+                # Cleaning symbols like commas or ₹
+                p_raw = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
+                op_raw = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
+                
+                current = float(p_raw) if p_raw and p_raw.lower() != 'nan' else 0
+                original = float(op_raw) if op_raw and op_raw.lower() != 'nan' else 0
+                
+                item['Price'] = current
+                item['Original_Price'] = original
+                
+                if original > current and current > 0:
+                    item['discount_perc'] = int(((original - current) / original) * 100)
+                else:
+                    item['discount_perc'] = 0
+            except:
+                item['Price'] = 0
+                item['Original_Price'] = 0
+                item['discount_perc'] = 0
+            
             item['Status'] = item.get('Status', 'Available').strip()
             final_list.append(item)
         return final_list
@@ -67,7 +83,6 @@ def get_rows(target_sheet):
 
 @app.route('/')
 def index():
-    # अब यहाँ Weather API कॉल करने की ज़रूरत नहीं है, index.html की JS इसे संभाल लेगी
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
     
@@ -90,7 +105,6 @@ def villa_details(villa_id):
     villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
     
-    # इमेज हैंडलिंग (Image_URL_1 to 20)
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}') and str(villa.get(f'Image_URL_{i}')).lower() != 'nan']
     if not imgs: imgs = [villa.get('Image_URL')]
     
@@ -133,9 +147,6 @@ def contact():
 def legal():
     return render_template('legal.html')
 
-import os
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-
-    
