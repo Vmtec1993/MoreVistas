@@ -150,10 +150,12 @@ def legal():
 # Is block ko update karein
 import os
 
+import os
+
 if __name__ == "__main__":
-    # Render automatically sets the 'PORT' environment variable
-    # Agar variable nahi milta toh default 10000 use karega
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
+    # Render ke liye ye settings compulsory hain
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
+
 
 
