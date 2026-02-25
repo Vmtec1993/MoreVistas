@@ -32,6 +32,8 @@
     .off-tag { background: #28a745; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
     .sold-out-overlay { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: bold; z-index: 5; border: 1px solid rgba(255,255,255,0.3); }
     .floating-wa { position: fixed; bottom: 30px; right: 20px; width: 65px; height: 65px; background-color: #25d366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; z-index: 1000; box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); }
+    .highlight-card { border: none; transition: 0.3s; background: #f8f9fa; border-radius: 20px; }
+    .highlight-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
 </style>
 
 <div class="container mt-4 text-center">
@@ -41,63 +43,102 @@
 
 <div class="container mt-5">
     <div class="row g-4" id="villaContainer">
-        {% for villa in villas %}
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
-                
-                {% if villa.Status|lower == 'sold out' %}
-                <div class="sold-out-overlay text-uppercase">🚫 Sold Out</div>
-                {% endif %}
-
-                <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(0.8);{% endif %}">
-                
-                <div class="card-body p-4 text-start">
-                    <span class="villa-title-main">{{ villa.Villa_Name }}</span>
+        {% if villas %}
+            {% for villa in villas %}
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
                     
-                    <div class="mt-2 mb-3">
-                        {% if villa.Price and villa.Price|int > 0 %}
-                            <div class="d-flex align-items-center mb-1">
-                                {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
-                                <span class="price-cut">₹{{ villa.Original_Price }}</span>
-                                <span class="off-tag">{{ (((villa.Original_Price|int - villa.Price|int) / villa.Original_Price|int) * 100)|int }}% OFF</span>
-                                {% endif %}
-                            </div>
-                            <span class="fs-4 fw-bold text-primary">₹{{ villa.Price|int }}</span><small class="text-muted">/night</small>
+                    {% if villa.Status|lower == 'sold out' %}
+                    <div class="sold-out-overlay text-uppercase">🚫 Sold Out</div>
+                    {% endif %}
+
+                    <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(0.8);{% endif %}">
+                    
+                    <div class="card-body p-4 text-start">
+                        <span class="villa-title-main">{{ villa.Villa_Name }}</span>
+                        
+                        <div class="mt-2 mb-3">
+                            {% if villa.Price and villa.Price|int > 0 %}
+                                <div class="d-flex align-items-center mb-1">
+                                    {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
+                                    <span class="price-cut">₹{{ villa.Original_Price }}</span>
+                                    <span class="off-tag">{{ villa.discount_perc }}% OFF</span>
+                                    {% endif %}
+                                </div>
+                                <span class="fs-4 fw-bold text-primary">₹{{ villa.Price|int }}</span><small class="text-muted">/night</small>
+                            {% else %}
+                                <span class="fs-5 fw-bold text-primary">Price on Request</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between p-2 bg-light rounded-3 small fw-bold mb-3">
+                            <span><i class="bi bi-people me-1"></i> {{ villa.Guests }} Guests</span>
+                            <span><i class="bi bi-door-open me-1"></i> {{ villa.BHK }} BHK</span>
+                        </div>
+
+                        {% if villa.Status|lower == 'sold out' %}
+                        <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Fully Booked</button>
                         {% else %}
-                            <span class="fs-5 fw-bold text-primary">Price on Request</span>
+                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-outline-primary w-100 rounded-pill fw-bold">View Details</a>
                         {% endif %}
                     </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">No villas found. Please check back later!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
 
-                    <div class="d-flex justify-content-between p-2 bg-light rounded-3 small fw-bold mb-3">
-                        <span><i class="bi bi-people me-1"></i> {{ villa.Guests }} Guests</span>
-                        <span><i class="bi bi-door-open me-1"></i> {{ villa.BHK }} BHK</span>
-                    </div>
-
-                    {% if villa.Status|lower == 'sold out' %}
-                    <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Fully Booked</button>
-                    {% else %}
-                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-outline-primary w-100 rounded-pill fw-bold">View Details</a>
-                    {% endif %}
+<div class="container mt-5 py-5">
+    <div class="bg-light rounded-5 p-4 p-md-5 shadow-sm border">
+        <h3 class="fw-bold mb-5 text-center">Why Stay With <span class="text-primary">MoreVistas?</span></h3>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-4 highlight-card h-100">
+                    <i class="bi bi-shield-check-fill fs-1 text-primary"></i>
+                    <h5 class="fw-bold mt-3">Verified Properties</h5>
+                    <p class="small text-muted mb-0">Every villa is hand-picked and personally verified for your comfort.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 highlight-card h-100">
+                    <i class="bi bi-cash-stack fs-1 text-success"></i>
+                    <h5 class="fw-bold mt-3">Owner Direct Pricing</h5>
+                    <p class="small text-muted mb-0">No hidden fees or commissions. Get the lowest rates guaranteed.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 highlight-card h-100">
+                    <i class="bi bi-geo-alt-fill fs-1 text-danger"></i>
+                    <h5 class="fw-bold mt-3">Local Support</h5>
+                    <p class="small text-muted mb-0">Our team is on-ground in Lonavala to assist you 24/7 during your stay.</p>
                 </div>
             </div>
         </div>
-        {% endfor %}
     </div>
 </div>
 
 <div class="container py-5">
     <h3 class="fw-bold mb-4 text-center">Popular Near You 🌄</h3>
     <div class="row g-3">
-        {% for place in tourist_places %}
-        <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden text-center h-100">
-                <img src="{{ place.Image_URL }}" class="card-img-top" style="height:120px; object-fit:cover;">
-                <div class="p-2 text-truncate">
-                    <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">{{ place.Place_Name }}</h6>
+        {% if tourist_places %}
+            {% for place in tourist_places %}
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden text-center h-100">
+                    <img src="{{ place.Image_URL }}" class="card-img-top" style="height:120px; object-fit:cover;">
+                    <div class="p-2 text-truncate">
+                        <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">{{ place.Place_Name }}</h6>
+                    </div>
                 </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <div class="text-center text-muted">Lonavala attractions loading...</div>
+        {% endif %}
     </div>
 </div>
 
@@ -112,7 +153,10 @@
             document.getElementById('weather-desc').innerText = data.weather[0].description;
             const iconCode = data.weather[0].icon;
             document.getElementById('weather-icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${iconCode}.png" width="40">`;
-        } catch (e) { console.log("Weather error"); }
+        } catch (e) { 
+            console.log("Weather error"); 
+            document.getElementById('temp').innerText = "28"; 
+        }
     }
     getLonavalaWeather();
 </script>
