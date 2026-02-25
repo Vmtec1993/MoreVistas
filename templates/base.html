@@ -1,183 +1,27 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoreVistas Lonavala</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .navbar-brand { font-weight: 800; color: #007bff !important; }
+    </style>
+</head>
+<body>
 
-{% block content %}
-<style>
-    /* 🏷️ Discount Tag Style */
-    .detail-discount-tag {
-        position: absolute; top: 15px; right: 15px; z-index: 30;
-        background: #007bff; color: white; padding: 6px 12px;
-        border-radius: 10px; font-weight: 800; font-size: 0.9rem;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    /* Sticky Mobile Footer */
-    @media (max-width: 767px) {
-        .sticky-booking-bar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: white; padding: 12px 20px;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-            z-index: 1000; display: flex;
-            justify-content: space-between; align-items: center;
-        }
-        body { padding-bottom: 80px; } 
-    }
-    @media (min-width: 768px) { .sticky-booking-bar { display: none; } }
-
-    .carousel-item img { height: 400px; object-fit: cover; }
-    @media (max-width: 768px) { .carousel-item img { height: 300px; } }
-
-    /* Blue Price Theme */
-    .price-blue { color: #007bff; font-weight: 800; }
-    .rule-item { border-left: 3px solid #007bff; padding-left: 15px; margin-bottom: 12px; }
-</style>
-
-<div class="container py-4">
-    <div id="villaSlider" class="carousel slide shadow-sm position-relative" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden;">
-        {# Safe Discount Calculation #}
-        {% set current = (villa.Price | float) if villa.Price else 0 %}
-        {% set original = (villa.Original_Price | float) if villa.Original_Price else 0 %}
-        
-        {% if original > current and current > 0 %}
-            {% set disc = (((original - current) / original) * 100) | round | int %}
-            <div class="detail-discount-tag">{{ disc }}% OFF</div>
-        {% endif %}
-
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="{{ villa.Image_URL or villa.Image_URL_1 }}" class="d-block w-100" alt="Villa Main">
-            </div>
-            {% if villa_images %}
-                {% for img_url in villa_images %}
-                    {% if img_url != villa.Image_URL and img_url != villa.Image_URL_1 %}
-                    <div class="carousel-item">
-                        <img src="{{ img_url }}" class="d-block w-100" alt="Villa Image">
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+    <nav class="navbar navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">More<span class="text-dark">Vistas</span></a>
+            <a href="tel:+918830024994" class="btn btn-outline-primary btn-sm rounded-pill">Call Us</a>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#villaSlider" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-        <button class="carousel-control-next" type="button" data-bs-target="#villaSlider" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
-    </div>
+    </nav>
 
-    <div class="mt-4 px-2">
-        {# Countdown Timer #}
-        <div class="p-3 mb-4 rounded-4 text-center" style="background: #f0f7ff; border: 1px solid #cfe2ff;">
-            <p class="small fw-bold text-primary mb-2"><i class="bi bi-clock-history me-1"></i> LIMITED TIME OFFER ENDS IN:</p>
-            <div class="d-flex justify-content-center gap-3 text-primary fw-bold fs-4">
-                <div><span id="hours">00</span><small style="font-size: 0.7rem; display: block;">Hrs</small></div>
-                <div>:</div>
-                <div><span id="minutes">00</span><small style="font-size: 0.7rem; display: block;">Min</small></div>
-                <div>:</div>
-                <div><span id="seconds">00</span><small style="font-size: 0.7rem; display: block;">Sec</small></div>
-            </div>
-        </div>
+    {% block content %}{% endblock %}
 
-        <div class="d-flex justify-content-between align-items-start mb-2">
-            <div>
-                <h2 class="fw-bold m-0 text-dark">{{ villa.Villa_Name }}</h2>
-                <div class="mt-1">
-                    <span class="badge {% if villa.Status == 'Available' %}bg-success{% else %}bg-warning text-dark{% endif %} rounded-pill small">
-                        {{ villa.Status | default('Available') }}
-                    </span>
-                    <small class="text-muted ms-2"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, MH</small>
-                </div>
-            </div>
-        </div>
-
-        {# Amenities Icons #}
-        <div class="d-flex gap-2 my-3 overflow-auto pb-2" style="white-space: nowrap;">
-            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-people text-primary"></i> Up to {{ villa.Guests | default('12') }} Guests</div>
-            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-door-open text-primary"></i> {{ villa.BHK | default('3') }} BHK</div>
-            <div class="border rounded-pill px-3 py-1 bg-white small shadow-sm"><i class="bi bi-droplet text-primary"></i> {{ villa.Bathrooms | default('2') }} Baths</div>
-        </div>
-
-        {# Price Card Desktop #}
-        <div class="card border-0 rounded-4 p-4 mb-4 d-none d-md-block shadow-sm" style="background: #fcfcfc; border: 1px solid #f0f7ff !important;">
-            <div class="row align-items-center">
-                <div class="col-7">
-                    {% if villa.Price %}
-                        <span class="text-muted small d-block">Special Nightly Rate</span>
-                        <div class="d-flex align-items-baseline">
-                            {% if original > current %}
-                                <h4 class="text-decoration-line-through me-3 opacity-50" style="color: #007bff;">₹{{ villa.Original_Price }}</h4>
-                            {% endif %}
-                            <h2 class="fw-bold mb-0" style="color: #007bff;">₹{{ villa.Price }} <small class="text-muted fs-6 fw-normal">/night</small></h2>
-                        </div>
-                    {% else %}
-                        <h2 class="fw-bold text-uppercase mb-0" style="color: #007bff; letter-spacing: 1px;">Price on Request</h2>
-                    {% endif %}
-                </div>
-                <div class="col-5">
-                    <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow">Reserve This Villa</a>
-                </div>
-            </div>
-        </div>
-
-        <h5 class="fw-bold mt-4">About this villa</h5>
-        <p class="text-muted" style="line-height: 1.6;">{{ villa.Description | default('Experience the ultimate luxury stay in Lonavala with MoreVistas.') }}</p>
-        
-        <div class="mt-4 mb-5">
-            <h6 class="fw-bold mb-3"><i class="bi bi-stars text-warning"></i> Premium Amenities</h6>
-            <div class="d-flex flex-wrap gap-2">
-                {% if villa.Amenities %}
-                    {% for item in villa.Amenities.split(',') %}
-                    <span class="badge bg-white text-dark border fw-normal p-2 px-3 shadow-sm rounded-3 small">
-                        <i class="bi bi-check2-circle text-success me-1"></i> {{ item.strip() }}
-                    </span>
-                    {% endfor %}
-                {% else %}
-                    <span class="text-muted small">Standard luxury amenities included.</span>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="mt-4 p-4 rounded-4" style="background: #f8f9fa; border: 1px solid #eee;">
-            <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-shield-check text-primary me-2"></i>Villa Guidelines</h5>
-            <div class="row">
-                {% if villa.Rules %}
-                    {% for rule in villa.Rules.split('.') %}
-                        {% if rule.strip() %}
-                        <div class="col-md-6">
-                            <div class="rule-item small text-muted">
-                                {{ rule.strip() }}
-                            </div>
-                        </div>
-                        {% endif %}
-                    {% endfor %}
-                {% else %}
-                    <div class="col-12"><p class="text-muted small">Standard house rules apply.</p></div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-{# Sticky Mobile Footer #}
-<div class="sticky-booking-bar shadow-lg">
-    <div>
-        {% if villa.Price %}
-            <h5 class="fw-bold mb-0 text-primary">₹{{ villa.Price }}</h5>
-            <small class="text-muted">Per Night</small>
-        {% else %}
-            <h6 class="fw-bold mb-0 text-primary">Price on Request</h6>
-        {% endif %}
-    </div>
-    <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Book Now</a>
-</div>
-
-<script>
-    // Simple Countdown Logic
-    function startTimer() {
-        let h = 14, m = 45, s = 0;
-        setInterval(() => {
-            if(s>0) s--; else { s=59; if(m>0) m--; else { m=59; if(h>0) h--; } }
-            document.getElementById('hours').innerText = h < 10 ? '0'+h : h;
-            document.getElementById('minutes').innerText = m < 10 ? '0'+m : m;
-            document.getElementById('seconds').innerText = s < 10 ? '0'+s : s;
-        }, 1000);
-    }
-    startTimer();
-</script>
-
-{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
