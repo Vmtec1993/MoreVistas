@@ -1,7 +1,7 @@
 import os
 import json
 import gspread
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from oauth2client.service_account import ServiceAccountCredentials
 import requests
 from datetime import datetime
@@ -12,6 +12,7 @@ app.secret_key = "morevistas_secure_2026"
 # --- CONFIG ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
+ADMIN_PASSWORD = "MoreVistas@2026"  # ✅ Aapka Admin Password
 
 # --- Google Sheets Setup ---
 creds_json = os.environ.get('GOOGLE_CREDS')
@@ -90,7 +91,6 @@ def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
     
-    # Settings Sheet Logic for Holi Banner & Text
     settings = {'Offer_Text': "Welcome to MoreVistas Lonavala", 'Contact': "8830024994"}
     if settings_sheet:
         try:
@@ -100,6 +100,47 @@ def index():
         except: pass
         
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
+
+# ✅ NEW ADMIN DASHBOARD ROUTE (Security + Analytics)
+@app.route('/admin', methods=['GET', 'POST'])
+def admin_dashboard():
+    if request.method == 'POST':
+        if request.form.get('password') == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+        else:
+            return "<script>alert('Incorrect Password!'); window.location='/admin';</script>"
+
+    if not session.get('admin_logged_in'):
+        return '''
+        <div style="max-width:400px; margin:100px auto; text-align:center; font-family:sans-serif; padding:30px; border-radius:20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eee;">
+            <h2 style="color:#0d6efd; font-weight:800; margin-bottom:20px;">MoreVistas Admin</h2>
+            <form method="POST">
+                <input type="password" name="password" placeholder="Admin Password" required 
+                       style="width:100%; padding:12px; margin-bottom:15px; border-radius:10px; border:1px solid #ddd; outline:none;">
+                <button type="submit" style="width:100%; padding:12px; background:#0d6efd; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Login</button>
+            </form>
+            <a href="/" style="display:block; margin-top:15px; color:#666; text-decoration:none; font-size:14px;">← Back to Home</a>
+        </div>
+        '''
+
+    villas = get_rows(sheet)
+    enquiries = []
+    if enquiry_sheet:
+        try:
+            raw_enq = enquiry_sheet.get_all_values()
+            if len(raw_enq) > 1:
+                headers = [h.strip() for h in raw_enq[0]]
+                rows = raw_enq[1:]
+                rows.reverse() # Latest first
+                enquiries = [dict(zip(headers, r + [''] * (len(headers) - len(r)))) for r in rows]
+        except: pass
+
+    return render_template('admin.html', villas=villas, enquiries=enquiries)
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('index'))
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
@@ -135,7 +176,6 @@ def explore():
     places = get_rows(places_sheet)
     return render_template('explore.html', tourist_places=places)
 
-# ✅ LEGAL ROUTE (For Terms & Privacy Tabs)
 @app.route('/legal')
 def legal():
     return render_template('legal.html')
@@ -147,4 +187,3 @@ def contact():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-    
