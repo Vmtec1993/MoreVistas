@@ -7,6 +7,10 @@
     .current-price { color: #0d6efd; font-weight: 800; font-size: 1.4rem; }
     .tourist-card { border-radius: 15px; transition: 0.3s; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
     .tourist-card:hover { transform: translateY(-5px); }
+    
+    /* Service Card Styling */
+    .service-card { transition: 0.3s; border: 1px solid #eee; }
+    .service-card:hover { border-color: #0d6efd; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
 </style>
 
 <div class="bg-dark text-white py-2 overflow-hidden">
@@ -60,6 +64,53 @@
             </div>
         </div>
         {% endfor %}
+    </div>
+
+    <div class="mt-5 py-5 border-top">
+        <div class="text-center mb-5">
+            <h6 class="text-primary fw-bold text-uppercase" style="letter-spacing: 2px;">Beyond Just a Stay</h6>
+            <h2 class="fw-bold">Elite <span class="text-primary">Add-on Services</span></h2>
+            <p class="text-muted mx-auto" style="max-width: 700px;">
+                Elevate your experience with our curated services. 
+                <span class="badge bg-warning-subtle text-dark fw-normal rounded-pill px-3 py-2 d-inline-block mt-2">
+                    <i class="bi bi-info-circle-fill me-1"></i> Subject to availability & extra charges.
+                </span>
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="p-4 bg-white rounded-4 service-card text-center h-100">
+                    <i class="bi bi-person-badge fs-1 text-primary mb-3"></i>
+                    <h6 class="fw-bold">Private Chef</h6>
+                    <p class="small text-muted mb-0">Freshly prepared meals & customized menus at the villa.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4 bg-white rounded-4 service-card text-center h-100">
+                    <i class="bi bi-balloon-heart fs-1 text-primary mb-3"></i>
+                    <h6 class="fw-bold">Celebration Decor</h6>
+                    <p class="small text-muted mb-0">Decorations for birthdays, anniversaries or surprises.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4 bg-white rounded-4 service-card text-center h-100">
+                    <i class="bi bi-fire fs-1 text-primary mb-3"></i>
+                    <h6 class="fw-bold">Poolside BBQ</h6>
+                    <p class="small text-muted mb-0">Live barbeque setup with marinated treats by the pool.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4 bg-white rounded-4 service-card text-center h-100">
+                    <i class="bi bi-car-front fs-1 text-primary mb-3"></i>
+                    <h6 class="fw-bold">Local Travel</h6>
+                    <p class="small text-muted mb-0">Car rentals & sightseeing tours around Lonavala.</p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <p class="text-muted small italic fst-italic">*Please book these services at least 48 hours in advance through our concierge.</p>
+        </div>
     </div>
 
     <div class="mt-5 py-5 border-top">
