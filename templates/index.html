@@ -11,6 +11,28 @@
     /* Service Card Styling */
     .service-card { transition: 0.3s; border: 1px solid #eee; }
     .service-card:hover { border-color: #0d6efd; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+    /* 🔥 Sold Out logic CSS */
+    .sold-out-card {
+        pointer-events: none; /* क्लिक बंद */
+        opacity: 0.85;
+    }
+    .sold-out-card img {
+        filter: grayscale(100%); /* फोटो काली-सफेद */
+    }
+    .sold-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #dc3545;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 0.7rem;
+        z-index: 5;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
 </style>
 
 <div class="bg-dark text-white py-2 overflow-hidden">
@@ -36,7 +58,12 @@
     <div class="row g-4" id="villaContainer">
         {% for villa in villas %}
         <div class="col-md-4 villa-item" data-bhk="{{ villa.BHK }}">
-            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden villa-card">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden villa-card {% if villa.Status == 'Sold Out' %} sold-out-card {% endif %}" style="position: relative;">
+                
+                {% if villa.Status == 'Sold Out' %}
+                    <div class="sold-badge"><i class="bi bi-patch-exclamation-fill me-1"></i> SOLD OUT</div>
+                {% endif %}
+
                 <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover;">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-2">{{ villa.Villa_Name }}</h5>
@@ -59,7 +86,12 @@
                         <span><i class="bi bi-people me-1"></i>{{ villa.Guests }} Guests</span>
                         <span class="text-primary"><i class="bi bi-door-open me-1"></i>{{ villa.BHK }} BHK</span>
                     </div>
-                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill fw-bold">View Villa Details</a>
+
+                    {% if villa.Status == 'Sold Out' %}
+                        <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Not Available</button>
+                    {% else %}
+                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill fw-bold">View Villa Details</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -107,9 +139,6 @@
                     <p class="small text-muted mb-0">Car rentals & sightseeing tours around Lonavala.</p>
                 </div>
             </div>
-        </div>
-        <div class="text-center mt-4">
-            <p class="text-muted small italic fst-italic">*Please book these services at least 48 hours in advance through our concierge.</p>
         </div>
     </div>
 
