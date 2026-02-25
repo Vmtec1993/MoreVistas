@@ -34,7 +34,7 @@
         /* Side Menu Customization */
         .offcanvas { border-radius: 0 25px 25px 0 !important; width: 320px !important; border: none !important; }
         .menu-link { 
-            border: none !important; padding: 15px 20px !important; 
+            border: none !important; padding: 12px 20px !important; 
             font-weight: 600; border-radius: 12px !important; margin-bottom: 5px;
             transition: 0.3s; color: #2d3436 !important; display: flex; align-items: center;
         }
@@ -43,6 +43,8 @@
         .list-property-btn { background: #0d6efd !important; color: white !important; }
 
         footer { background: #111; color: white; padding: 60px 0 30px; text-align: center; }
+        .footer-link { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; transition: 0.3s; }
+        .footer-link:hover { color: #0d6efd; }
     </style>
 </head>
 <body>
@@ -63,6 +65,7 @@
                 <div class="list-group list-group-flush mt-2">
                     <a href="/" class="list-group-item menu-link"><i class="bi bi-house-door"></i> Home</a>
                     <a href="/explore" class="list-group-item menu-link"><i class="bi bi-geo-alt"></i> Tourist Spots</a>
+                    <a href="/legal" class="list-group-item menu-link"><i class="bi bi-shield-check"></i> Legal & Policies</a>
                     <a href="/contact" class="list-group-item menu-link"><i class="bi bi-chat-left-dots"></i> Contact Us</a>
                 </div>
             </div>
@@ -132,7 +135,16 @@
                 <a href="#" class="text-white mx-3 fs-4"><i class="bi bi-facebook"></i></a>
             </div>
             <hr class="mt-5 opacity-10">
-            <p class="small opacity-50 mb-0">© 2026 MoreVistas. Crafted for Luxury.</p>
+            
+            <div class="row align-items-center">
+                <div class="col-md-6 text-md-start text-center">
+                    <p class="small opacity-50 mb-0">© 2026 MoreVistas. Crafted for Luxury.</p>
+                </div>
+                <div class="col-md-6 text-md-end text-center mt-3 mt-md-0">
+                    <a href="/legal" class="footer-link me-3">Terms & Conditions</a>
+                    <a href="/legal" class="footer-link">Privacy Policy</a>
+                </div>
+            </div>
         </div>
     </footer>
 
