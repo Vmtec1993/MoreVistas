@@ -2,68 +2,58 @@
 {% block content %}
 
 <style>
-    /* 1. Colourful Villa Name Styling */
+    /* 1. Colourful Villa Name & Typography */
     .villa-title-main {
-        background: linear-gradient(45deg, #ff416c, #ff4b2b); /* Vibrant Red-Orange Gradient */
+        background: linear-gradient(45deg, #ff416c, #ff4b2b);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-weight: 850;
-        font-size: 1.3rem;
-        margin-bottom: 18px !important; 
-        display: block;
+        font-weight: 850; font-size: 1.3rem; display: block; margin-bottom: 10px !important;
     }
 
-    /* 2. Price Section Spacing */
-    .price-container {
-        margin-top: 15px; 
-        min-height: 45px;
-        display: flex;
-        align-items: center;
-    }
-
-    .price-request { color: #0d6efd; font-weight: 800; font-size: 1.1rem; text-transform: uppercase; }
-    .original-price { text-decoration: line-through; color: #6c757d; font-size: 0.9rem; margin-right: 8px; }
-    .current-price { color: #0d6efd; font-weight: 800; font-size: 1.4rem; }
-    
-    /* Tourist & Service Cards */
-    .tourist-card { border-radius: 15px; transition: 0.3s; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    .tourist-card:hover { transform: translateY(-5px); }
-    .service-card { transition: 0.3s; border: 1px solid #eee; }
-    .service-card:hover { border-color: #0d6efd; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-
-    /* Sold Out Logic */
-    .sold-out-card { pointer-events: none; opacity: 0.85; }
-    .sold-out-card img { filter: grayscale(100%); }
+    /* 2. Glassmorphism Sold Out Badge (Improvement #3) */
     .sold-badge {
-        position: absolute; top: 15px; right: 15px; background: #dc3545;
-        color: white; padding: 4px 12px; border-radius: 50px;
-        font-weight: 800; font-size: 0.7rem; z-index: 5;
+        position: absolute; top: 15px; right: 15px; 
+        background: rgba(220, 53, 69, 0.85);
+        backdrop-filter: blur(8px);
+        color: white; padding: 5px 15px; border-radius: 50px;
+        font-weight: 800; font-size: 0.75rem; z-index: 5;
+        letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.2);
     }
 
-    /* Weather Dot Animation */
-    .live-dot {
-        width: 8px; height: 8px; background-color: #2ecc71;
-        border-radius: 50%; display: inline-block; margin-right: 8px;
-        animation: pulse 1.5s infinite;
+    /* 3. Floating WhatsApp Button (Improvement #4) */
+    .floating-wa {
+        position: fixed; bottom: 30px; right: 20px; 
+        width: 65px; height: 65px; background-color: #25d366;
+        color: white; border-radius: 50%; display: flex;
+        align-items: center; justify-content: center;
+        font-size: 32px; box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+        z-index: 1000; transition: 0.3s; text-decoration: none;
     }
-    @keyframes pulse {
-        0% { transform: scale(0.9); opacity: 0.7; }
-        50% { transform: scale(1.2); opacity: 1; }
-        100% { transform: scale(0.9); opacity: 0.7; }
-    }
+    .floating-wa:hover { transform: scale(1.1); color: white; }
+
+    /* Layout & Spacing */
+    .price-container { margin-top: 10px; min-height: 45px; display: flex; flex-direction: column; justify-content: center; }
+    .current-price { color: #0d6efd; font-weight: 800; font-size: 1.4rem; }
+    .tourist-card { border-radius: 15px; transition: 0.3s; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .live-dot { width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; display: inline-block; margin-right: 8px; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { transform: scale(0.9); opacity: 0.7; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.7; } }
 </style>
 
-<div class="bg-dark text-white py-2 overflow-hidden">
-    <marquee scrollamount="5">✨ {{ runner_text }} | Contact: 8830024994 | Best Price Guaranteed ✨</marquee>
+<div class="container mt-5 text-center">
+    <h1 class="fw-bold display-5">
+        Experience <span class="text-primary">Private Pool Luxury</span> in Lonavala
+    </h1>
+    <p class="text-muted fs-5">Perfect for Parties • Family Trips • Birthday Celebrations</p>
+    <a href="#villaContainer" class="btn btn-dark rounded-pill px-5 py-2 mt-2 shadow">Explore Villas</a>
 </div>
 
-<div class="container mt-4">
+<div class="container mt-5">
     <div class="row mb-5 align-items-center bg-white p-3 rounded-4 shadow-sm mx-1">
         <div class="col-md-6">
             <h5 class="mb-0 fw-bold d-flex align-items-center">
                 <span class="live-dot"></span>
                 Lonavala: <span id="live-temp" class="text-primary ms-1">--</span>°C
-                <span id="weather-desc" class="text-muted fw-normal ms-2 small" style="text-transform: capitalize;">Checking...</span>
+                <span id="weather-desc" class="text-muted fw-normal ms-2 small">Checking...</span>
             </h5>
         </div>
         <div class="col-md-6 mt-3 mt-md-0">
@@ -76,43 +66,43 @@
         </div>
     </div>
 
-    <h3 class="fw-bold mb-4">Luxury Villa Collection</h3>
     <div class="row g-4" id="villaContainer">
         {% for villa in villas %}
         <div class="col-md-4 villa-item" data-bhk="{{ villa.BHK }}">
-            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden villa-card {% if villa.Status == 'Sold Out' %} sold-out-card {% endif %}" style="position: relative;">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
                 
                 {% if villa.Status == 'Sold Out' %}
-                    <div class="sold-badge"><i class="bi bi-patch-exclamation-fill me-1"></i> SOLD OUT</div>
+                    <div class="sold-badge"><i class="bi bi-lock-fill me-1"></i> SOLD OUT</div>
                 {% endif %}
 
                 <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover;">
+                
                 <div class="card-body p-4">
                     <span class="villa-title-main">{{ villa.Villa_Name }}</span>
                     
-                    <div class="price-container mb-3">
+                    <div class="price-container mb-2">
                         {% if villa.Price and villa.Price|float > 0 %}
                             <div class="d-flex align-items-center">
-                                {% if villa.Original_Price and villa.Original_Price|float > villa.Price|float %}
-                                    <span class="original-price">₹{{ villa.Original_Price }}</span>
-                                {% endif %}
                                 <span class="current-price">₹{{ villa.Price }}</span>
                                 <small class="text-muted ms-1">/night</small>
                             </div>
+                            {% if villa.Status != 'Sold Out' %}
+                                <small class="text-danger fw-bold mt-1">⚡ Only 2 slots left this weekend!</small>
+                            {% endif %}
                         {% else %}
-                            <div class="price-request">Price on Request</div>
+                            <div class="text-primary fw-bold text-uppercase">Price on Request</div>
                         {% endif %}
                     </div>
 
-                    <div class="d-flex justify-content-between small fw-bold bg-light p-2 rounded-3 mb-3">
+                    <div class="d-flex justify-content-between small fw-bold bg-light p-2 rounded-3 mb-3 mt-2">
                         <span><i class="bi bi-people me-1"></i>{{ villa.Guests }} Guests</span>
                         <span class="text-primary"><i class="bi bi-door-open me-1"></i>{{ villa.BHK }} BHK</span>
                     </div>
 
                     {% if villa.Status == 'Sold Out' %}
-                        <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Not Available</button>
+                        <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Fully Booked</button>
                     {% else %}
-                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill fw-bold">View Villa Details</a>
+                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill fw-bold py-2">View Details</a>
                     {% endif %}
                 </div>
             </div>
@@ -120,26 +110,36 @@
         {% endfor %}
     </div>
 
-    <div class="mt-5 py-5 border-top">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">Elite <span class="text-primary">Add-on Services</span></h2>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-3"><div class="p-4 bg-white rounded-4 service-card text-center h-100"><i class="bi bi-person-badge fs-1 text-primary mb-3"></i><h6 class="fw-bold">Private Chef</h6><p class="small text-muted mb-0">Fresh meals at the villa.</p></div></div>
-            <div class="col-md-3"><div class="p-4 bg-white rounded-4 service-card text-center h-100"><i class="bi bi-balloon-heart fs-1 text-primary mb-3"></i><h6 class="fw-bold">Celebration Decor</h6><p class="small text-muted mb-0">For birthdays & surprises.</p></div></div>
-            <div class="col-md-3"><div class="p-4 bg-white rounded-4 service-card text-center h-100"><i class="bi bi-fire fs-1 text-primary mb-3"></i><h6 class="fw-bold">Poolside BBQ</h6><p class="small text-muted mb-0">Live BBQ by the pool.</p></div></div>
-            <div class="col-md-3"><div class="p-4 bg-white rounded-4 service-card text-center h-100"><i class="bi bi-car-front fs-1 text-primary mb-3"></i><h6 class="fw-bold">Local Travel</h6><p class="small text-muted mb-0">Sightseeing tours.</p></div></div>
+    <div class="bg-white p-5 rounded-4 mt-5 text-center shadow-sm border">
+        <h4 class="fw-bold mb-4">Why MoreVistas?</h4>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="text-primary fs-2 mb-2">✔</div>
+                <h6 class="fw-bold">Verified Villas</h6>
+                <p class="small text-muted">Personally checked for quality.</p>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="text-primary fs-2 mb-2">✔</div>
+                <h6 class="fw-bold">24/7 Support</h6>
+                <p class="small text-muted">On-ground assistance anytime.</p>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="text-primary fs-2 mb-2">✔</div>
+                <h6 class="fw-bold">Best Price</h6>
+                <p class="small text-muted">Direct rates, no hidden fees.</p>
+            </div>
         </div>
     </div>
 
-    <div class="mt-5 py-5 border-top">
-        <h3 class="fw-bold mb-4">Explore Lonavala</h3>
+    <div class="mt-5 py-5">
+        <h3 class="fw-bold mb-4 text-center">Popular Near You 🌄</h3>
         <div class="row g-3">
             {% for place in tourist_places %}
-            <div class="col-6 col-md-3">
-                <div class="card tourist-card h-100 p-2 text-center">
-                    <img src="{{ place.Image_URL }}" class="rounded-3 mb-2" style="height:120px; object-fit:cover;">
-                    <h6 class="fw-bold mb-0 small">{{ place.Place_Name }}</h6>
+            <div class="col-6 col-md-3 text-center">
+                <div class="card tourist-card h-100 p-2">
+                    <img src="{{ place.Image_URL }}" class="rounded-3 mb-2" style="height:110px; object-fit:cover;">
+                    <h6 class="fw-bold mb-1 small">{{ place.Place_Name }}</h6>
+                    <small class="text-muted" style="font-size: 0.7rem;">📍 15 mins drive</small>
                 </div>
             </div>
             {% endfor %}
@@ -147,30 +147,26 @@
     </div>
 </div>
 
+<a href="https://wa.me/918830024994" class="floating-wa shadow-lg">
+    <i class="bi bi-whatsapp"></i>
+</a>
+
 <script>
-    // Updated with your NEW API Key
     async function fetchLiveWeather() {
         const apiKey = "ff33d264f24db26d13749072556f8794"; 
         const city = "Lonavala,IN";
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
-        
         const tempEl = document.getElementById('live-temp');
         const descEl = document.getElementById('weather-desc');
-
         try {
             const response = await fetch(url);
-            if (!response.ok) throw new Error();
             const data = await response.json();
             if (data.main) {
                 tempEl.innerText = Math.round(data.main.temp);
                 descEl.innerText = `• ${data.weather[0].description}`;
             }
-        } catch (error) {
-            tempEl.innerText = "24"; 
-            descEl.innerText = "• Sunny Sky";
-        }
+        } catch (e) { tempEl.innerText = "24"; descEl.innerText = "• Clear Sky"; }
     }
-
     function filterVillas() {
         let bhk = document.getElementById('bhkFilter').value;
         document.querySelectorAll('.villa-item').forEach(item => {
@@ -180,7 +176,6 @@
             } else { item.style.display = 'none'; }
         });
     }
-
     window.onload = fetchLiveWeather;
 </script>
 {% endblock %}
