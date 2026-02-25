@@ -20,12 +20,23 @@
         text-align: center; 
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
-    /* Updated Rule Card Style */
-    .rule-card { border-left: 4px solid #ff4757; background: #fff5f6; padding: 12px; border-radius: 0 12px 12px 0; margin-bottom: 10px; font-size: 0.9rem; display: flex; align-items: center; }
-    .rule-card i { color: #ff4757; margin-right: 10px; }
+    
+    /* Rules Vertical List Style - FIX */
+    .rule-item-box { 
+        display: block; 
+        width: 100%;
+        border-left: 5px solid #ff4757; 
+        background: #fff5f6; 
+        padding: 15px; 
+        border-radius: 8px; 
+        margin-bottom: 12px; 
+        font-size: 0.95rem; 
+        font-weight: 500;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
     
     .detail-original-price { text-decoration: line-through; color: #adb5bd; font-size: 1.1rem; }
-    .savings-badge { background: #28a745; color: white; padding: 2px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; }
+    .savings-badge { background: #28a745; color: white; padding: 4px 12px; border-radius: 5px; font-size: 0.85rem; font-weight: bold; }
     .offer-banner { position: absolute; top: 20px; left: 20px; z-index: 10; background: #ff4757; color: white; padding: 5px 15px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; }
 
     /* Mobile Booking Bar */
@@ -41,7 +52,7 @@
 
 <div class="container py-4">
     <div id="villaSlider" class="carousel slide shadow-sm position-relative mb-4" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden;">
-        {% if villa.Original_Price and villa.Price and villa.Original_Price|int > villa.Price|int %}
+        {% if villa.Original_Price|int > villa.Price|int %}
             <div class="offer-banner">🔥 SPECIAL OFFER LIVE</div>
         {% endif %}
         
@@ -97,14 +108,18 @@
             </div>
 
             <div class="rules-section mb-5">
-                <h4 class="fw-bold mb-3"><i class="bi bi-shield-check text-primary me-2"></i>Stay Rules</h4>
-                {% if villa.Rules_List %}
-                    {% for rule in villa.Rules_List %}
-                    <div class="rule-card"><i class="bi bi-info-circle-fill"></i> {{ rule }}</div>
-                    {% endfor %}
-                {% else %}
-                    <div class="rule-card">Standard villa rules apply. Contact owner for details.</div>
-                {% endif %}
+                <h4 class="fw-bold mb-4"><i class="bi bi-shield-check text-primary me-2"></i>Stay Rules</h4>
+                <div class="d-flex flex-column">
+                    {% if villa.Rules_List %}
+                        {% for rule in villa.Rules_List %}
+                        <div class="rule-item-box">
+                            <i class="bi bi-info-circle-fill text-danger me-2"></i> {{ rule }}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="rule-item-box">Standard villa rules apply. Contact owner for details.</div>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
@@ -114,10 +129,12 @@
                 
                 {% if villa.Price and villa.Price|int > 0 %}
                     <div class="mb-3">
-                        {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
+                        {% if villa.Original_Price|int > villa.Price|int %}
                             <div class="d-flex align-items-center mb-1">
                                 <span class="detail-original-price me-2">₹{{ villa.Original_Price }}</span>
-                                <span class="savings-badge">{{ villa.discount_perc }}% OFF</span>
+                                <span class="savings-badge">
+                                    {{ (((villa.Original_Price|int - villa.Price|int) / villa.Original_Price|int) * 100)|int }}% OFF
+                                </span>
                             </div>
                         {% endif %}
                         <div class="d-flex align-items-baseline">
