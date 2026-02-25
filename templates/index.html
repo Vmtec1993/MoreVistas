@@ -9,13 +9,13 @@
         -webkit-text-fill-color: transparent;
         font-weight: 850;
         font-size: 1.3rem;
-        margin-bottom: 18px !important; /* Name के नीचे गैप */
+        margin-bottom: 18px !important; 
         display: block;
     }
 
     /* 2. Price Section Spacing */
     .price-container {
-        margin-top: 15px; /* नाम से दूरी */
+        margin-top: 15px; 
         min-height: 45px;
         display: flex;
         align-items: center;
@@ -25,12 +25,13 @@
     .original-price { text-decoration: line-through; color: #6c757d; font-size: 0.9rem; margin-right: 8px; }
     .current-price { color: #0d6efd; font-weight: 800; font-size: 1.4rem; }
     
+    /* Tourist & Service Cards */
     .tourist-card { border-radius: 15px; transition: 0.3s; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
     .tourist-card:hover { transform: translateY(-5px); }
-    
     .service-card { transition: 0.3s; border: 1px solid #eee; }
     .service-card:hover { border-color: #0d6efd; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
 
+    /* Sold Out Logic */
     .sold-out-card { pointer-events: none; opacity: 0.85; }
     .sold-out-card img { filter: grayscale(100%); }
     .sold-badge {
@@ -39,6 +40,7 @@
         font-weight: 800; font-size: 0.7rem; z-index: 5;
     }
 
+    /* Weather Dot Animation */
     .live-dot {
         width: 8px; height: 8px; background-color: #2ecc71;
         border-radius: 50%; display: inline-block; margin-right: 8px;
@@ -123,34 +125,10 @@
             <h2 class="fw-bold">Elite <span class="text-primary">Add-on Services</span></h2>
         </div>
         <div class="row g-4">
-            <div class="col-md-3">
-                <div class="p-4 bg-white rounded-4 service-card text-center h-100">
-                    <i class="bi bi-person-badge fs-1 text-primary mb-3"></i>
-                    <h6 class="fw-bold">Private Chef</h6>
-                    <p class="small text-muted mb-0">Freshly prepared meals & customized menus at the villa.</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="p-4 bg-white rounded-4 service-card text-center h-100">
-                    <i class="bi bi-balloon-heart fs-1 text-primary mb-3"></i>
-                    <h6 class="fw-bold">Celebration Decor</h6>
-                    <p class="small text-muted mb-0">Decorations for birthdays, anniversaries or surprises.</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="p-4 bg-white rounded-4 service-card text-center h-100">
-                    <i class="bi bi-fire fs-1 text-primary mb-3"></i>
-                    <h6 class="fw-bold">Poolside BBQ</h6>
-                    <p class="small text-muted mb-0">Live barbeque setup with marinated treats by the pool.</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="p-4 bg-white rounded-4 service-card text-center h-100">
-                    <i class="bi bi-car-front fs-1 text-primary mb-3"></i>
-                    <h6 class="fw-bold">Local Travel</h6>
-                    <p class="small text-muted mb-0">Car rentals & sightseeing tours around Lonavala.</p>
-                </div>
-            </div>
+            <div class="col-md-3"><div class="p-4 bg-white rounded-4 service-card text-center h-100"><i class="bi bi-person-badge fs-1 text-primary mb-3"></i><h6 class="fw-bold">Private Chef</h6><p class="small text-muted mb-0">Fresh meals at the villa.</p></div></div>
+            <div class="col-md-3"><div class="p-4 bg-white rounded-4 service-card text-center h-100"><i class="bi bi-balloon-heart fs-1 text-primary mb-3"></i><h6 class="fw-bold">Celebration Decor</h6><p class="small text-muted mb-0">For birthdays & surprises.</p></div></div>
+            <div class="col-md-3"><div class="p-4 bg-white rounded-4 service-card text-center h-100"><i class="bi bi-fire fs-1 text-primary mb-3"></i><h6 class="fw-bold">Poolside BBQ</h6><p class="small text-muted mb-0">Live BBQ by the pool.</p></div></div>
+            <div class="col-md-3"><div class="p-4 bg-white rounded-4 service-card text-center h-100"><i class="bi bi-car-front fs-1 text-primary mb-3"></i><h6 class="fw-bold">Local Travel</h6><p class="small text-muted mb-0">Sightseeing tours.</p></div></div>
         </div>
     </div>
 
@@ -170,19 +148,29 @@
 </div>
 
 <script>
+    // Updated with your NEW API Key
     async function fetchLiveWeather() {
-        const apiKey = "602d32574e40263f16952813df186b59";
-        const city = "Lonavala";
+        const apiKey = "ff33d264f24db26d13749072556f8794"; 
+        const city = "Lonavala,IN";
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+        
+        const tempEl = document.getElementById('live-temp');
+        const descEl = document.getElementById('weather-desc');
+
         try {
             const response = await fetch(url);
+            if (!response.ok) throw new Error();
             const data = await response.json();
             if (data.main) {
-                document.getElementById('live-temp').innerText = Math.round(data.main.temp);
-                document.getElementById('weather-desc').innerText = `• ${data.weather[0].description}`;
+                tempEl.innerText = Math.round(data.main.temp);
+                descEl.innerText = `• ${data.weather[0].description}`;
             }
-        } catch (error) { document.getElementById('live-temp').innerText = "21"; }
+        } catch (error) {
+            tempEl.innerText = "24"; 
+            descEl.innerText = "• Sunny Sky";
+        }
     }
+
     function filterVillas() {
         let bhk = document.getElementById('bhkFilter').value;
         document.querySelectorAll('.villa-item').forEach(item => {
@@ -192,6 +180,7 @@
             } else { item.style.display = 'none'; }
         });
     }
+
     window.onload = fetchLiveWeather;
 </script>
 {% endblock %}
