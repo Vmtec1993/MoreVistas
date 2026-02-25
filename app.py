@@ -148,8 +148,12 @@ def legal():
     return render_template('legal.html')
 
 # Is block ko update karein
+import os
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    # debug=False karein production ke liye
-    app.run(host='0.0.0.0', port=port, debug=False)
+    # Render automatically sets the 'PORT' environment variable
+    # Agar variable nahi milta toh default 10000 use karega
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
 
