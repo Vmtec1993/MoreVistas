@@ -29,7 +29,7 @@
     @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .villa-title-main { background: linear-gradient(45deg, #ff416c, #ff4b2b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 850; font-size: 1.3rem; }
     .price-cut { text-decoration: line-through; color: #6c757d; font-size: 0.9rem; margin-right: 5px; }
-    .off-tag { background: #28a745; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+    .off-tag { background: #28a745; color: white; font-size: 0.75rem; padding: 2px 10px; border-radius: 5px; font-weight: bold; }
     .sold-out-overlay { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: bold; z-index: 5; border: 1px solid rgba(255,255,255,0.3); }
     .floating-wa { position: fixed; bottom: 30px; right: 20px; width: 65px; height: 65px; background-color: #25d366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; z-index: 1000; box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); }
     .highlight-card { border: none; transition: 0.3s; background: #f8f9fa; border-radius: 20px; }
@@ -55,17 +55,22 @@
                     <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(0.8);{% endif %}">
                     
                     <div class="card-body p-4 text-start">
-                        <span class="villa-title-main">{{ villa.Villa_Name }}</span>
+                        <span class="villa-title-main text-uppercase">{{ villa.Villa_Name }}</span>
                         
                         <div class="mt-2 mb-3">
                             {% if villa.Price and villa.Price|int > 0 %}
                                 <div class="d-flex align-items-center mb-1">
                                     {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
                                     <span class="price-cut">₹{{ villa.Original_Price }}</span>
-                                    <span class="off-tag">{{ villa.discount_perc }}% OFF</span>
+                                    <span class="off-tag">
+                                        {{ (((villa.Original_Price|int - villa.Price|int) / villa.Original_Price|int) * 100)|int }}% OFF
+                                    </span>
                                     {% endif %}
                                 </div>
-                                <span class="fs-4 fw-bold text-primary">₹{{ villa.Price|int }}</span><small class="text-muted">/night</small>
+                                <div class="d-flex align-items-baseline">
+                                    <span class="fs-4 fw-bold text-primary">₹{{ villa.Price|int }}</span>
+                                    <small class="text-muted ms-1">/night</small>
+                                </div>
                             {% else %}
                                 <span class="fs-5 fw-bold text-primary">Price on Request</span>
                             {% endif %}
@@ -137,7 +142,9 @@
             </div>
             {% endfor %}
         {% else %}
-            <div class="text-center text-muted">Lonavala attractions loading...</div>
+            <div class="col-12 text-center py-4">
+                <div class="text-muted">Lonavala attractions loading...</div>
+            </div>
         {% endif %}
     </div>
 </div>
