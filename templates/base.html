@@ -53,6 +53,18 @@
         .menu-link:hover { background: #f0f7ff !important; color: #0d6efd !important; }
         .menu-link i { margin-right: 15px; font-size: 1.2rem; }
 
+        /* List Property Button Style */
+        .btn-list-property {
+            background-color: #f0f7ff;
+            color: #0d6efd;
+            border: 1px dashed #0d6efd;
+            transition: 0.3s;
+        }
+        .btn-list-property:hover {
+            background-color: #0d6efd;
+            color: white;
+        }
+
         footer { background: #111; color: white; padding: 60px 0 30px; text-align: center; }
         .footer-link { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; transition: 0.3s; cursor: pointer; }
         .footer-link:hover { color: #0d6efd; text-decoration: underline; }
@@ -70,15 +82,19 @@
             <h4 class="offcanvas-title fw-800">More<span class="text-primary">Vistas</span></h4>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
-        <div class="offcanvas-body p-4">
+        <div class="offcanvas-body p-4 d-flex flex-column">
             <div class="list-group list-group-flush">
                 <a href="/" class="menu-link"><i class="bi bi-house-door"></i> Home</a>
                 <a href="/explore" class="menu-link"><i class="bi bi-geo-alt"></i> Tourist Spots</a>
                 <a href="/legal" class="menu-link"><i class="bi bi-shield-check"></i> Terms & Policies</a>
                 <a href="/contact" class="menu-link"><i class="bi bi-chat-left-dots"></i> Contact Us</a>
             </div>
-            <hr>
-            <div class="mt-4">
+            
+            <div class="mt-auto">
+                <hr>
+                <a href="https://wa.me/918830024994?text=I%20want%20to%20list%20my%20property" class="btn btn-outline-primary w-100 rounded-pill fw-bold py-2 mb-2">
+                    <i class="bi bi-plus-circle me-2"></i>List Your Property
+                </a>
                 <a href="https://wa.me/918830024994" class="btn btn-primary w-100 rounded-pill fw-bold py-2">
                     <i class="bi bi-whatsapp me-2"></i>WhatsApp Us
                 </a>
@@ -96,12 +112,20 @@
                     More<span class="text-primary">Vistas</span>
                 </a>
             </div>
+            
             <div class="collapse navbar-collapse d-none d-lg-block">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="/explore">Explore</a></li>
+                    
                     <li class="nav-item ms-lg-3">
-                        <a href="tel:+918830024994" class="btn btn-primary btn-sm rounded-pill px-4">Call Now</a>
+                        <a href="https://wa.me/918830024994?text=I%20want%20to%20list%20my%20property" class="btn btn-list-property btn-sm rounded-pill px-3 fw-bold">
+                            <i class="bi bi-plus-circle me-1"></i> List Property
+                        </a>
+                    </li>
+
+                    <li class="nav-item ms-lg-2">
+                        <a href="tel:+918830024994" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold">Call Now</a>
                     </li>
                 </ul>
             </div>
@@ -138,7 +162,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Loader script
         window.addEventListener("load", function() {
             const loader = document.getElementById("loader-wrapper");
             setTimeout(() => {
@@ -147,7 +170,6 @@
             }, 500);
         });
 
-        // Tab selection logic from URL hash
         window.onload = function() {
             if(window.location.hash === "#privacy") {
                 const privacyTab = document.querySelector('#nav-privacy-tab');
