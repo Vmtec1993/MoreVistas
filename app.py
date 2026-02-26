@@ -31,7 +31,6 @@ def init_sheets():
             client = gspread.authorize(creds)
             SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
             main_spreadsheet = client.open_by_key(SHEET_ID)
-            
             worksheets = main_spreadsheet.worksheets()
             sheet = worksheets[0]
             if len(worksheets) > 1: places_sheet = worksheets[1]
@@ -41,6 +40,7 @@ def init_sheets():
         except Exception as e:
             print(f"❌ Sheet Init Error: {e}")
 
+# Initialization
 init_sheets()
 
 def get_rows(target_sheet):
@@ -59,38 +59,48 @@ def get_rows(target_sheet):
     except: return []
 
 def get_settings():
-    # Default values logic improved
     res = {
         'Banner_Status': 'OFF',
-        'Offer_Text': 'Welcome to MoreVistas',
-        'Offer_Tag': 'OFFER LIVE',
+        'Offer_Text': 'Luxury Living',
+        'Offer_Tag': 'SPECIAL',
         'Banner_URL': '',
         'Contact': '8830024994',
         'Logo_URL': '',
-        'Logo_Height': '40'
+        'Logo_Height': '50'
     }
     if settings_sheet:
         try:
             data = settings_sheet.get_all_values()
             for r in data:
                 if len(r) >= 2:
-                    res[r[0].strip()] = r[1].strip()
-        except Exception as e:
-            print(f"Settings Load Error: {e}")
+                    key = r[0].strip()
+                    val = r[1].strip()
+                    # Auto-fix: Adding https if missing from sheet
+                    if ('URL' in key) and val and not val.startswith('http'):
+                        val = 'https://' + val
+                    res[key] = val
+        except: pass
     return res
 
 @app.route('/')
 def index():
     settings_data = get_settings()
-    villas_data = get_rows(sheet)
-    places_data = get_rows(places_sheet)
-    return render_template('index.html', villas=villas_data, settings=settings_data, tourist_places=places_data)
+    return render_template('index.html', 
+                           villas=get_rows(sheet), 
+                           settings=settings_data, 
+                           tourist_places=get_rows(places_sheet))
 
-# ... (Add other routes: admin, enquiry, explore, contact etc. exactly as you had them)
+@app.route('/villa/<villa_id>')
+def villa_details(villa_id):
+    villas = get_rows(sheet)
+    villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
+    if not villa: return "Villa Not Found", 404
+    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
+    if not imgs or not any(imgs): imgs = [villa.get('Image_URL')]
+    return render_template('villa_details.html', villa=villa, villa_images=imgs, settings=get_settings())
 
-if __name__ == '__main__':
-    import os
-    # Render automatically sets a PORT environment variable
+# Main Entry
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    # '0.0.0.0' is required for Render to find the app
     app.run(host='0.0.0.0', port=port)
+    
