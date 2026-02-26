@@ -58,7 +58,6 @@ def get_rows(target_sheet):
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
-            # Price Processing
             try:
                 p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
@@ -70,7 +69,6 @@ def get_rows(target_sheet):
             except: 
                 item['discount_perc'] = 0
             
-            # Rules Processing
             raw_rules = item.get('Rules', '')
             item['Rules_List'] = [r.strip() for r in raw_rules.split('|')] if '|' in raw_rules else ([raw_rules.strip()] if raw_rules else ["ID Proof Required"])
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
@@ -129,11 +127,10 @@ def admin_dashboard():
             if len(raw_enq) > 1:
                 headers = [h.strip() for h in raw_enq[0]]
                 rows = [r for r in raw_enq[1:] if any(r)]
-                rows.reverse() # Latest entries first
+                rows.reverse() 
                 enquiries = [dict(zip(headers, r + [''] * (len(headers) - len(r)))) for r in rows]
         except: pass
         
-    # Yahan render_template ka naam dashboard wali file par set kar diya
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries, settings=settings)
 
 @app.route('/admin/update', methods=['POST'])
@@ -152,10 +149,14 @@ def update_data():
             except:
                 settings_sheet.append_row([key, val])
         elif target == "villas" and sheet:
+            # FIX: More robust ID searching
             cell = sheet.find(str(v_id))
             headers = sheet.row_values(1)
-            col_index = headers.index(key) + 1
-            sheet.update_cell(cell.row, col_index, val)
+            if key in headers:
+                col_index = headers.index(key) + 1
+                sheet.update_cell(cell.row, col_index, val)
+            else:
+                return jsonify({"status": "error", "message": f"Column {key} not found"})
         return jsonify({"status": "success"})
     except Exception as e: 
         return jsonify({"status": "error", "message": str(e)})
@@ -191,7 +192,7 @@ def enquiry(villa_id):
         
     return render_template('enquiry.html', villa=villa, settings=settings)
 
-@app.route('/admin/logout')
+@app.route('/admin-logout') # Link updated to match dashboard
 def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('index'))
@@ -207,3 +208,4 @@ def contact():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+                
