@@ -7,7 +7,6 @@
     .feature-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
     .feature-icon { width: 60px; height: 60px; background: #f0fbff; color: #00b4d8; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; }
     
-    /* Tourist Points Horizontal Scroll */
     .tourist-scroll { display: flex; overflow-x: auto; gap: 20px; padding-bottom: 20px; scrollbar-width: none; -ms-overflow-style: none; }
     .tourist-scroll::-webkit-scrollbar { display: none; }
     .tourist-card { min-width: 280px; border-radius: 20px; overflow: hidden; position: relative; height: 350px; flex-shrink: 0; }
@@ -18,12 +17,12 @@
     .list-property-banner { background: #0a0a0a; border-radius: 30px; padding: 60px 40px; color: white; margin-top: 80px; position: relative; overflow: hidden; }
 </style>
 
-{% if settings.Banner_Status == 'ON' %}
+{% if settings.Banner_Status.strip() == 'ON' %}
 <div class="container-fluid p-0 mb-0">
     <div class="position-relative shadow-lg overflow-hidden">
-        <img src="{{ settings.Banner_URL if settings.Banner_URL else 'https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg' }}" class="w-100 d-block" alt="Offer Banner" style="max-height: 500px; object-fit: cover;">
+        <img src="{{ settings.Banner_URL if settings.Banner_URL != "" else 'https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg' }}" class="w-100 d-block" alt="Offer Banner" style="max-height: 500px; object-fit: cover;">
         <div class="position-absolute top-0 end-0 m-3">
-            <span class="badge bg-danger rounded-pill px-3 py-2 animate-pulse">🔥 {{ settings.Offer_Tag }}</span>
+            <span class="badge bg-danger rounded-pill px-3 py-2">🔥 {{ settings.Offer_Tag }}</span>
         </div>
         <div class="position-absolute bottom-0 start-0 w-100 p-4 text-center" style="background: linear-gradient(transparent, rgba(0,0,0,0.9));">
             <h2 class="text-white fw-bold mb-3">{{ settings.Offer_Text }}</h2>
@@ -62,7 +61,7 @@
     <div class="row g-4" id="villaContainer">
         {% for villa in villas %}
         <div class="col-md-4 villa-item">
-            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative villa-card-hover">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
                 {% if villa.Status|lower == 'sold out' %}
                     <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50 text-white fw-bold z-3" style="font-size: 1.5rem;">SOLD OUT</div>
                 {% endif %}
@@ -71,18 +70,15 @@
                     <h5 class="fw-bold text-dark">{{ villa.Villa_Name }}</h5>
                     <div class="d-flex align-items-baseline gap-2 mb-3">
                         <span class="fs-4 fw-bold text-primary">₹{{ villa.Price }}</span>
-                        {% if villa.Original_Price|int > villa.Price|int %}
-                        <span class="text-muted text-decoration-line-through small">₹{{ villa.Original_Price }}</span>
-                        {% endif %}
                     </div>
                     <div class="row g-2 mb-4">
                         <div class="col-6"><div class="p-2 bg-light rounded-3 text-center small">👥 {{ villa.Guests }} Guests</div></div>
                         <div class="col-6"><div class="p-2 bg-light rounded-3 text-center small">🚪 {{ villa.BHK }} BHK</div></div>
                     </div>
                     {% if villa.Status|lower == 'sold out' %}
-                    <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Sold Out</button>
+                    <button class="btn btn-secondary w-100 rounded-pill" disabled>Sold Out</button>
                     {% else %}
-                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark w-100 rounded-pill fw-bold py-2">View Details</a>
+                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark w-100 rounded-pill py-2">View Details</a>
                     {% endif %}
                 </div>
             </div>
@@ -94,76 +90,51 @@
 <div class="container mt-5 pt-5">
     <div class="text-center mb-5">
         <h2 class="fw-bold">Why Stay With <span class="text-primary">MoreVistas?</span></h2>
-        <p class="text-muted">Experience luxury like never before with our premium services.</p>
     </div>
     <div class="row g-4">
         <div class="col-md-4">
-            <div class="feature-card text-center">
+            <div class="feature-card text-center border">
                 <div class="feature-icon mx-auto"><i class="bi bi-shield-check"></i></div>
                 <h5 class="fw-bold">Verified Luxury</h5>
-                <p class="small text-muted">Every villa is personally inspected for quality and premium standards.</p>
+                <p class="small text-muted">Hand-picked premium villas in Lonavala.</p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="feature-card text-center">
+            <div class="feature-card text-center border">
                 <div class="feature-icon mx-auto"><i class="bi bi-water"></i></div>
                 <h5 class="fw-bold">Private Pools</h5>
-                <p class="small text-muted">Complete privacy with clean, private swimming pools for your group.</p>
+                <p class="small text-muted">100% privacy with clean, private swimming pools.</p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="feature-card text-center">
+            <div class="feature-card text-center border">
                 <div class="feature-icon mx-auto"><i class="bi bi-headset"></i></div>
-                <h5 class="fw-bold">24/7 Concierge</h5>
-                <p class="small text-muted">A dedicated manager for your group to handle food and travel.</p>
+                <h5 class="fw-bold">24/7 Support</h5>
+                <p class="small text-muted">Dedicated concierge for your group.</p>
             </div>
         </div>
     </div>
 </div>
 
 <div class="container mt-5 pt-5">
-    <div class="d-flex justify-content-between align-items-end mb-4">
-        <div>
-            <h2 class="fw-bold mb-0">Explore <span class="text-primary">Lonavala</span></h2>
-            <p class="text-muted mb-0">Must visit spots near our villas.</p>
-        </div>
-        <a href="/explore" class="btn btn-outline-primary btn-sm rounded-pill px-3">View All</a>
-    </div>
-    
+    <h2 class="fw-bold mb-4">Explore <span class="text-primary">Lonavala</span></h2>
     <div class="tourist-scroll">
-        {% if tourist_places %}
-            {% for place in tourist_places %}
-            <div class="tourist-card">
-                <img src="{{ place.Image_URL }}" alt="{{ place.Place_Name }}" onerror="this.src='https://images.unsplash.com/photo-1626014303757-64663979069d?q=80&w=600'">
-                <div class="tourist-overlay">
-                    <h5 class="fw-bold">{{ place.Place_Name }}</h5>
-                    <small>{{ place.Distance if place.Distance else 'Nearby' }}</small>
-                </div>
+        {% for place in tourist_places %}
+        <div class="tourist-card shadow-sm border">
+            <img src="{{ place.Image_URL }}" alt="{{ place.Place_Name }}">
+            <div class="tourist-overlay">
+                <h5 class="fw-bold">{{ place.Place_Name or place.Location }}</h5>
+                <small>{{ place.Distance if place.Distance else 'Nearby' }}</small>
             </div>
-            {% endfor %}
-        {% else %}
-            <div class="tourist-card"><img src="https://images.unsplash.com/photo-1626014303757-64663979069d?q=80&w=600"><div class="tourist-overlay"><h5>Tiger Point</h5><small>15 mins away</small></div></div>
-            <div class="tourist-card"><img src="https://images.unsplash.com/photo-1590400589304-712f5a6b744d?q=80&w=600"><div class="tourist-overlay"><h5>Bhushi Dam</h5><small>10 mins away</small></div></div>
-        {% endif %}
+        </div>
+        {% endfor %}
     </div>
 </div>
 
-<div class="container">
+<div class="container mb-5">
     <div class="list-property-banner text-center shadow-lg">
         <h2 class="display-6 fw-bold mb-3">Want to Earn from Your Villa?</h2>
-        <p class="lead opacity-75 mb-4">Partner with MoreVistas and let us manage your property for maximum returns.</p>
-        <a href="https://wa.me/91{{ settings.Contact }}?text=Hi, I want to list my villa with MoreVistas" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">List Your Property Now</a>
-    </div>
-</div>
-
-<div class="wa-widget" id="waWidget">
-    <div class="wa-pull-tab" onclick="document.getElementById('waWidget').classList.toggle('active')">
-        <i class="bi bi-whatsapp"></i>
-    </div>
-    <div class="wa-box text-center shadow-lg">
-        <h6 class="fw-bold">Need Help?</h6>
-        <p class="small text-muted mb-3">Chat with our luxury concierge for discounts.</p>
-        <a href="https://wa.me/91{{ settings.Contact }}?text={{ settings.Book_Now_Msg | urlencode }}" target="_blank" class="btn btn-success w-100 rounded-pill fw-bold">Chat Now</a>
+        <a href="https://wa.me/91{{ settings.Contact }}?text=List my villa" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">List Your Property Now</a>
     </div>
 </div>
 
@@ -178,7 +149,7 @@
         } catch (e) { document.getElementById('temp').innerText = "26"; }
     }
     getLonavalaWeather();
-
+    
     document.getElementById('villaSearch').addEventListener('keyup', function() {
         let val = this.value.toLowerCase();
         document.querySelectorAll('.villa-item').forEach(item => {
