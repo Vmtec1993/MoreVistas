@@ -58,6 +58,7 @@ def get_rows(target_sheet):
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
+            # Price Calculation Logic
             try:
                 p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
@@ -69,8 +70,6 @@ def get_rows(target_sheet):
             except: 
                 item['discount_perc'] = 0
             
-            raw_rules = item.get('Rules', '')
-            item['Rules_List'] = [r.strip() for r in raw_rules.split('|')] if '|' in raw_rules else ([raw_rules.strip()] if raw_rules else ["ID Proof Required"])
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
             final_list.append(item)
         return final_list
@@ -81,11 +80,11 @@ def get_settings():
         'Offer_Text': "Welcome to MoreVistas", 
         'Contact': "8830024994", 
         'Logo_URL': '', 
-        'Logo_Width': '160',
         'Logo_Height': '45',
         'Book_Now_Msg': 'I want to book a luxury villa',
         'Banner_URL': '', 
-        'Banner_Status': 'OFF'
+        'Banner_Status': 'OFF',
+        'Offer_Tag': 'OFFER LIVE'
     }
     if settings_sheet:
         try:
@@ -104,9 +103,10 @@ def get_settings():
 def index():
     settings = get_settings()
     villas = get_rows(sheet)
-    places = get_rows(places_sheet)
+    # Why Stay Here and Tourist points are handled in index.html, 
+    # ensuring villas are sorted by availability
     sorted_villas = sorted(villas, key=lambda x: str(x.get('Status', '')).lower() == 'sold out')
-    return render_template('index.html', villas=sorted_villas, tourist_places=places, settings=settings)
+    return render_template('index.html', villas=sorted_villas, settings=settings)
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_dashboard():
@@ -128,13 +128,13 @@ def admin_dashboard():
             raw_enq = enquiry_sheet.get_all_values()
             if len(raw_enq) > 1:
                 headers = [h.strip() for h in raw_enq[0]]
-                # ✅ FIX: Khali ya 'None' rows ko filter kiya
+                # ✅ FILTER: Removing empty rows or rows with 'None' string
                 rows = [r for r in raw_enq[1:] if any(r) and len(r) > 1 and r[1].strip() != "" and r[1].lower() != "none"]
-                rows.reverse() 
+                rows.reverse() # Newest leads first
                 enquiries = [dict(zip(headers, r + [''] * (len(headers) - len(r)))) for r in rows]
         except: pass
         
-    return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries, settings=settings)
+    return render_template('admin.html', villas=villas, enquiries=enquiries, settings=settings)
 
 @app.route('/admin/update', methods=['POST'])
 def update_data():
@@ -159,27 +159,27 @@ def update_data():
                 if key in headers:
                     col_index = headers.index(key) + 1
                     sheet.update_cell(row_index, col_index, val)
-                else:
-                    return jsonify({"status": "error", "message": f"Column {key} not found"})
-            else:
-                return jsonify({"status": "error", "message": "Villa ID not found"})
         return jsonify({"status": "success"})
     except Exception as e: 
         return jsonify({"status": "error", "message": str(e)})
 
-# ✅ Policy Routes Added
+# ✅ ADVANCED LEGAL PAGES (FIXED)
 @app.route('/privacy-policy')
-def privacy(): return "<h1>Privacy Policy</h1><p>Work in progress for MoreVistas.</p>"
+def privacy():
+    return render_template('legal.html', type='privacy', settings=get_settings())
 
 @app.route('/terms')
-def terms(): return "<h1>Terms & Conditions</h1><p>Work in progress for MoreVistas.</p>"
+def terms():
+    return render_template('legal.html', type='terms', settings=get_settings())
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     villas = get_rows(sheet)
     villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
-    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')] or [villa.get('Image_URL')]
+    # Handling multiple images
+    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
+    if not imgs or not any(imgs): imgs = [villa.get('Image_URL')]
     return render_template('villa_details.html', villa=villa, villa_images=imgs, settings=get_settings())
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
@@ -221,4 +221,3 @@ def contact():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
-        
