@@ -52,7 +52,7 @@
                     <button class="nav-link rounded-pill px-4 me-2 border-0" data-bs-toggle="tab" data-bs-target="#villas-tab">Prices</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link rounded-pill px-4 border-0" data-bs-toggle="tab" data-bs-target="#settings-tab">Banner Settings</button>
+                    <button class="nav-link rounded-pill px-4 border-0" data-bs-toggle="tab" data-bs-target="#settings-tab">Site Settings</button>
                 </li>
             </ul>
 
@@ -115,25 +115,39 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-4">
-                                <label class="fw-bold mb-2">Offer Banner Text</label>
-                                <input type="text" id="offer-text" class="form-control rounded-3" value="Holi Special: 20% Off on All Villas!">
+                                <label class="fw-bold mb-2 text-primary">1. Offer Banner Text</label>
+                                <input type="text" id="offer-text" class="form-control rounded-3" value="{{ settings.Offer_Text }}">
                                 <button onclick="updateSettings('Offer_Text', 'offer-text')" class="btn btn-primary mt-2 btn-sm rounded-pill px-4">Update Text</button>
                             </div>
                             <div class="mb-4">
-                                <label class="fw-bold mb-2">Banner Image URL</label>
-                                <input type="text" id="banner-url" class="form-control rounded-3" placeholder="Paste PostImg Link Here">
-                                <button onclick="updateSettings('Banner_URL', 'banner-url')" class="btn btn-primary mt-2 btn-sm rounded-pill px-4">Update Image</button>
+                                <label class="fw-bold mb-2 text-primary">2. Banner Image URL</label>
+                                <input type="text" id="banner-url" class="form-control rounded-3" value="{{ settings.Banner_URL }}" placeholder="Paste Banner Image Link">
+                                <button onclick="updateSettings('Banner_URL', 'banner-url')" class="btn btn-primary mt-2 btn-sm rounded-pill px-4">Update Banner Image</button>
+                            </div>
+                            <div class="mb-4 pt-3 border-top">
+                                <label class="fw-bold mb-2 text-success">3. Site Logo URL</label>
+                                <input type="text" id="logo-url" class="form-control rounded-3" value="{{ settings.Logo_URL }}" placeholder="Paste Logo Image Link">
+                                <button onclick="updateSettings('Logo_URL', 'logo-url')" class="btn btn-success mt-2 btn-sm rounded-pill px-4">Update Logo</button>
                             </div>
                         </div>
+
                         <div class="col-md-6 border-start ps-md-4">
                             <label class="fw-bold mb-2">Banner Visibility</label>
                             <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="bannerSwitch" checked onchange="toggleBanner(this.checked)">
+                                <input class="form-check-input" type="checkbox" id="bannerSwitch" {% if settings.Banner_Status == 'ON' %}checked{% endif %} onchange="toggleBanner(this.checked)">
                                 <label class="form-check-label" for="bannerSwitch">Show Offer Banner on Site</label>
                             </div>
+                            
+                            <div class="p-3 bg-light rounded-4 border mb-3">
+                                <small class="text-muted d-block mb-2 font-weight-bold">Current Offer Banner:</small>
+                                <img src="{{ settings.Banner_URL if settings.Banner_URL else 'https://via.placeholder.com/400x150?text=No+Banner+Set' }}" id="preview-img" class="img-fluid rounded-3 border" style="max-height: 150px; width: 100%; object-fit: cover;">
+                            </div>
+
                             <div class="p-3 bg-light rounded-4 border">
-                                <small class="text-muted d-block mb-2">Current Preview:</small>
-                                <img src="https://i.postimg.cc/zXL98fC7/20260222-141917.jpg" id="preview-img" class="img-fluid rounded-3" style="max-height: 150px;">
+                                <small class="text-muted d-block mb-2 font-weight-bold">Current Site Logo:</small>
+                                <div class="bg-white p-2 text-center rounded">
+                                    <img src="{{ settings.Logo_URL if settings.Logo_URL else 'https://via.placeholder.com/150x50?text=No+Logo' }}" id="preview-logo" style="max-height: 50px;">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -173,12 +187,15 @@ function saveData(target, key, val, vId = '') {
     .then(res => res.json())
     .then(data => {
         if(data.status === 'success') {
-            alert('✅ Updated Successfully!');
+            alert('✅ Success! Data updated on Google Sheets.');
+            // Live Preview update
             if(key === 'Banner_URL') document.getElementById('preview-img').src = val;
+            if(key === 'Logo_URL') document.getElementById('preview-logo').src = val;
         } else {
             alert('❌ Error: ' + data.message);
         }
-    });
+    })
+    .catch(err => alert('❌ Error connecting to server.'));
 }
 </script>
 
@@ -186,6 +203,6 @@ function saveData(target, key, val, vId = '') {
     .w-100px { width: 120px; }
     .nav-pills .nav-link.active { background-color: #0d6efd; color: white; }
     .nav-pills .nav-link { color: #666; font-weight: 600; }
+    .fw-800 { font-weight: 800; }
 </style>
-
 {% endblock %}
