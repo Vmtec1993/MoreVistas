@@ -19,9 +19,9 @@
         
         @keyframes pulse-blue { 0% { transform: scale(1); } 70% { transform: scale(1.05); } 100% { transform: scale(1); } }
         
-        .site-logo-nav { height: {{ settings.Logo_Height if settings.Logo_Height else '40' }}px !important; width: auto; filter: brightness(0) invert(1); }
+        /* Logo Fix: No more invert filter to show original logo colors */
+        .site-logo-nav { height: {{ settings.Logo_Height if settings.Logo_Height else '40' }}px !important; width: auto; max-width: 150px; object-fit: contain; }
         
-        /* Premium Footer Styles */
         .premium-footer { background: #0a0a0a; color: #ffffff; padding: 60px 0 40px; text-align: center; }
         .footer-brand-name { font-family: 'Marcellus', serif; font-size: 2rem; letter-spacing: 4px; text-transform: uppercase; color: #fff; }
         .footer-tagline { font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase; color: #00b4d8; font-weight: 700; display: block; margin-bottom: 25px; }
@@ -30,7 +30,6 @@
         .legal-links-small { margin-top: 30px; font-size: 0.75rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
         .legal-links-small a { color: rgba(255,255,255,0.3); text-decoration: none; margin: 0 10px; }
 
-        /* Floating WhatsApp Widget */
         .wa-widget { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; }
         .wa-pull-tab { background: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); cursor: pointer; transition: 0.3s; }
         .wa-box { width: 280px; background: white; border-radius: 20px; margin-bottom: 15px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: none; }
@@ -47,7 +46,9 @@
                     <i class="bi bi-list fs-4"></i>
                 </button>
                 <a class="nav-brand-group" href="/">
-                    {% if settings.Logo_URL %}<img src="{{ settings.Logo_URL }}" class="site-logo-nav" alt="Logo">{% endif %}
+                    {% if settings.Logo_URL and settings.Logo_URL != "" %}
+                        <img src="{{ settings.Logo_URL }}" class="site-logo-nav" alt="Logo">
+                    {% endif %}
                     <div class="brand-divider"></div>
                     <div>
                         <span class="nav-brand-name">MoreVistas</span>
@@ -68,7 +69,7 @@
             <div class="list-group list-group-flush">
                 <a href="/" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold"><i class="bi bi-house me-3"></i> Home</a>
                 <a href="/explore" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold"><i class="bi bi-compass me-3"></i> Explore Lonavala</a>
-                <a href="https://wa.me/91{{ settings.Contact }}?text=I want to list my property with MoreVistas" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold text-primary"><i class="bi bi-plus-circle me-3"></i> List Your Property</a>
+                <a href="https://wa.me/91{{ settings.Contact }}?text=I want to list my property" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold text-primary"><i class="bi bi-plus-circle me-3"></i> List Your Property</a>
                 <a href="/contact" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold"><i class="bi bi-chat-left-text me-3"></i> Contact Us</a>
                 {% if session.get('admin_logged_in') %}
                 <a href="/admin" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold text-danger"><i class="bi bi-speedometer2 me-3"></i> Admin Dashboard</a>
@@ -87,7 +88,6 @@
                 <a href="/" class="footer-nav-link">Home</a>
                 <a href="/explore" class="footer-nav-link">Explore</a>
                 <a href="/contact" class="footer-nav-link">Contact</a>
-                <a href="/admin" class="footer-nav-link opacity-25">Admin Login</a>
             </div>
             <div class="legal-links-small">
                 <a href="/terms">Terms & Conditions</a>
