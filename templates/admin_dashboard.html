@@ -13,249 +13,224 @@
         :root {
             --accent: #00b4d8;
             --sidebar-bg: #0a0a0a;
-            --body-bg: #f0f2f5;
-            --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --body-bg: #f8f9fa;
+            --card-shadow: 0 10px 40px rgba(0,0,0,0.05);
         }
 
-        body { 
-            background-color: var(--body-bg); 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            overflow-x: hidden;
-        }
+        body { background-color: var(--body-bg); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
 
         /* Sidebar Design */
-        .sidebar {
-            width: 260px;
-            height: 100vh;
-            background: var(--sidebar-bg);
-            position: fixed;
-            left: 0; top: 0;
-            color: white;
-            padding: 25px;
-            z-index: 1000;
-        }
-
-        .main-content { margin-left: 260px; padding: 40px; }
+        .sidebar { width: 260px; height: 100vh; background: var(--sidebar-bg); position: fixed; left: 0; top: 0; color: white; padding: 25px; z-index: 1000; border-right: 1px solid rgba(255,255,255,0.1); }
+        .main-content { margin-left: 260px; padding: 40px; transition: 0.3s; }
 
         .nav-link-custom {
             color: rgba(255,255,255,0.6);
-            padding: 12px 15px;
-            border-radius: 10px;
+            padding: 14px 18px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             text-decoration: none;
             margin-bottom: 8px;
             transition: 0.3s;
+            font-weight: 500;
         }
 
-        .nav-link-custom:hover, .nav-link-custom.active {
-            background: rgba(255,255,255,0.1);
-            color: var(--accent);
-        }
+        .nav-link-custom:hover, .nav-link-custom.active { background: rgba(255,255,255,0.1); color: var(--accent); }
 
-        /* Stats Cards */
-        .premium-card {
-            border: none;
-            border-radius: 20px;
-            background: white;
-            box-shadow: var(--card-shadow);
-            padding: 25px;
-            transition: 0.3s;
-        }
+        /* Premium Components */
+        .premium-card { border: none; border-radius: 24px; background: white; box-shadow: var(--card-shadow); padding: 25px; transition: 0.3s; height: 100%; }
+        .premium-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.1); }
 
-        .premium-card:hover { transform: translateY(-5px); }
+        .table-luxury { background: white; border-radius: 24px; overflow: hidden; box-shadow: var(--card-shadow); border: 1px solid rgba(0,0,0,0.05); }
+        .table thead { background: #fdfdfd; border-bottom: 2px solid #f1f1f1; }
+        .table th { font-weight: 700; color: #888; font-size: 0.75rem; text-transform: uppercase; padding: 20px; letter-spacing: 1px; }
+        .table td { padding: 20px; vertical-align: middle; border-bottom: 1px solid #f8f8f8; }
 
-        .stat-icon {
-            width: 50px; height: 50px;
-            border-radius: 15px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; margin-bottom: 15px;
-        }
-
-        /* Table Design */
-        .table-luxury {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-        }
-
-        .table thead { background: #f8f9fa; border-bottom: 2px solid #eee; }
-        .table th { font-weight: 700; color: #666; font-size: 0.85rem; text-transform: uppercase; padding: 20px; }
-        .table td { padding: 20px; vertical-align: middle; }
-
-        /* Custom Inputs */
-        .form-control-luxury {
-            border: 2px solid #eee;
-            border-radius: 12px;
-            padding: 12px;
-            transition: 0.3s;
-        }
-        .form-control-luxury:focus { border-color: var(--accent); box-shadow: none; }
-
-        .btn-luxury {
-            background: var(--sidebar-bg);
-            color: white;
-            border-radius: 12px;
-            padding: 10px 25px;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        .btn-luxury:hover { background: #222; color: var(--accent); }
-
-        .btn-whatsapp { background: #25d366; color: white; border-radius: 50px; font-size: 0.8rem; }
+        /* Custom UI */
+        .form-control-luxury { border: 2px solid #f1f1f1; border-radius: 14px; padding: 12px 18px; transition: 0.3s; background: #fafafa; }
+        .form-control-luxury:focus { border-color: var(--accent); background: #fff; box-shadow: none; }
+        .btn-luxury { background: var(--sidebar-bg); color: white; border-radius: 14px; padding: 12px 25px; font-weight: 700; border: none; transition: 0.3s; }
+        .btn-luxury:hover { background: var(--accent); transform: scale(1.02); }
+        
+        .btn-whatsapp { background: #25d366; color: white; border-radius: 50px; font-weight: 700; font-size: 0.8rem; padding: 8px 20px; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
 
         @media (max-width: 992px) {
             .sidebar { left: -260px; }
-            .main-content { margin-left: 0; }
+            .main-content { margin-left: 0; padding: 20px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar d-none d-lg-block">
-        <div class="mb-5">
-            <h4 class="fw-bold">More<span style="color: var(--accent);">Vistas</span></h4>
-            <small class="opacity-50">Luxury Control Center</small>
+    <div class="sidebar d-none d-lg-block shadow">
+        <div class="mb-5 px-2">
+            <h4 class="fw-bold m-0" style="letter-spacing: 1px;">MORE<span style="color: var(--accent);">VISTAS</span></h4>
+            <small class="opacity-50 text-uppercase fw-bold" style="font-size: 0.6rem; letter-spacing: 2px;">Admin Suite 2026</small>
         </div>
         
-        <a href="#" class="nav-link-custom active"><i class="bi bi-grid-1x2-fill me-3"></i> Dashboard</a>
-        <a href="#enquiries" class="nav-link-custom"><i class="bi bi-chat-dots-fill me-3"></i> Enquiries</a>
-        <a href="#inventory" class="nav-link-custom"><i class="bi bi-house-door-fill me-3"></i> Villa Status</a>
-        <a href="#settings" class="nav-link-custom"><i class="bi bi-sliders me-3"></i> UI Settings</a>
+        <a href="#" class="nav-link-custom active"><i class="bi bi-speedometer2 me-3"></i> Dashboard</a>
+        <a href="#leads" class="nav-link-custom"><i class="bi bi-person-badge me-3"></i> Booking Leads</a>
+        <a href="#inventory" class="nav-link-custom"><i class="bi bi-houses me-3"></i> Villa Status</a>
+        <a href="#branding" class="nav-link-custom"><i class="bi bi-palette me-3"></i> UI & Branding</a>
         
         <div style="position: absolute; bottom: 30px; width: 210px;">
-            <a href="/admin-logout" class="btn btn-outline-danger w-100 rounded-pill px-4">Logout</a>
+            <a href="/admin-logout" class="btn btn-outline-danger w-100 rounded-pill fw-bold border-2">Sign Out</a>
         </div>
     </div>
 
     <div class="main-content">
+        
         <div class="d-flex justify-content-between align-items-center mb-5">
             <div>
-                <h2 class="fw-bold m-0">Welcome Back, Admin</h2>
-                <p class="text-muted">Here's what's happening with your villas today.</p>
+                <h2 class="fw-800 m-0">Control Dashboard</h2>
+                <p class="text-muted">Manage your luxury empire from one place.</p>
             </div>
-            <div class="d-flex align-items-center">
-                <span class="badge bg-success p-2 px-3 rounded-pill">System Online</span>
+            <div class="text-end">
+                <div class="badge bg-dark rounded-pill p-2 px-3 fw-bold shadow-sm">
+                    <span class="status-dot bg-success"></span> Server Online
+                </div>
             </div>
         </div>
 
         <div class="row g-4 mb-5">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="premium-card">
-                    <div class="stat-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-people"></i></div>
-                    <h3 class="fw-bold m-0">{{ enquiries|length }}</h3>
-                    <small class="text-muted">Total Enquiries</small>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="premium-card text-center">
-                    <div class="stat-icon bg-success bg-opacity-10 text-success mx-auto"><i class="bi bi-check-circle"></i></div>
-                    <h3 class="fw-bold m-0">{{ villas|length }}</h3>
-                    <small class="text-muted">Managed Villas</small>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="premium-card h-100 d-flex align-items-center justify-content-between">
-                    <div>
-                        <p class="fw-bold small mb-1">Current Site Logo</p>
-                        <img src="{{ settings.Logo_URL }}" style="height: 50px; filter: grayscale(1); opacity: 0.7;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted small fw-bold text-uppercase mb-1">Recent Enquiries</p>
+                            <h2 class="fw-800 m-0">{{ enquiries|length }}</h2>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-4"><i class="bi bi-graph-up-arrow fs-4"></i></div>
                     </div>
-                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="document.getElementById('logo-url').focus()">Change</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="premium-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted small fw-bold text-uppercase mb-1">Active Villas</p>
+                            <h2 class="fw-800 m-0">{{ villas|length }}</h2>
+                        </div>
+                        <div class="bg-info bg-opacity-10 text-info p-3 rounded-4"><i class="bi bi-house-heart fs-4"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="premium-card bg-dark text-white">
+                    <p class="text-muted small fw-bold text-uppercase mb-1">Quick Action</p>
+                    <a href="/" target="_blank" class="btn btn-accent w-100 rounded-pill fw-bold py-2 mt-1" style="background: var(--accent); color: white;">View Live Website <i class="bi bi-box-arrow-up-right ms-2"></i></a>
                 </div>
             </div>
         </div>
 
-        <div id="settings" class="premium-card mb-5">
-            <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-palette-fill me-2"></i>Premium UI Control</h5>
+        <div id="branding" class="premium-card mb-5">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-warning bg-opacity-10 text-warning p-2 rounded-3 me-3"><i class="bi bi-stars"></i></div>
+                <h5 class="fw-bold m-0">Visual Branding Control</h5>
+            </div>
+            
             <div class="row g-4">
-                <div class="col-md-4">
-                    <label class="small fw-bold mb-2">Logo Height (Pixels)</label>
-                    <div class="input-group">
-                        <input type="number" id="logo-height" class="form-control form-control-luxury" value="{{ settings.Logo_Height if settings.Logo_Height else '40' }}">
-                        <button class="btn btn-luxury" onclick="updateSetting('Logo_Height', 'logo-height')">Update</button>
-                    </div>
-                    <small class="text-muted">Controls logo size in Top Navbar.</small>
-                </div>
-                <div class="col-md-8">
-                    <label class="small fw-bold mb-2">Book Now WhatsApp Message</label>
-                    <div class="input-group">
-                        <input type="text" id="book-msg" class="form-control form-control-luxury" value="{{ settings.Book_Now_Msg if settings.Book_Now_Msg else 'I want to book a luxury villa' }}">
-                        <button class="btn btn-luxury" onclick="updateSetting('Book_Now_Msg', 'book-msg')">Save Message</button>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <label class="small fw-bold mb-2">Master Logo URL</label>
+                <div class="col-md-6">
+                    <label class="small fw-bold mb-2">Master Logo URL (Recommended: PNG with transparent bg)</label>
                     <div class="input-group">
                         <input type="text" id="logo-url" class="form-control form-control-luxury" value="{{ settings.Logo_URL }}">
-                        <button class="btn btn-success rounded-end-3 px-4" onclick="updateSetting('Logo_URL', 'logo-url')">Update Branding</button>
+                        <button class="btn btn-dark px-4 rounded-end-3" onclick="updateSetting('Logo_URL', 'logo-url')">Apply</button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold mb-2">Logo Height (px)</label>
+                    <input type="number" id="logo-height" class="form-control form-control-luxury" value="{{ settings.Logo_Height if settings.Logo_Height else '45' }}" onchange="updateSetting('Logo_Height', 'logo-height')">
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold mb-2">Banner Status</label>
+                    <select id="banner-status" class="form-select form-control-luxury" onchange="updateSetting('Banner_Status', 'banner-status')">
+                        <option value="ON" {% if settings.Banner_Status == 'ON' %}selected{% endif %}>Show Offer Banner</option>
+                        <option value="OFF" {% if settings.Banner_Status == 'OFF' %}selected{% endif %}>Hide Banner</option>
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <label class="small fw-bold mb-2">WhatsApp "Book Now" Default Message</label>
+                    <div class="input-group">
+                        <input type="text" id="book-msg" class="form-control form-control-luxury" value="{{ settings.Book_Now_Msg if settings.Book_Now_Msg else 'Hi MoreVistas, I want to book a villa' }}">
+                        <button class="btn btn-luxury" onclick="updateSetting('Book_Now_Msg', 'book-msg')">Save Global Message</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="enquiries" class="table-luxury mb-5">
-            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold m-0"><i class="bi bi-chat-square-quote me-2"></i>Recent Booking Leads</h5>
+        <div id="leads" class="table-luxury mb-5">
+            <div class="p-4 border-bottom bg-white d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold m-0">Recent Booking Leads</h5>
+                <span class="badge bg-light text-dark border">Showing last {{ enquiries|length }} entries</span>
             </div>
             <div class="table-responsive">
                 <table class="table align-middle m-0">
                     <thead>
                         <tr>
-                            <th>Guest Info</th>
-                            <th>Villa & Stay</th>
-                            <th>Action</th>
+                            <th>Customer Profile</th>
+                            <th>Stay Interest</th>
+                            <th class="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for enq in enquiries %}
-                        <tr>
-                            <td>
-                                <div class="fw-bold">{{ enq.get('Name') }}</div>
-                                <div class="small text-muted">+91 {{ enq.get('Phone') }}</div>
-                            </td>
-                            <td>
-                                <span class="badge bg-primary bg-opacity-10 text-primary mb-1">{{ enq.get('Villa') }}</span>
-                                <div class="small text-muted">📅 {{ enq.get('Dates') }} | 👥 {{ enq.get('Guests') }} Pax</div>
-                            </td>
-                            <td>
-                                {% set phone = enq.get('Phone')|string|replace(' ', '')|replace('+', '') %}
-                                <a href="https://wa.me/91{{ phone }}" target="_blank" class="btn btn-whatsapp px-4">
-                                    <i class="bi bi-whatsapp me-2"></i> Chat
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
+                        {% if enquiries %}
+                            {% for enq in enquiries %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ enq.get('Name') }}</div>
+                                    <div class="small text-muted"><i class="bi bi-clock me-1"></i> {{ enq.get('Timestamp') }}</div>
+                                </td>
+                                <td>
+                                    <div class="badge bg-primary bg-opacity-10 text-primary mb-1">{{ enq.get('Villa') }}</div>
+                                    <div class="small fw-bold">📅 {{ enq.get('Dates') }} | 👥 {{ enq.get('Guests') }} Pax</div>
+                                </td>
+                                <td class="text-center">
+                                    {% set phone = enq.get('Phone')|string|replace(' ', '')|replace('+', '') %}
+                                    <a href="https://wa.me/91{{ phone }}" target="_blank" class="btn btn-whatsapp">
+                                        <i class="bi bi-whatsapp me-2"></i> WhatsApp Chat
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-inbox fs-1 d-block mb-3 opacity-20"></i>
+                                        No active enquiries found in the system.
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div id="inventory" class="row">
-            <div class="col-12">
-                <div class="table-luxury p-4">
-                    <h5 class="fw-bold mb-4">Villa Inventory Status</h5>
-                    <div class="row g-3">
-                        {% for villa in villas %}
-                        <div class="col-md-4">
-                            <div class="border rounded-4 p-3 d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="fw-bold">{{ villa.get('Villa_Name') }}</div>
-                                    <span class="small {{ 'text-danger' if villa.get('Status') == 'Sold Out' else 'text-success' }}">
-                                        ● {{ villa.get('Status') }}
-                                    </span>
-                                </div>
-                                <button onclick="saveToServer('villas', 'Status', '{{ 'Available' if villa.get('Status') == 'Sold Out' else 'Sold Out' }}', '{{ villa.get('Villa_ID') }}')" 
-                                        class="btn btn-sm {{ 'btn-outline-danger' if villa.get('Status') == 'Available' else 'btn-outline-success' }} rounded-pill">
-                                    Set {{ 'Sold' if villa.get('Status') == 'Available' else 'Available' }}
-                                </button>
-                            </div>
+        <div id="inventory" class="premium-card">
+            <h5 class="fw-bold mb-4">Villa Booking Status Control</h5>
+            <div class="row g-3">
+                {% for villa in villas %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-3 border rounded-4 d-flex justify-content-between align-items-center bg-light bg-opacity-50">
+                        <div>
+                            <div class="fw-bold text-dark mb-1">{{ villa.get('Villa_Name') }}</div>
+                            <span class="small fw-bold {{ 'text-danger' if villa.get('Status') == 'Sold Out' else 'text-success' }}">
+                                <span class="status-dot {{ 'bg-danger' if villa.get('Status') == 'Sold Out' else 'bg-success' }}"></span>
+                                {{ villa.get('Status') }}
+                            </span>
                         </div>
-                        {% endfor %}
+                        <button onclick="saveToServer('villas', 'Status', '{{ 'Available' if villa.get('Status') == 'Sold Out' else 'Sold Out' }}', '{{ villa.get('Villa_ID') }}')" 
+                                class="btn btn-sm {{ 'btn-dark' if villa.get('Status') == 'Available' else 'btn-outline-dark' }} rounded-pill px-3 fw-bold">
+                            {{ 'Mark Sold' if villa.get('Status') == 'Available' else 'Make Available' }}
+                        </button>
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
+
     </div>
 
     <script>
@@ -275,16 +250,22 @@
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success') {
-                    if(target === 'villas') location.reload();
-                    else showToast('✅ Success: ' + key + ' updated!');
-                } else alert('❌ Error: ' + data.message);
+                    if(target === 'villas') {
+                        location.reload();
+                    } else {
+                        // Success Toast / Alert
+                        const alertBox = document.createElement('div');
+                        alertBox.className = 'position-fixed bottom-0 start-50 translate-middle-x mb-4 badge bg-dark p-3 shadow-lg rounded-pill';
+                        alertBox.style.zIndex = '9999';
+                        alertBox.innerHTML = '✅ Successfully Updated: ' + key;
+                        document.body.appendChild(alertBox);
+                        setTimeout(() => alertBox.remove(), 2500);
+                    }
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
             })
-            .catch(err => alert('❌ Server error!'));
-        }
-
-        function showToast(msg) {
-            // Basic alert is fine, but you can add a toast later
-            alert(msg);
+            .catch(err => alert('❌ Connection Error!'));
         }
     </script>
 </body>
