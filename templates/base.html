@@ -6,7 +6,7 @@
     <meta property="og:image" content="https://i.postimg.cc/zXL98fC7/20260222-141917.jpg"> 
     <meta property="og:url" content="https://morevistas.onrender.com/">
     <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -17,7 +17,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Marcellus&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0a0a0a; color: #ffffff; overflow-x: hidden; }
+        :root {
+            --primary-gold: #c5a059;
+            --luxury-blue: #00b4d8;
+            --dark-bg: #0a0a0a;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; color: #2d3436; }
+
+        /* ✅ Luxury Typography */
+        h1, h2, h3, .navbar-brand, .footer-logo-text { 
+            font-family: 'Marcellus', serif !important; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
 
         /* ✅ Loader Styling */
         #loader-wrapper {
@@ -26,88 +39,104 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         .spinner {
-            width: 70px; height: 70px; border: 5px solid rgba(13, 110, 253, 0.2);
-            border-left-color: #0d6efd; border-radius: 50%; animation: spin 1s linear infinite;
+            width: 50px; height: 50px; border: 3px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #ffffff; border-radius: 50%; animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-text { color: white; margin-top: 20px; font-weight: 300; letter-spacing: 4px; font-family: 'Marcellus', serif; }
 
-        /* --- SILVER GRADIENT LOGO STYLE (TOP & BOTTOM) --- */
-        .silver-text {
-            font-family: 'Marcellus', serif;
-            text-transform: uppercase;
-            background: linear-gradient(180deg, #ffffff 0%, #bbbbbb 50%, #888888 100%);
+        /* ✅ Navbar Styling - Premium White */
+        .navbar { background-color: #ffffff !important; border-bottom: 1px solid #eee; padding: 15px 0; }
+        
+        /* Silver-Gradient Logo Text */
+        .premium-logo-text {
+            background: linear-gradient(180deg, #2d3436 0%, #636e72 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 700;
-            letter-spacing: 2px;
+            font-size: 1.6rem;
         }
 
-        /* Navbar Styling */
-        .navbar { background-color: #0a0a0a !important; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px 0; }
-        .nav-link { font-weight: 600; color: #ffffff !important; transition: 0.3s; }
-        .nav-tagline { font-size: 0.5rem; letter-spacing: 2px; color: #00b4d8; text-transform: uppercase; display: block; }
+        /* ✅ Villa Card Text Visibility Fix (BHK/Guest Fix) */
+        .villa-card-meta { color: #2d3436 !important; font-weight: 600; font-size: 0.9rem; }
+        .villa-card-meta i { color: var(--luxury-blue); }
 
-        /* Side Menu Styling */
-        .offcanvas { background-color: #111 !important; color: white !important; width: 300px !important; }
+        /* ✅ Side Menu Styling */
+        .offcanvas { background-color: #ffffff; border-radius: 0 25px 25px 0 !important; width: 320px !important; }
         .menu-link { 
-            border: none !important; padding: 15px 20px !important; 
-            font-weight: 600; color: #ffffff !important; display: flex; align-items: center;
+            border: none !important; padding: 15px 25px !important; 
+            font-weight: 600; border-radius: 12px !important; margin-bottom: 8px;
+            color: #2d3436 !important; display: flex; align-items: center;
             text-decoration: none; transition: 0.3s;
         }
-        .menu-link:hover { background: rgba(255,255,255,0.05) !important; color: #00b4d8 !important; }
+        .menu-link:hover { background: #f8f9fa !important; transform: translateX(5px); color: var(--luxury-blue) !important; }
 
-        /* Footer Styling */
-        footer { background: #050505; color: white; padding: 80px 0 40px; text-align: center; border-top: 1px solid #222; }
-        .footer-tagline { font-size: 0.75rem; letter-spacing: 5px; color: #00b4d8; text-transform: uppercase; margin-bottom: 30px; display: block; }
-        .footer-link { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.9rem; margin: 0 12px; transition: 0.3s; }
-        .footer-link:hover { color: white; }
-
-        /* SIDE-HIDDEN WHATSAPP */
-        .wa-side-tab {
-            position: fixed; right: -135px; bottom: 30px; background: #25d366; color: white;
-            padding: 12px 18px; border-radius: 50px 0 0 50px; text-decoration: none; 
-            z-index: 9999; transition: 0.4s ease; box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
-            display: flex; align-items: center; gap: 10px;
+        /* ✅ Footer Styling - Deep Dark */
+        footer { background: var(--dark-bg); color: white; padding: 80px 0 40px; text-align: center; }
+        .footer-logo-text {
+            font-size: 2.2rem;
+            background: linear-gradient(180deg, #ffffff 0%, #a1a1a1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
         }
-        .wa-side-tab:hover { right: 0; color: white; }
-        .wa-side-tab i { font-size: 1.5rem; }
+        .footer-link { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem; transition: 0.3s; letter-spacing: 1px; }
+        .footer-link:hover { color: #ffffff; }
+
+        /* Floating WhatsApp */
+        .wa-float {
+            position: fixed; bottom: 30px; right: 30px; background: #25d366; 
+            width: 60px; height: 60px; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; font-size: 30px; 
+            color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000;
+            transition: 0.3s;
+        }
+        .wa-float:hover { transform: scale(1.1); color: white; }
     </style>
 </head>
 <body>
 
     <div id="loader-wrapper">
         <div class="spinner"></div>
-        <div class="loader-text silver-text mt-3">MOREVISTAS LUXURY</div>
+        <div class="loader-text">MOREVISTAS LUXURY</div>
     </div>
 
     <div class="offcanvas offcanvas-start shadow-lg" tabindex="-1" id="sideMenu">
-        <div class="offcanvas-header p-4 border-bottom border-secondary">
-            <h4 class="offcanvas-title silver-text">MoreVistas</h4>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        <div class="offcanvas-header p-4 border-bottom">
+            <h4 class="offcanvas-title premium-logo-text">MoreVistas</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
-        <div class="offcanvas-body p-0">
-            <div class="list-group list-group-flush pt-3">
+        <div class="offcanvas-body p-4">
+            <div class="list-group list-group-flush">
                 <a href="/" class="menu-link"><i class="bi bi-house-door me-3"></i> Home</a>
                 <a href="/explore" class="menu-link"><i class="bi bi-geo-alt me-3"></i> Explore Lonavala</a>
                 <a href="/legal" class="menu-link"><i class="bi bi-shield-check me-3"></i> Terms & Policies</a>
                 <a href="/contact" class="menu-link"><i class="bi bi-chat-left-dots me-3"></i> Contact Us</a>
             </div>
+            <div class="mt-5 pt-4 border-top">
+                <p class="small text-muted mb-3">Instant Booking:</p>
+                <a href="https://wa.me/918830024994" class="btn btn-dark w-100 rounded-pill fw-bold py-3">
+                    <i class="bi bi-whatsapp me-2"></i>+91 88300 24994
+                </a>
+            </div>
         </div>
     </div>
 
-    <nav class="navbar navbar-expand-lg sticky-top">
+    <nav class="navbar sticky-top shadow-sm">
         <div class="container">
             <div class="d-flex align-items-center">
-                <button class="btn btn-dark rounded-circle me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" style="background: #222;">
+                <button class="btn btn-white border shadow-sm rounded-circle me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
                     <i class="bi bi-list fs-4"></i>
                 </button>
-                <a class="text-decoration-none" href="/">
-                    <span class="silver-text fs-4">MoreVistas</span>
-                    <span class="nav-tagline">The Art of Luxury Living</span>
+                <a class="navbar-brand d-flex flex-column" href="/">
+                    <span class="premium-logo-text">MoreVistas</span>
                 </a>
             </div>
-            <div class="d-none d-lg-block ms-auto">
-                <a href="https://wa.me/918830024994" class="btn btn-outline-info rounded-pill px-4 fw-bold">BOOK NOW</a>
+            <div class="d-none d-lg-block">
+                <a href="tel:+918830024994" class="btn btn-outline-dark rounded-pill px-4 fw-bold me-2">
+                    <i class="bi bi-telephone me-2"></i>+91 88300 24994
+                </a>
+                <a href="https://wa.me/918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold">BOOK NOW</a>
             </div>
         </div>
     </nav>
@@ -118,32 +147,36 @@
 
     <footer>
         <div class="container">
-            <h2 class="silver-text mb-1" style="font-size: 2.5rem;">MoreVistas</h2>
-            <span class="footer-tagline">The Art of Luxury Living</span>
+            <h2 class="footer-logo-text">MoreVistas</h2>
+            <p class="text-info small fw-bold mb-4" style="letter-spacing: 3px;">THE ART OF LUXURY LIVING</p>
             
-            <div class="mb-5 mt-4">
-                <a href="/" class="footer-link">HOME</a>
-                <a href="/explore" class="footer-link">EXPLORE</a>
-                <a href="/contact" class="footer-link">CONTACT</a>
+            <div class="footer-links mb-5">
+                <a href="/" class="footer-link mx-3">HOME</a>
+                <a href="/explore" class="footer-link mx-3">EXPLORE</a>
+                <a href="/contact" class="footer-link mx-3">CONTACT</a>
             </div>
 
-            <hr class="my-5 opacity-10">
+            <div class="mb-5">
+                <a href="https://wa.me/918830024994" class="text-white mx-3 fs-4"><i class="bi bi-whatsapp"></i></a>
+                <a href="#" class="text-white mx-3 fs-4"><i class="bi bi-instagram"></i></a>
+            </div>
+
+            <hr class="my-5 opacity-10 border-white">
             
-            <div class="row align-items-center">
+            <div class="row align-items-center opacity-50">
                 <div class="col-md-6 text-md-start text-center">
-                    <p class="small opacity-50 mb-0">© 2026 MoreVistas Luxury Villas. All rights Reserved.</p>
+                    <p class="small mb-0">© 2026 MoreVistas Luxury Villas Lonavala.</p>
                 </div>
                 <div class="col-md-6 text-md-end text-center mt-3 mt-md-0">
-                    <a href="/legal" class="footer-link" style="font-size: 0.75rem;">Terms & Conditions</a>
-                    <a href="/legal#privacy" class="footer-link" style="font-size: 0.75rem;">Privacy Policy</a>
+                    <a href="/legal" class="footer-link me-3">Terms & Conditions</a>
+                    <a href="/legal#privacy" class="footer-link">Privacy Policy</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <a href="https://wa.me/918830024994" class="wa-side-tab">
+    <a href="https://wa.me/918830024994" class="wa-float">
         <i class="bi bi-whatsapp"></i>
-        <span>Chat with Concierge</span>
     </a>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
