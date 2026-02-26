@@ -12,7 +12,7 @@ app.secret_key = "morevistas_secure_2026"
 # --- CONFIG ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
-ADMIN_PASSWORD = "MoreVistas@2026"  # ✅ Aapka Admin Password
+ADMIN_PASSWORD = "MoreVistas@2026"
 
 # --- Google Sheets Setup ---
 creds_json = os.environ.get('GOOGLE_CREDS')
@@ -29,13 +29,10 @@ def init_sheets():
             scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
             creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
             client = gspread.authorize(creds)
-            
             SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
             main_spreadsheet = client.open_by_key(SHEET_ID)
-            
             sheet = main_spreadsheet.sheet1
             all_ws = {ws.title: ws for ws in main_spreadsheet.worksheets()}
-            
             places_sheet = all_ws.get("Places")
             enquiry_sheet = all_ws.get("Enquiries")
             settings_sheet = all_ws.get("Settings")
@@ -55,8 +52,6 @@ def get_rows(target_sheet):
         for row in data[1:]:
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
-            
-            # --- Price & Offer Logic ---
             try:
                 p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
@@ -64,25 +59,26 @@ def get_rows(target_sheet):
                 original = int(float(op_val)) if op_val and op_val.lower() != 'nan' else 0
                 item['Price'] = current
                 item['Original_Price'] = original
-                if original > current > 0:
-                    item['discount_perc'] = int(((original - current) / original) * 100)
-                else:
-                    item['discount_perc'] = 0
-            except:
-                item['discount_perc'] = 0
-
-            # --- Rules Splitting ---
+                item['discount_perc'] = int(((original - current) / original) * 100) if original > current > 0 else 0
+            except: item['discount_perc'] = 0
             raw_rules = item.get('Rules', '')
-            if '|' in raw_rules:
-                item['Rules_List'] = [r.strip() for r in raw_rules.split('|')]
-            else:
-                item['Rules_List'] = [raw_rules.strip()] if raw_rules else ["ID Proof Required"]
-
+            item['Rules_List'] = [r.strip() for r in raw_rules.split('|')] if '|' in raw_rules else ([raw_rules.strip()] if raw_rules else ["ID Proof Required"])
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
             final_list.append(item)
         return final_list
-    except:
-        return []
+    except: return []
+
+# --- Helper for Settings ---
+def get_settings():
+    # Default values agar sheet khali ho
+    res = {'Offer_Text': "Welcome", 'Contact': "8830024994", 'Logo_URL': '', 'Banner_URL': '', 'Banner_Status': 'OFF'}
+    if settings_sheet:
+        try:
+            data = settings_sheet.get_all_values()
+            for r in data:
+                if len(r) >= 2: res[r[0].strip()] = r[1].strip()
+        except: pass
+    return res
 
 # --- Routes ---
 
@@ -90,18 +86,9 @@ def get_rows(target_sheet):
 def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
-    
-    settings = {'Offer_Text': "Welcome to MoreVistas Lonavala", 'Contact': "8830024994"}
-    if settings_sheet:
-        try:
-            s_data = settings_sheet.get_all_values()
-            for r in s_data:
-                if len(r) >= 2: settings[r[0].strip()] = r[1].strip()
-        except: pass
-        
+    settings = get_settings()
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
 
-# ✅ ADMIN DASHBOARD
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_dashboard():
     if request.method == 'POST':
@@ -122,60 +109,46 @@ def admin_dashboard():
             <a href="/" style="display:block; margin-top:15px; color:#666; text-decoration:none; font-size:14px;">← Back to Home</a>
         </div>
         '''
-
     villas = get_rows(sheet)
+    settings = get_settings()
     enquiries = []
     if enquiry_sheet:
         try:
             raw_enq = enquiry_sheet.get_all_values()
             if len(raw_enq) > 1:
                 headers = [h.strip() for h in raw_enq[0]]
-                rows = raw_enq[1:]
-                rows.reverse()
+                rows = raw_enq[1:]; rows.reverse()
                 enquiries = [dict(zip(headers, r + [''] * (len(headers) - len(r)))) for r in rows]
         except: pass
+    return render_template('admin.html', villas=villas, enquiries=enquiries, settings=settings)
 
-    return render_template('admin.html', villas=villas, enquiries=enquiries)
-
-# ✅ NEW: UPDATE DATA FROM DASHBOARD
 @app.route('/admin/update', methods=['POST'])
 def update_data():
-    if not session.get('admin_logged_in'):
-        return jsonify({"status": "error", "message": "Unauthorized"}), 403
-
-    target = request.form.get('target')
-    key = request.form.get('key')
-    val = request.form.get('value')
-    v_id = request.form.get('villa_id')
-
+    if not session.get('admin_logged_in'): return jsonify({"status": "error"}), 403
+    target, key, val, v_id = request.form.get('target'), request.form.get('key'), request.form.get('value'), request.form.get('villa_id')
     try:
         if target == "settings" and settings_sheet:
             cell = settings_sheet.find(key)
             settings_sheet.update_cell(cell.row, 2, val)
-        
         elif target == "villas" and sheet:
             cell = sheet.find(v_id)
             headers = sheet.row_values(1)
-            col_index = headers.index(key) + 1 # Key here is column name like 'Price'
+            col_index = headers.index(key) + 1
             sheet.update_cell(cell.row, col_index, val)
-
         return jsonify({"status": "success"})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
+    except Exception as e: return jsonify({"status": "error", "message": str(e)})
 
 @app.route('/admin/logout')
 def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('index'))
 
-# --- Baki Routes ---
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     villas = get_rows(sheet)
     villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
-    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
-    if not imgs: imgs = [villa.get('Image_URL')]
+    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')] or [villa.get('Image_URL')]
     return render_template('villa_details.html', villa=villa, villa_images=imgs)
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
@@ -183,8 +156,7 @@ def enquiry(villa_id):
     villas = get_rows(sheet)
     villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     if request.method == 'POST':
-        name, phone = request.form.get('name'), request.form.get('phone')
-        dates, guests = request.form.get('stay_dates'), request.form.get('guests')
+        name, phone, dates, guests = request.form.get('name'), request.form.get('phone'), request.form.get('stay_dates'), request.form.get('guests')
         v_name = villa.get('Villa_Name', 'Villa') if villa else "Villa"
         if enquiry_sheet:
             try: enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
@@ -200,14 +172,12 @@ def explore():
     return render_template('explore.html', tourist_places=places)
 
 @app.route('/legal')
-def legal():
-    return render_template('legal.html')
+def legal(): return render_template('legal.html')
 
 @app.route('/contact')
-def contact():
-    return render_template('contact.html')
+def contact(): return render_template('contact.html')
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-            
+    
