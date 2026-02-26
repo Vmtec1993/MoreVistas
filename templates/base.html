@@ -16,8 +16,12 @@
         .brand-divider { height: 30px; width: 1px; background: rgba(255,255,255,0.2); margin: 0 12px; }
         .btn-menu-dark { background: rgba(255,255,255,0.1); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; }
         .btn-book-now { background: linear-gradient(45deg, #00b4d8, #0077b6); color: white !important; border: none; font-weight: 800; font-size: 0.7rem; letter-spacing: 1px; animation: pulse-blue 2s infinite; }
+        
         @keyframes pulse-blue { 0% { transform: scale(1); } 70% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
         .site-logo-nav { height: {{ settings.Logo_Height if settings.Logo_Height else '40' }}px !important; width: auto; filter: brightness(0) invert(1); }
+        
+        /* Premium Footer Styles */
         .premium-footer { background: #0a0a0a; color: #ffffff; padding: 60px 0 40px; text-align: center; }
         .footer-brand-name { font-family: 'Marcellus', serif; font-size: 2rem; letter-spacing: 4px; text-transform: uppercase; color: #fff; }
         .footer-tagline { font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase; color: #00b4d8; font-weight: 700; display: block; margin-bottom: 25px; }
@@ -25,6 +29,13 @@
         .footer-nav-link:hover { color: #00b4d8; }
         .legal-links-small { margin-top: 30px; font-size: 0.75rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
         .legal-links-small a { color: rgba(255,255,255,0.3); text-decoration: none; margin: 0 10px; }
+
+        /* Floating WhatsApp Widget */
+        .wa-widget { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; }
+        .wa-pull-tab { background: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); cursor: pointer; transition: 0.3s; }
+        .wa-box { width: 280px; background: white; border-radius: 20px; margin-bottom: 15px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: none; }
+        .wa-widget.active .wa-box { display: block; animation: slideInUp 0.3s ease; }
+        @keyframes slideInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -59,6 +70,9 @@
                 <a href="/explore" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold"><i class="bi bi-compass me-3"></i> Explore Lonavala</a>
                 <a href="https://wa.me/91{{ settings.Contact }}?text=I want to list my property with MoreVistas" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold text-primary"><i class="bi bi-plus-circle me-3"></i> List Your Property</a>
                 <a href="/contact" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold"><i class="bi bi-chat-left-text me-3"></i> Contact Us</a>
+                {% if session.get('admin_logged_in') %}
+                <a href="/admin" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold text-danger"><i class="bi bi-speedometer2 me-3"></i> Admin Dashboard</a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -73,7 +87,8 @@
                 <a href="/" class="footer-nav-link">Home</a>
                 <a href="/explore" class="footer-nav-link">Explore</a>
                 <a href="/contact" class="footer-nav-link">Contact</a>
-                </div>
+                <a href="/admin" class="footer-nav-link opacity-25">Admin Login</a>
+            </div>
             <div class="legal-links-small">
                 <a href="/terms">Terms & Conditions</a>
                 <a href="/privacy-policy">Privacy Policy</a>
@@ -81,6 +96,18 @@
             </div>
         </div>
     </footer>
+
+    <div class="wa-widget" id="waWidget">
+        <div class="wa-box text-center">
+            <h6 class="fw-bold mb-2">Luxury Concierge</h6>
+            <p class="small text-muted mb-3">Hi! Need help with your booking?</p>
+            <a href="https://wa.me/91{{ settings.Contact }}?text={{ settings.Book_Now_Msg | urlencode }}" target="_blank" class="btn btn-success btn-sm w-100 rounded-pill">Chat with us</a>
+        </div>
+        <div class="wa-pull-tab" onclick="document.getElementById('waWidget').classList.toggle('active')">
+            <i class="bi bi-whatsapp"></i>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
