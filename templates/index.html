@@ -2,7 +2,7 @@
 {% block content %}
 
 {% if settings.Banner_Status == 'ON' %}
-<div class="container-fluid p-0 mb-4">
+<div class="container-fluid p-0 mb-0">
     <div class="position-relative shadow-lg overflow-hidden">
         <img src="{{ settings.Banner_URL if settings.Banner_URL else 'https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg' }}" 
              class="w-100 d-block holi-banner-img" 
@@ -14,15 +14,28 @@
             </span>
         </div>
 
-        <div class="position-absolute bottom-0 start-0 w-100 p-3 text-center" style="background: linear-gradient(transparent, rgba(0,0,0,0.6));">
-            <p class="text-white fw-bold mb-2 d-none d-md-block">{{ settings.Offer_Text }}</p>
+        <div class="position-absolute bottom-0 start-0 w-100 p-3 text-center" style="background: linear-gradient(transparent, rgba(0,0,0,0.7));">
+            <p class="text-white fw-bold mb-2 fs-5 px-2">{{ settings.Offer_Text }}</p>
             <a href="#villaContainer" class="btn btn-light btn-lg rounded-pill fw-bold px-5 shadow-lg border-0 text-danger">BOOK NOW 🚀</a>
         </div>
     </div>
 </div>
+
+<div class="offer-bar py-2 shadow-sm text-center">
+    <div class="container">
+        <span class="fw-600"><i class="bi bi-megaphone-fill me-2"></i> {{ settings.Offer_Text }}</span>
+    </div>
+</div>
+
+<style>
+    .offer-bar { background: #0d6efd; color: white; font-size: 0.9rem; letter-spacing: 0.5px; }
+    .holi-banner-img { height: auto; max-height: 480px; min-height: 250px; object-fit: cover; width: 100%; }
+    .animate-pulse { animation: pulse-red 2s infinite; }
+    @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+</style>
 {% endif %}
 
-<div class="container mb-4">
+<div class="container my-4">
     <div class="bg-white p-3 rounded-4 shadow-sm border d-flex align-items-center justify-content-center">
         <div id="weather-icon" class="me-2 fs-3">☁️</div>
         <div class="fw-bold fs-5 text-dark">Lonavala: <span id="temp">--</span>°C</div>
@@ -31,9 +44,6 @@
 </div>
 
 <style>
-    .holi-banner-img { height: auto; max-height: 480px; min-height: 250px; object-fit: cover; width: 100%; }
-    .animate-pulse { animation: pulse-red 2s infinite; }
-    @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .villa-title-main { background: linear-gradient(45deg, #ff416c, #ff4b2b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 850; font-size: 1.3rem; }
     .price-cut { text-decoration: line-through; color: #6c757d; font-size: 0.9rem; margin-right: 5px; }
     .off-tag { background: #28a745; color: white; font-size: 0.75rem; padding: 2px 10px; border-radius: 5px; font-weight: bold; }
