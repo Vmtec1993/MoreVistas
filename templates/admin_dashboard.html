@@ -9,22 +9,13 @@
     <style>
         :root { --primary-blue: #0d6efd; --dark-bg: #f8f9fa; }
         body { background-color: var(--dark-bg); font-family: 'Plus Jakarta Sans', sans-serif; }
-        
-        /* Sidebar/Header */
         .admin-nav { background: white; border-bottom: 1px solid #dee2e6; padding: 15px 0; }
         .stats-card { border: none; border-radius: 15px; transition: 0.3s; }
-        .stats-card:hover { transform: translateY(-5px); }
-        
-        /* Table Styling */
         .table-container { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .table thead { background: #f8f9fa; }
-        .table thead th { border: none; color: #6c757d; font-size: 0.85rem; text-transform: uppercase; padding: 15px; }
-        .table tbody td { padding: 15px; vertical-align: middle; border-bottom: 1px solid #f1f1f1; }
-        
         .status-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
-        .bg-new { background: #e7f3ff; color: #0d6efd; }
         .bg-sold { background: #ffe5e5; color: #dc3545; }
         .bg-available { background: #e8f5e9; color: #2e7d32; }
+        .preview-box { border: 1px solid #eee; border-radius: 10px; padding: 10px; background: #fff; text-align: center; }
     </style>
 </head>
 <body>
@@ -32,61 +23,73 @@
     <nav class="admin-nav mb-4">
         <div class="container d-flex justify-content-between align-items-center">
             <h4 class="fw-bold m-0">More<span class="text-primary">Vistas</span> Admin</h4>
-            <div class="d-flex align-items-center gap-3">
-                <span class="text-muted small">Welcome, Admin</span>
-                <a href="/admin-logout" class="btn btn-outline-danger btn-sm rounded-pill px-3">Logout</a>
-            </div>
+            <a href="/admin-logout" class="btn btn-outline-danger btn-sm rounded-pill px-3">Logout</a>
         </div>
     </nav>
 
     <div class="container">
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="card stats-card p-4 shadow-sm">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <p class="text-muted mb-1">Total Enquiries</p>
-                            <h2 class="fw-bold">{{ enquiries|length }}</h2>
-                        </div>
-                        <div class="icon-box text-primary fs-1"><i class="bi bi-envelope-paper"></i></div>
-                    </div>
-                </div>
-            </div>
+        <div class="row g-4 mb-4">
             <div class="col-md-4">
                 <div class="card stats-card p-4 shadow-sm bg-primary text-white">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <p class="opacity-75 mb-1">Total Villas</p>
-                            <h2 class="fw-bold">{{ villas|length }}</h2>
-                        </div>
-                        <div class="icon-box text-white fs-1"><i class="bi bi-house-check"></i></div>
-                    </div>
+                    <p class="opacity-75 mb-1">Total Enquiries</p>
+                    <h2 class="fw-bold m-0">{{ enquiries|length }}</h2>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card stats-card p-4 shadow-sm">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <p class="text-muted mb-1">Quick Links</p>
-                            <a href="https://docs.google.com/spreadsheets/d/1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao" target="_blank" class="btn btn-sm btn-link p-0 text-decoration-none">Open Google Sheet <i class="bi bi-box-arrow-up-right"></i></a>
+            <div class="col-md-8">
+                <div class="card stats-card p-4 shadow-sm bg-white">
+                    <h5 class="fw-bold mb-2">Quick Action: Site Settings</h5>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <label class="small fw-bold">Logo Width (px)</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" id="logo-width" class="form-control" value="{{ settings.Logo_Width }}" placeholder="150">
+                                <button class="btn btn-primary" onclick="updateSetting('Logo_Width', 'logo-width')">Save</button>
+                            </div>
                         </div>
-                        <div class="icon-box text-success fs-1"><i class="bi bi-table"></i></div>
+                        <div class="col-md-8">
+                            <label class="small fw-bold">Update Logo URL</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="logo-url" class="form-control" value="{{ settings.Logo_URL }}" placeholder="Paste direct image link">
+                                <button class="btn btn-success" onclick="updateSetting('Logo_URL', 'logo-url')">Update Logo</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="table-container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold m-0"><i class="bi bi-gear-fill me-2"></i>Villa Inventory Control</h5>
+            <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-palette2 me-2"></i>Banner & Visibility</h5>
+            <div class="row g-4 align-items-center">
+                <div class="col-md-6">
+                    <label class="fw-bold small mb-2">Offer Banner Text</label>
+                    <input type="text" id="banner-text" class="form-control mb-3" value="{{ settings.Offer_Text }}">
+                    <label class="fw-bold small mb-2">Banner Image URL</label>
+                    <input type="text" id="banner-url" class="form-control mb-3" value="{{ settings.Banner_URL }}">
+                    <button class="btn btn-primary btn-sm rounded-pill px-4" onclick="updateBanner()">Save Banner Changes</button>
+                </div>
+                <div class="col-md-6 border-start ps-md-4 text-center">
+                    <p class="small fw-bold mb-2">Current Banner Preview</p>
+                    <div class="preview-box">
+                        <img src="{{ settings.Banner_URL }}" style="max-height: 100px; max-width: 100%; border-radius: 5px;" id="preview-banner">
+                    </div>
+                    <div class="form-check form-switch mt-3 d-inline-block text-start">
+                        <input class="form-check-input" type="checkbox" id="bannerSwitch" {% if settings.Banner_Status == 'ON' %}checked{% endif %} onchange="toggleBanner(this.checked)">
+                        <label class="form-check-label fw-bold small" for="bannerSwitch">Show Banner on Website</label>
+                    </div>
+                </div>
             </div>
+        </div>
+
+        <div class="table-container">
+            <h5 class="fw-bold mb-4"><i class="bi bi-house-door me-2"></i>Villa Inventory</h5>
             <div class="table-responsive">
                 <table class="table align-middle">
-                    <thead>
+                    <thead class="table-light">
                         <tr>
                             <th>Villa Name</th>
                             <th>Status</th>
-                            <th>Quick Action</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,15 +104,10 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if villa.get('Status') == 'Sold Out' %}
-                                    <a href="/update-status/{{ villa.get('Villa_ID') }}/Available" class="btn btn-sm btn-outline-success rounded-pill px-3">
-                                        Mark Available
-                                    </a>
-                                {% else %}
-                                    <a href="/update-status/{{ villa.get('Villa_ID') }}/Sold Out" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                                        Mark Sold Out
-                                    </a>
-                                {% endif %}
+                                <a href="/update-status/{{ villa.get('Villa_ID') }}/{{ 'Available' if villa.get('Status') == 'Sold Out' else 'Sold Out' }}" 
+                                   class="btn btn-sm {{ 'btn-outline-success' if villa.get('Status') == 'Sold Out' else 'btn-outline-danger' }} rounded-pill px-3">
+                                    Mark {{ 'Available' if villa.get('Status') == 'Sold Out' else 'Sold Out' }}
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -117,50 +115,40 @@
                 </table>
             </div>
         </div>
-
-        <div class="table-container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold m-0"><i class="bi bi-chat-left-dots-fill me-2"></i>Recent Enquiries</h5>
-                <button class="btn btn-light btn-sm" onclick="location.reload()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
-            </div>
-            
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Customer</th>
-                            <th>Phone</th>
-                            <th>Stay Dates</th>
-                            <th>Guests</th>
-                            <th>Message</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in enquiries %}
-                        <tr>
-                            <td class="small text-muted">{{ row.get('Date', row.get('Timestamp', 'N/A')) }}</td>
-                            <td><span class="fw-bold">{{ row.get('Name', 'Unknown') }}</span></td>
-                            <td><a href="https://wa.me/91{{ row.get('Phone') }}" target="_blank" class="text-decoration-none"><i class="bi bi-whatsapp text-success"></i> {{ row.get('Phone') }}</a></td>
-                            <td class="small">{{ row.get('Check-in') }} to {{ row.get('Check-out') }}</td>
-                            <td><span class="badge bg-new status-badge">{{ row.get('Guests') }} Ppl</span></td>
-                            <td class="small text-muted">{{ row.get('Message', 'No message')[:30] }}...</td>
-                        </tr>
-                        {% endfor %}
-                        {% if not enquiries %}
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">No enquiries found yet.</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
     </div>
 
-    <footer class="text-center mt-5 pb-4 text-muted small">
-        &copy; 2026 MoreVistas Admin Control Panel
-    </footer>
+    <script>
+        // Common function to save data to app.py /update route
+        function updateSetting(key, inputId) {
+            const val = document.getElementById(inputId).value;
+            saveToServer('settings', key, val);
+        }
 
+        function updateBanner() {
+            const text = document.getElementById('banner-text').value;
+            const url = document.getElementById('banner-url').value;
+            saveToServer('settings', 'Offer_Text', text);
+            saveToServer('settings', 'Banner_URL', url);
+            document.getElementById('preview-banner').src = url;
+        }
+
+        function toggleBanner(isChecked) {
+            saveToServer('settings', 'Banner_Status', isChecked ? 'ON' : 'OFF');
+        }
+
+        function saveToServer(target, key, val) {
+            const formData = new FormData();
+            formData.append('target', target);
+            formData.append('key', key);
+            formData.append('value', val);
+
+            fetch('/admin/update', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') alert('✅ Updated: ' + key);
+                else alert('❌ Error: ' + data.message);
+            });
+        }
+    </script>
 </body>
 </html>
