@@ -16,6 +16,7 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; color: #2d3436; }
         
+        /* Loader */
         #loader-wrapper {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000000; z-index: 99999;
@@ -28,68 +29,92 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loader-text { color: white; margin-top: 20px; font-weight: bold; letter-spacing: 2px; }
 
-        /* ✅ DYNAMIC LOGO CSS - FIXED BY Gemini */
+        /* ✅ LOGO SYSTEM */
         .site-logo { 
-            /* Ye direct admin panel se width lega */
             width: {{ settings.Logo_Width if settings.Logo_Width else '150' }}px !important; 
             height: auto !important; 
             max-height: none !important; 
             object-fit: contain; 
-            transition: 0.3s ease; /* Smooth size change */
+            transition: 0.3s ease;
         }
 
-        /* Mobile ke liye smart scaling */
         @media (max-width: 768px) { 
             .site-logo { 
-                /* Mobile par auto-scale karega taaki screen se bahar na jaye */
                 max-width: 80vw !important; 
-                /* Agar width 200px se zyada hai toh mobile par use 140px tak restrict karega */
                 width: min({{ settings.Logo_Width if settings.Logo_Width else '150' }}px, 140px) !important;
             }
         }
 
-        .brand-text-container {
-            display: flex;
-            flex-direction: column;
-            border-left: 2px solid #e0e0e0;
-            padding-left: 12px;
-            margin-left: 12px;
-        }
-
-        .brand-name {
-            font-family: 'Marcellus', serif;
-            font-size: 1.6rem;
-            line-height: 1;
-            color: #1a1a1a;
-            letter-spacing: 1px;
-            font-weight: 500;
-        }
-
-        .brand-tagline {
-            font-size: 0.6rem;
-            letter-spacing: 3px;
-            color: #0d6efd;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
-
-        @media (max-width: 768px) { 
-            .brand-name { font-size: 1.2rem; }
-            .brand-tagline { font-size: 0.5rem; letter-spacing: 2px; }
-            .brand-text-container { padding-left: 8px; margin-left: 8px; }
-        }
+        .brand-text-container { display: flex; flex-direction: column; border-left: 2px solid #e0e0e0; padding-left: 12px; margin-left: 12px; }
+        .brand-name { font-family: 'Marcellus', serif; font-size: 1.6rem; line-height: 1; color: #1a1a1a; letter-spacing: 1px; font-weight: 500; }
+        .brand-tagline { font-size: 0.6rem; letter-spacing: 3px; color: #0d6efd; font-weight: 700; text-transform: uppercase; margin-top: 4px; }
 
         .navbar { background-color: rgba(255, 255, 255, 0.98) !important; backdrop-filter: blur(10px); border-bottom: 1px solid #eee; }
         .nav-link { font-weight: 600; color: #2d3436 !important; transition: 0.3s; }
-        .offcanvas { border-radius: 0 25px 25px 0 !important; width: 300px !important; }
-        .menu-link { 
-            border: none !important; padding: 12px 20px !important; 
-            font-weight: 600; border-radius: 12px !important; margin-bottom: 5px;
-            color: #2d3436 !important; display: flex; align-items: center; text-decoration: none;
+
+        /* ✅ PREMIUM FOOTER CSS */
+        .premium-footer {
+            background: #0a0a0a;
+            color: #ffffff;
+            padding: 60px 0 40px;
+            text-align: center;
         }
-        .btn-list-property { background-color: #f0f7ff; color: #0d6efd; border: 1px dashed #0d6efd; transition: 0.3s; }
-        footer { background: #111; color: white; padding: 60px 0 30px; text-align: center; }
+
+        .footer-brand-name {
+            font-family: 'Marcellus', serif;
+            font-size: 2.2rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #ffffff, #a1a1a1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .footer-tagline {
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #00b4d8; /* Elegant Cyan */
+            font-weight: 700;
+            display: block;
+            margin-bottom: 25px;
+        }
+
+        .footer-nav-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        .footer-nav-link:hover { color: #00b4d8; }
+
+        .footer-social-icon {
+            font-size: 1.5rem;
+            color: white;
+            margin: 0 12px;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+
+        .footer-social-icon:hover { opacity: 1; transform: translateY(-3px); }
+
+        .footer-divider { border-color: rgba(255, 255, 255, 0.1); margin: 30px 0; }
+
+        .legal-links { margin-top: 20px; font-size: 0.8rem; }
+        .legal-links a { color: rgba(255,255,255,0.4); text-decoration: none; margin: 0 8px; }
+        .legal-links a:hover { color: white; }
+
+        .copyright-text {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 1px;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -118,14 +143,6 @@
                 <a href="/legal" class="menu-link"><i class="bi bi-shield-check"></i> Terms & Policies</a>
                 <a href="/contact" class="menu-link"><i class="bi bi-chat-left-dots"></i> Contact Us</a>
             </div>
-            <div class="mt-auto pt-4 border-top">
-                <a href="https://wa.me/91{{ settings.Contact if settings.Contact else '8830024994' }}?text=I%20want%20to%20list%20my%20property" class="btn btn-outline-primary w-100 rounded-pill fw-bold py-2 mb-2">
-                    <i class="bi bi-plus-circle me-2"></i>List Your Property
-                </a>
-                <a href="https://wa.me/91{{ settings.Contact if settings.Contact else '8830024994' }}" class="btn btn-primary w-100 rounded-pill fw-bold py-2">
-                    <i class="bi bi-whatsapp me-2"></i>WhatsApp Us
-                </a>
-            </div>
         </div>
     </div>
 
@@ -145,20 +162,6 @@
                     </div>
                 </a>
             </div>
-            <div class="collapse navbar-collapse d-none d-lg-block">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/explore">Explore</a></li>
-                    <li class="nav-item ms-lg-3">
-                        <a href="https://wa.me/91{{ settings.Contact if settings.Contact else '8830024994' }}?text=I%20want%20to%20list%20my%20property" class="btn btn-list-property btn-sm rounded-pill px-3 fw-bold">
-                            <i class="bi bi-plus-circle me-1"></i> List Property
-                        </a>
-                    </li>
-                    <li class="nav-item ms-lg-2">
-                        <a href="tel:+91{{ settings.Contact if settings.Contact else '8830024994' }}" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold">Call Now</a>
-                    </li>
-                </ul>
-            </div>
         </div>
     </nav>
 
@@ -166,17 +169,40 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
+    <footer class="premium-footer">
         <div class="container">
             <div class="d-flex flex-column align-items-center">
                 {% if settings.Logo_URL %}
-                    <img src="{{ settings.Logo_URL }}" class="mb-2" style="height: 50px; filter: brightness(0) invert(1); width: auto;">
+                    <img src="{{ settings.Logo_URL }}" class="mb-3" style="height: 60px; filter: brightness(0) invert(1); width: auto;">
                 {% endif %}
-                <h3 style="font-family: 'Marcellus', serif; letter-spacing: 2px;">MoreVistas</h3>
-                <p class="opacity-50 small">Your Luxury Getaway Partner in Lonavala</p>
+                <h2 class="footer-brand-name">MoreVistas</h2>
+                <span class="footer-tagline">The Art of Luxury Living</span>
             </div>
-            <hr class="my-5 opacity-10">
-            <p class="small opacity-50 mb-0">© 2026 MoreVistas Luxury.</p>
+
+            <div class="my-4">
+                <a href="/" class="footer-nav-link">Home</a>
+                <a href="/explore" class="footer-nav-link">Explore</a>
+                <a href="/contact" class="footer-nav-link">Contact</a>
+                <a href="/legal" class="footer-nav-link">Legal</a>
+            </div>
+
+            <div class="mb-2">
+                <a href="#" class="footer-social-icon"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="footer-social-icon"><i class="bi bi-facebook"></i></a>
+                <a href="https://wa.me/91{{ settings.Contact }}" class="footer-social-icon"><i class="bi bi-whatsapp"></i></a>
+            </div>
+
+            <hr class="footer-divider">
+
+            <div class="legal-links">
+                <a href="/legal#terms">Terms & Conditions</a> | 
+                <a href="/legal#privacy">Privacy Policy</a> | 
+                <a href="/legal#copyright">Copyright</a>
+            </div>
+
+            <p class="copyright-text">
+                © 2026 MoreVistas Luxury Villas Lonavala. All Rights Reserved.
+            </p>
         </div>
     </footer>
 
