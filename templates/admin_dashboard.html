@@ -1,110 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoreVistas | Command Center</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        :root { 
-            --accent: #00b4d8; 
-            --dark-bg: #0f172a; 
-            --card-border: rgba(226, 232, 240, 0.8);
-            --sidebar-width: 280px;
-        }
-        
-        body { background-color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; }
-
-        /* Modern Sidebar */
-        .sidebar { 
-            width: var(--sidebar-width); height: 100vh; background: var(--dark-bg); 
-            position: fixed; left: 0; top: 0; color: white; padding: 35px 25px; 
-            z-index: 1000; transition: 0.4s;
-        }
-        
-        .nav-link-custom {
-            color: rgba(255,255,255,0.5); padding: 14px 18px; border-radius: 15px;
-            display: flex; align-items: center; text-decoration: none; 
-            margin-bottom: 12px; transition: 0.3s; font-weight: 500;
-        }
-        
-        .nav-link-custom:hover, .nav-link-custom.active { 
-            background: rgba(255,255,255,0.1); color: var(--accent); 
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
-        }
-
-        .main-content { margin-left: var(--sidebar-width); padding: 50px; transition: 0.4s; }
-
-        /* Dashboard Cards */
-        .glass-card {
-            background: white; border-radius: 28px; padding: 30px;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.02);
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glass-card:hover { transform: translateY(-5px); box-shadow: 0 20px 45px rgba(0,0,0,0.05); }
-
-        .icon-shape {
-            width: 60px; height: 60px; border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.6rem; margin-bottom: 20px;
-        }
-
-        /* Lead Management Table */
-        .table-luxury { background: white; border-radius: 28px; overflow: hidden; border: 1px solid var(--card-border); }
-        .table thead th { 
-            background: #f1f5f9; color: #64748b; font-size: 0.75rem; 
-            text-transform: uppercase; letter-spacing: 1.5px; border: none; padding: 20px; 
-        }
-        .table tbody td { padding: 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-
-        /* Input Controls */
-        .luxury-input {
-            border: 2px solid #f1f5f9 !important; border-radius: 14px !important;
-            padding: 12px 18px !important; font-size: 0.95rem; transition: 0.3s;
-        }
-        .luxury-input:focus { border-color: var(--accent) !important; box-shadow: none !important; }
-
-        .btn-whatsapp { 
-            background: #25d366; color: white; border-radius: 12px; 
-            font-weight: 700; font-size: 0.85rem; padding: 10px 18px;
-            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.2); transition: 0.3s;
-        }
-        .btn-whatsapp:hover { background: #1fb355; color: white; transform: scale(1.05); }
-
-        @media (max-width: 992px) {
-            .sidebar { left: -100%; }
-            .main-content { margin-left: 0; padding: 25px; }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="sidebar shadow-lg">
-        <div class="mb-5 px-3">
-            <h3 class="fw-bold text-white mb-1">MORE<span style="color: var(--accent);">VISTAS</span></h3>
-            <p class="small opacity-50 mb-0">Management Portal v2.0</p>
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid py-5" style="background: #f8f9fa; min-height: 100vh;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h2>
+            <a href="/admin-logout" class="btn btn-outline-danger btn-sm rounded-pill px-4">Logout</a>
         </div>
-        
-        <a href="#" class="nav-link-custom active"><i class="bi bi-speedometer2 me-3"></i> Overview</a>
-        <a href="#leads" class="nav-link-custom"><i class="bi bi-megaphone me-3"></i> Booking Leads</a>
-        <a href="#villas" class="nav-link-custom"><i class="bi bi-house-gear me-3"></i> Villa Status</a>
-        <a href="#settings" class="nav-link-custom"><i class="bi bi-palette me-3"></i> UI Settings</a>
-        
-        <div style="position: absolute; bottom: 40px; left: 25px; right: 25px;">
-            <a href="/admin-logout" class="btn btn-outline-danger w-100 rounded-pill fw-bold border-2">Sign Out</a>
+
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm p-3 rounded-4 bg-primary text-white">
+                    <small>Total Villas</small>
+                    <h3 class="fw-bold">{{ villas|length }}</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm p-3 rounded-4 bg-success text-white">
+                    <small>Recent Enquiries</small>
+                    <h3 class="fw-bold">{{ enquiries|length }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <h4 class="fw-bold mb-3">Recent Booking Leads</h4>
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Villa</th>
+                                <th>Phone</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enq in enquiries %}
+                            <tr>
+                                <td class="small">{{ enq.Timestamp }}</td>
+                                <td class="fw-bold">{{ enq.Name }}</td>
+                                <td><span class="badge bg-info text-dark">{{ enq.Villa }}</span></td>
+                                <td>{{ enq.Phone }}</td>
+                                <td>
+                                    <a href="https://wa.me/91{{ enq.Phone }}" target="_blank" class="btn btn-success btn-sm rounded-pill">
+                                        <i class="bi bi-whatsapp"></i> Chat
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <h4 class="fw-bold mb-3">Manage Villas (Status)</h4>
+            <div class="row g-3">
+                {% for villa in villas %}
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-3 rounded-4">
+                        <h6 class="fw-bold mb-2">{{ villa.Villa_Name }}</h6>
+                        <select class="form-select form-select-sm rounded-pill update-status" data-id="{{ villa.Villa_ID }}">
+                            <option value="Available" {% if villa.Status == 'Available' %}selected{% endif %}>Available</option>
+                            <option value="Sold Out" {% if villa.Status == 'Sold Out' %}selected{% endif %}>Sold Out</option>
+                        </select>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="main-content">
-        <header class="d-flex justify-content-between align-items-center mb-5">
-            <div>
-                <h1 class="fw-800 m-0">Dashboard</h1>
-                <p class="text-muted">Welcome back! Manage your luxury villa empire.</p>
-            </div>
-            <div class="d
-                
+<script>
+    // Status update logic
+    document.querySelectorAll('.update-status').forEach(select => {
+        select.addEventListener('change', function() {
+            let vId = this.getAttribute('data-id');
+            let newVal = this.value;
+            
+            fetch('/admin/update', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `target=villas&villa_id=${vId}&key=Status&value=${newVal}`
+            }).then(res => res.json()).then(data => {
+                if(data.status === 'success') alert('Status Updated!');
+            });
+        });
+    });
+</script>
+{% endblock %}
