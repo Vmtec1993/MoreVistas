@@ -2,39 +2,29 @@
 {% block content %}
 
 <style>
-    .luxury-tagline {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        color: #00b4d8;
-        text-transform: uppercase;
-        letter-spacing: 3px;
-        font-weight: 600;
-        font-size: 0.7rem;
-    }
-    /* Logo line separator */
-    .logo-divider {
-        height: 30px;
-        width: 1px;
-        background-color: #eee;
-        margin: 0 15px;
-    }
+    .luxury-tagline { font-family: 'Plus Jakarta Sans', sans-serif; color: #00b4d8; text-transform: uppercase; letter-spacing: 3px; font-weight: 600; font-size: 0.7rem; }
+    .feature-card { border: none; border-radius: 20px; transition: 0.3s; background: #fff; padding: 30px; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .feature-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+    .feature-icon { width: 60px; height: 60px; background: #f0fbff; color: #00b4d8; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; }
+    .tourist-scroll { display: flex; overflow-x: auto; gap: 20px; padding-bottom: 20px; scrollbar-width: none; }
+    .tourist-scroll::-webkit-scrollbar { display: none; }
+    .tourist-card { min-width: 280px; border-radius: 20px; overflow: hidden; position: relative; height: 350px; }
+    .tourist-card img { height: 100%; width: 100%; object-fit: cover; transition: 0.5s; }
+    .tourist-card:hover img { transform: scale(1.1); }
+    .tourist-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; }
+    .list-property-banner { background: #0a0a0a; border-radius: 30px; padding: 60px 40px; color: white; margin-top: 80px; position: relative; overflow: hidden; }
 </style>
 
 {% if settings.Banner_Status == 'ON' %}
 <div class="container-fluid p-0 mb-0">
     <div class="position-relative shadow-lg overflow-hidden">
-        <img src="{{ settings.Banner_URL if settings.Banner_URL else 'https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg' }}" 
-             class="w-100 d-block holi-banner-img" 
-             alt="Luxury Villa Offer">
-        
+        <img src="{{ settings.Banner_URL if settings.Banner_URL else 'https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg' }}" class="w-100 d-block holi-banner-img" alt="Offer">
         <div class="position-absolute top-0 end-0 m-3">
-            <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm animate-pulse text-uppercase">
-                🎨 {{ settings.Offer_Tag if settings.Offer_Tag else 'OFFER LIVE' }}
-            </span>
+            <span class="badge bg-danger rounded-pill px-3 py-2 animate-pulse">🎨 {{ settings.Offer_Tag }}</span>
         </div>
-
-        <div class="position-absolute bottom-0 start-0 w-100 p-3 text-center" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
-            <p class="text-white fw-bold mb-2 fs-5 px-2">{{ settings.Offer_Text }}</p>
-            <a href="#villaContainer" class="btn btn-light btn-lg rounded-pill fw-bold px-5 shadow-lg border-0 text-danger">BOOK NOW 🚀</a>
+        <div class="position-absolute bottom-0 start-0 w-100 p-4 text-center" style="background: linear-gradient(transparent, rgba(0,0,0,0.9));">
+            <h2 class="text-white fw-bold mb-3">{{ settings.Offer_Text }}</h2>
+            <a href="#villaContainer" class="btn btn-light btn-lg rounded-pill fw-bold px-5 text-danger border-0">BOOK NOW 🚀</a>
         </div>
     </div>
 </div>
@@ -54,104 +44,119 @@
         <div class="col-md-8">
             <div class="bg-white p-2 rounded-4 shadow-sm border d-flex align-items-center px-3 h-100">
                 <i class="bi bi-search text-muted me-2"></i>
-                <input type="text" class="form-control border-0 shadow-none" placeholder="Search for Villas or BHK...">
+                <input type="text" class="form-control border-0 shadow-none" placeholder="Search Villas (e.g. 4 BHK, Pool, Ac)">
             </div>
         </div>
     </div>
 </div>
 
-<div class="container mt-4 text-center">
+<div class="container mt-5 text-center">
     <div class="luxury-tagline mb-2">The Art of Luxury Living</div>
-    <h1 class="fw-bold display-6">Private Pool <span class="text-primary">Villas</span></h1>
-    <p class="text-muted">Handpicked Collection for Your Perfect Getaway</p>
+    <h1 class="fw-bold">Private Pool <span class="text-primary">Villas</span></h1>
 </div>
 
-<div class="container mt-5">
+<div class="container mt-4">
     <div class="row g-4" id="villaContainer">
-        {% if villas %}
-            {% for villa in villas %}
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative villa-card-hover">
-                    {% if villa.Status|lower == 'sold out' %}
+        {% for villa in villas %}
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative villa-card-hover">
+                {% if villa.Status|lower == 'sold out' %}
                     <div class="sold-out-overlay">🚫 SOLD OUT</div>
-                    {% endif %}
-
-                    <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:240px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(1); opacity: 0.6;{% endif %}">
-                    
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="fw-bold text-dark m-0">{{ villa.Villa_Name }}</h5>
-                            <span class="badge bg-light text-dark border"><i class="bi bi-star-fill text-warning"></i> 4.8</span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            {% if villa.Price and villa.Price|int > 0 %}
-                                <div class="d-flex align-items-baseline gap-2">
-                                    <span class="fs-4 fw-bold text-primary">₹{{ villa.Price }}</span>
-                                    {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
-                                    <span class="text-muted text-decoration-line-through small">₹{{ villa.Original_Price }}</span>
-                                    <span class="text-success small fw-bold">{{ villa.discount_perc }}% OFF</span>
-                                    {% endif %}
-                                </div>
-                            {% else %}
-                                <span class="fw-bold text-primary">Price on Request</span>
-                            {% endif %}
-                        </div>
-
-                        <div class="row g-2 mb-4">
-                            <div class="col-6">
-                                <div class="p-2 bg-light rounded-3 text-center small">
-                                    <i class="bi bi-people me-1"></i> {{ villa.Guests }} Guests
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-2 bg-light rounded-3 text-center small">
-                                    <i class="bi bi-door-open me-1"></i> {{ villa.BHK }} BHK
-                                </div>
-                            </div>
-                        </div>
-
-                        {% if villa.Status|lower == 'sold out' %}
-                        <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Sold Out</button>
-                        {% else %}
-                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark w-100 rounded-pill fw-bold py-2">Check Availability</a>
+                {% endif %}
+                <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:240px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(1); opacity: 0.6;{% endif %}">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark">{{ villa.Villa_Name }}</h5>
+                    <div class="d-flex align-items-baseline gap-2 mb-3">
+                        <span class="fs-4 fw-bold text-primary">₹{{ villa.Price }}</span>
+                        {% if villa.Original_Price|int > villa.Price|int %}
+                        <span class="text-muted text-decoration-line-through small">₹{{ villa.Original_Price }}</span>
                         {% endif %}
                     </div>
+                    <div class="row g-2 mb-4">
+                        <div class="col-6"><div class="p-2 bg-light rounded-3 text-center small">👥 {{ villa.Guests }} Guests</div></div>
+                        <div class="col-6"><div class="p-2 bg-light rounded-3 text-center small">🚪 {{ villa.BHK }} BHK</div></div>
+                    </div>
+                    {% if villa.Status|lower == 'sold out' %}
+                    <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Sold Out</button>
+                    {% else %}
+                    <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-dark w-100 rounded-pill fw-bold py-2">View Details</a>
+                    {% endif %}
                 </div>
             </div>
-            {% endfor %}
-        {% endif %}
+        </div>
+        {% endfor %}
     </div>
 </div>
 
-<style>
-    .wa-widget { position: fixed; right: -280px; bottom: 100px; z-index: 9999; display: flex; align-items: center; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .wa-widget.active { right: 20px; }
-    .wa-pull-tab { background: #25d366; color: white; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50% 0 0 50%; cursor: pointer; box-shadow: -5px 0 20px rgba(0,0,0,0.15); border: 2px solid white; border-right: none; }
-    .wa-box { background: white; padding: 20px; width: 280px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); border: 1px solid #f1f1f1; }
-    
-    /* Extra UI Styles */
-    .villa-card-hover { transition: 0.3s; }
-    .villa-card-hover:hover { transform: translateY(-10px); }
-    .sold-out-overlay { position: absolute; top: 20px; left: 20px; background: #000; color: #fff; padding: 6px 15px; border-radius: 50px; font-size: 0.7rem; font-weight: 800; z-index: 10; letter-spacing: 1px; }
-    .holi-banner-img { height: 450px; object-fit: cover; }
-    @media (max-width: 768px) { .holi-banner-img { height: 280px; } .wa-widget { bottom: 30px; } }
-</style>
+<div class="container mt-5 pt-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Why Stay With <span class="text-primary">MoreVistas?</span></h2>
+        <p class="text-muted">Experience luxury like never before with our premium services.</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon mx-auto"><i class="bi bi-shield-check"></i></div>
+                <h5 class="fw-bold">Verified Luxury</h5>
+                <p class="small text-muted">Every villa is personally inspected for quality and premium standards.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon mx-auto"><i class="bi bi-water"></i></div>
+                <h5 class="fw-bold">Private Pools</h5>
+                <p class="small text-muted">Complete privacy with temperature-controlled or infinity pools.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon mx-auto"><i class="bi bi-headset"></i></div>
+                <h5 class="fw-bold">24/7 Concierge</h5>
+                <p class="small text-muted">A dedicated manager for your group to handle food, décor, and travel.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5 pt-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">Explore <span class="text-primary">Lonavala</span></h2>
+            <p class="text-muted mb-0">Must visit spots near our villas.</p>
+        </div>
+        <a href="/explore" class="btn btn-outline-primary btn-sm rounded-pill px-3">View All</a>
+    </div>
+    <div class="tourist-scroll">
+        <div class="tourist-card">
+            <img src="https://images.unsplash.com/photo-1626014303757-64663979069d?q=80&w=600" alt="Tiger Point">
+            <div class="tourist-overlay"><h5>Tiger Point</h5><small>15 mins away</small></div>
+        </div>
+        <div class="tourist-card">
+            <img src="https://images.unsplash.com/photo-1590400589304-712f5a6b744d?q=80&w=600" alt="Bhushi Dam">
+            <div class="tourist-overlay"><h5>Bhushi Dam</h5><small>10 mins away</small></div>
+        </div>
+        <div class="tourist-card">
+            <img src="https://images.unsplash.com/photo-1626014303965-728639556191?q=80&w=600" alt="Lonavala Lake">
+            <div class="tourist-overlay"><h5>Pawna Lake</h5><small>25 mins away</small></div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="list-property-banner text-center shadow-lg">
+        <h2 class="display-6 fw-bold mb-3">Want to Earn from Your Villa?</h2>
+        <p class="lead opacity-75 mb-4">Partner with MoreVistas and let us manage your property for maximum returns.</p>
+        <a href="https://wa.me/91{{ settings.Contact }}?text=Hi, I want to list my villa with MoreVistas" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">List Your Property Now</a>
+    </div>
+</div>
 
 <div class="wa-widget" id="waWidget">
-    <div class="wa-pull-tab" onclick="document.getElementById('waWidget').classList.toggle('active')">
-        <i class="bi bi-whatsapp" style="font-size: 1.8rem;"></i>
-    </div>
+    <div class="wa-pull-tab" onclick="document.getElementById('waWidget').classList.toggle('active')"><i class="bi bi-whatsapp" style="font-size: 1.8rem;"></i></div>
     <div class="wa-box text-center">
-        <div class="bg-success bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
-            <i class="bi bi-chat-dots-fill text-success fs-3"></i>
-        </div>
+        <div class="bg-success bg-opacity-10 p-3 rounded-circle d-inline-block mb-3"><i class="bi bi-chat-dots-fill text-success fs-3"></i></div>
         <h6 class="fw-bold">Luxury Concierge</h6>
         <p class="small text-muted mb-4">Chat with us for group discounts & custom bookings.</p>
-        <a href="https://wa.me/91{{ settings.Contact if settings.Contact else '8830024994' }}?text={{ settings.Book_Now_Msg }}" 
-           target="_blank" class="btn btn-success w-100 rounded-pill fw-bold py-2 shadow-sm">
-            Message on WhatsApp
-        </a>
+        <a href="https://wa.me/91{{ settings.Contact }}?text={{ settings.Book_Now_Msg | urlencode }}" target="_blank" class="btn btn-success w-100 rounded-pill fw-bold">Message on WhatsApp</a>
     </div>
 </div>
 
@@ -162,14 +167,11 @@
             const data = await res.json();
             document.getElementById('temp').innerText = Math.round(data.main.temp);
             document.getElementById('weather-desc').innerText = data.weather[0].description;
-            const iconCode = data.weather[0].icon;
-            document.getElementById('weather-icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${iconCode}.png" width="40">`;
-        } catch (e) { 
-            document.getElementById('temp').innerText = "28"; 
-            document.getElementById('weather-desc').innerText = "Clear Sky";
-        }
+            document.getElementById('weather-icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${data.weather[0].icon}.png" width="40">`;
+        } catch (e) { document.getElementById('temp').innerText = "26"; }
     }
     getLonavalaWeather();
 </script>
 
 {% endblock %}
+                
