@@ -37,7 +37,6 @@ def init_sheets():
             if len(worksheets) > 1: places_sheet = worksheets[1]
             if len(worksheets) > 2: enquiry_sheet = worksheets[2]
             if len(worksheets) > 3: settings_sheet = worksheets[3]
-            
             print("✅ Sheets Linked Successfully")
         except Exception as e:
             print(f"❌ Sheet Init Error: {e}")
@@ -58,7 +57,7 @@ def get_rows(target_sheet):
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
-            # --- Price & Discount Logic ---
+            # Price Calculation
             try:
                 p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
@@ -66,18 +65,8 @@ def get_rows(target_sheet):
                 original = int(float(op_val)) if op_val and op_val.lower() != 'nan' else 0
                 item['Price'] = current
                 item['Original_Price'] = original
-                item['discount_perc'] = int(((original - current) / original) * 100) if original > current > 0 else 0
             except: 
-                item['discount_perc'] = 0
-
-            # --- Rules List Logic (Sheet se automatic todna) ---
-            raw_rules = item.get('Rules', '')
-            if raw_rules and '|' in raw_rules:
-                item['Rules_List'] = [r.strip() for r in raw_rules.split('|')]
-            elif raw_rules:
-                item['Rules_List'] = [raw_rules.strip()]
-            else:
-                item['Rules_List'] = ["Contact for house rules"]
+                item['Price'] = 0
             
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
             final_list.append(item)
@@ -85,24 +74,20 @@ def get_rows(target_sheet):
     except: return []
 
 def get_settings():
+    # Default values taaki agar sheet khali ho toh banner gayab na ho
     res = {
-        'Offer_Text': "Welcome to MoreVistas", 
-        'Contact': "8830024994", 
-        'Logo_URL': '', 
-        'Logo_Height': '45',
-        'Book_Now_Msg': 'I want to book a luxury villa',
-        'Banner_URL': '', 
         'Banner_Status': 'OFF',
-        'Offer_Tag': 'OFFER LIVE'
+        'Offer_Text': 'Welcome to MoreVistas',
+        'Offer_Tag': 'OFFER LIVE',
+        'Banner_URL': '',
+        'Contact': '8830024994'
     }
     if settings_sheet:
         try:
             data = settings_sheet.get_all_values()
             for r in data:
                 if len(r) >= 2:
-                    key = r[0].strip()
-                    val = r[1].strip()
-                    if key: res[key] = val
+                    res[r[0].strip()] = r[1].strip()
         except: pass
     return res
 
@@ -110,12 +95,17 @@ def get_settings():
 
 @app.route('/')
 def index():
-    settings = get_settings()
-    villas = get_rows(sheet)
-    # Tourist places ko pass kiya taaki photos dikhein
-    places = get_rows(places_sheet)
-    sorted_villas = sorted(villas, key=lambda x: str(x.get('Status', '')).lower() == 'sold out')
-    return render_template('index.html', villas=sorted_villas, tourist_places=places, settings=settings)
+    settings_data = get_settings()
+    villas_data = get_rows(sheet)
+    places_data = get_rows(places_sheet) # ✅ Tourist Points fix
+    
+    # Sorting villas: Sold out last
+    sorted_villas = sorted(villas_data, key=lambda x: str(x.get('Status', '')).lower() == 'sold out')
+    
+    return render_template('index.html', 
+                           villas=sorted_villas, 
+                           settings=settings_data, 
+                           tourist_places=places_data)
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_dashboard():
@@ -137,48 +127,12 @@ def admin_dashboard():
             raw_enq = enquiry_sheet.get_all_values()
             if len(raw_enq) > 1:
                 headers = [h.strip() for h in raw_enq[0]]
-                rows = [r for r in raw_enq[1:] if any(r) and len(r) > 1 and r[1].strip() != "" and r[1].lower() != "none"]
-                rows.reverse() 
+                rows = [r for r in raw_enq[1:] if any(r) and len(r) > 1]
+                rows.reverse()
                 enquiries = [dict(zip(headers, r + [''] * (len(headers) - len(r)))) for r in rows]
         except: pass
         
-    # Yahan 'admin_dashboard.html' use kiya hai
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries, settings=settings)
-
-@app.route('/admin/update', methods=['POST'])
-def update_data():
-    if not session.get('admin_logged_in'): return jsonify({"status": "error"}), 403
-    target = request.form.get('target')
-    key = request.form.get('key')
-    val = request.form.get('value')
-    v_id = request.form.get('villa_id')
-    
-    try:
-        if target == "settings" and settings_sheet:
-            try:
-                cell = settings_sheet.find(key)
-                settings_sheet.update_cell(cell.row, 2, val)
-            except:
-                settings_sheet.append_row([key, val])
-        elif target == "villas" and sheet:
-            all_ids = sheet.col_values(1)
-            if str(v_id) in all_ids:
-                row_index = all_ids.index(str(v_id)) + 1
-                headers = sheet.row_values(1)
-                if key in headers:
-                    col_index = headers.index(key) + 1
-                    sheet.update_cell(row_index, col_index, val)
-        return jsonify({"status": "success"})
-    except Exception as e: 
-        return jsonify({"status": "error", "message": str(e)})
-
-@app.route('/privacy-policy')
-def privacy():
-    return render_template('legal.html', type='privacy', settings=get_settings())
-
-@app.route('/terms')
-def terms():
-    return render_template('legal.html', type='terms', settings=get_settings())
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
@@ -186,10 +140,16 @@ def villa_details(villa_id):
     villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
     
+    # Rules string ko list mein badalna
+    raw_rules = villa.get('Rules', 'ID Proof Required')
+    villa['Rules_List'] = [r.strip() for r in raw_rules.split('|')] if '|' in raw_rules else [raw_rules]
+    
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not imgs or not any(imgs): imgs = [villa.get('Image_URL')]
     
     return render_template('villa_details.html', villa=villa, villa_images=imgs, settings=get_settings())
+
+# ... (Baaki saare routes same rahenge: enquiry, legal, logout, explore, contact) ...
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
@@ -197,21 +157,17 @@ def enquiry(villa_id):
     villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
     settings = get_settings()
     if request.method == 'POST':
-        name = request.form.get('name')
-        phone = request.form.get('phone')
-        dates = request.form.get('stay_dates')
-        guests = request.form.get('guests')
+        name, phone = request.form.get('name'), request.form.get('phone')
+        dates, guests = request.form.get('stay_dates'), request.form.get('guests')
         v_name = villa.get('Villa_Name', 'Villa') if villa else "Villa"
         
         if enquiry_sheet:
-            try: 
-                enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
+            try: enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
             except: pass
             
-        alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
+        alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}"
         requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
         return render_template('success.html', name=name, villa_name=v_name, settings=settings)
-        
     return render_template('enquiry.html', villa=villa, settings=settings)
 
 @app.route('/admin-logout')
@@ -227,10 +183,35 @@ def explore():
 def contact(): 
     return render_template('contact.html', settings=get_settings())
 
-if __name__ == "__main__":
-    # Render hamesha 'PORT' environment variable deta hai
-    port = int(os.environ.get("PORT", 10000)) 
-    # '0.0.0.0' hona zaroori hai taaki Render ise bahar se access kar sake
-    app.run(host='0.0.0.0', port=port)
+@app.route('/admin/update', methods=['POST'])
+def update_data():
+    if not session.get('admin_logged_in'): return jsonify({"status": "error"}), 403
+    target, key, val, v_id = request.form.get('target'), request.form.get('key'), request.form.get('value'), request.form.get('villa_id')
+    try:
+        if target == "settings" and settings_sheet:
+            try:
+                cell = settings_sheet.find(key)
+                settings_sheet.update_cell(cell.row, 2, val)
+            except: settings_sheet.append_row([key, val])
+        elif target == "villas" and sheet:
+            all_ids = sheet.col_values(1)
+            if str(v_id) in all_ids:
+                row_index = all_ids.index(str(v_id)) + 1
+                headers = sheet.row_values(1)
+                if key in headers:
+                    col_index = headers.index(key) + 1
+                    sheet.update_cell(row_index, col_index, val)
+        return jsonify({"status": "success"})
+    except: return jsonify({"status": "error"})
 
-                
+@app.route('/privacy-policy')
+def privacy(): return render_template('legal.html', type='privacy', settings=get_settings())
+
+@app.route('/terms')
+def terms(): return render_template('legal.html', type='terms', settings=get_settings())
+
+# --- RENDER DEPLOYMENT FIX ---
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000)) 
+    app.run(host='0.0.0.0', port=port)
+            
