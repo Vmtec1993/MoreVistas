@@ -3,6 +3,7 @@ import json
 import gspread
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from oauth2client.service_account import ServiceAccountCredentials
+import requests
 from datetime import datetime
 
 app = Flask(__name__)
@@ -35,13 +36,12 @@ def init_sheets():
             if len(worksheets) > 1: places_sheet = worksheets[1]
             if len(worksheets) > 2: enquiry_sheet = worksheets[2]
             if len(worksheets) > 3: settings_sheet = worksheets[3]
-            print("✅ All Sheets Linked Successfully")
+            print("✅ Sheets Linked Successfully")
         except Exception as e:
             print(f"❌ Sheet Init Error: {e}")
 
 init_sheets()
 
-# --- HELPER FUNCTIONS ---
 def get_rows(target_sheet):
     if not target_sheet: return []
     try:
@@ -52,7 +52,24 @@ def get_rows(target_sheet):
         for row in data[1:]:
             if not any(row): continue
             padded_row = row + [''] * (len(headers) - len(row))
-            final_list.append(dict(zip(headers, padded_row)))
+            item = dict(zip(headers, padded_row))
+            
+            # --- RULES LIST LOGIC (For villa_details.html) ---
+            rules = []
+            for i in range(1, 11):
+                r = item.get(f'Rule_{i}')
+                if r and r.strip(): rules.append(r.strip())
+            item['Rules_List'] = rules
+            
+            # --- DISCOUNT LOGIC (For Offer Banner in Details) ---
+            try:
+                p = int(str(item.get('Price', 0)).replace(',',''))
+                op = int(str(item.get('Original_Price', 0)).replace(',',''))
+                if op > p:
+                    item['discount_perc'] = round(((op - p) / op) * 100)
+            except: item['discount_perc'] = 0
+                
+            final_list.append(item)
         return final_list
     except: return []
 
@@ -63,14 +80,15 @@ def get_settings():
             data = settings_sheet.get_all_values()
             for r in data:
                 if len(r) >= 2:
-                    key = r[0].strip()
-                    val = r[1].strip()
-                    if 'URL' in key and val and not val.startswith('http'): val = 'https://' + val
+                    key, val = r[0].strip(), r[1].strip()
+                    if 'URL' in key and val and not val.startswith('http'): 
+                        val = 'https://' + val
                     res[key] = val
         except: pass
     return res
 
 # --- ROUTES ---
+
 @app.route('/')
 def index():
     return render_template('index.html', villas=get_rows(sheet), settings=get_settings(), tourist_places=get_rows(places_sheet))
@@ -78,39 +96,24 @@ def index():
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     villas = get_rows(sheet)
-    villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
+    villa = next((v for v in villas if str(v.get('Villa_ID')).strip() == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
     
-    # Image logic for gallery
+    # Gallery Images Logic
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not any(imgs): imgs = [villa.get('Image_URL')]
     
-    # Rules logic - Clean list
-    rules = [villa.get(f'Rule_{i}') for i in range(1, 11) if villa.get(f'Rule_{i}')]
-    
-    return render_template('villa_details.html', villa=villa, villa_images=imgs, villa_rules=rules, settings=get_settings())
+    return render_template('villa_details.html', villa=villa, villa_images=imgs, settings=get_settings())
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
     v_data = get_rows(sheet)
-    villa = next((v for v in v_data if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
-    if not villa: return "Villa Not Found", 404
-
+    villa = next((v for v in v_data if str(v.get('Villa_ID')).strip() == str(villa_id).strip()), None)
     if request.method == 'POST':
-        name = request.form.get('name')
-        phone = request.form.get('phone')
-        dates = request.form.get('stay_dates')
-        guests = request.form.get('guests')
-        
+        name, phone = request.form.get('name'), request.form.get('phone')
         if enquiry_sheet:
-            enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y"), name, phone, dates, guests, villa.get('Villa_Name')])
-        
-        # Telegram Alert
-        msg = f"🆕 NEW ENQUIRY!\n\nVilla: {villa.get('Villa_Name')}\nName: {name}\nPhone: {phone}\nDates: {dates}\nGuests: {guests}"
-        requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage?chat_id={TELEGRAM_CHAT_ID}&text={msg}")
-        
+            enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y"), name, phone, request.form.get('stay_dates'), request.form.get('guests'), villa.get('Villa_Name')])
         return render_template('success.html', name=name, settings=get_settings())
-    
     return render_template('enquiry.html', villa=villa, settings=get_settings())
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -131,7 +134,7 @@ def logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('index'))
 
+# --- RENDER PORT BINDING ---
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
-    
