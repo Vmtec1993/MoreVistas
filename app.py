@@ -32,8 +32,8 @@ def init_sheets():
             SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
             main_spreadsheet = client.open_by_key(SHEET_ID)
             
-            sheet = main_spreadsheet.sheet1
             all_ws = {ws.title: ws for ws in main_spreadsheet.worksheets()}
+            sheet = all_ws.get("Sheet1") # Ensure this matches your main villa sheet name
             places_sheet = all_ws.get("Places")
             enquiry_sheet = all_ws.get("Enquiries")
             settings_sheet = all_ws.get("Settings")
@@ -41,6 +41,7 @@ def init_sheets():
         except Exception as e:
             print(f"❌ Sheet Init Error: {e}")
 
+# Call once at startup
 init_sheets()
 
 # --- Utility Functions ---
@@ -63,7 +64,8 @@ def get_rows(target_sheet):
                 item['Price'] = current
                 item['Original_Price'] = original
                 item['discount_perc'] = int(((original - current) / original) * 100) if original > current > 0 else 0
-            except: item['discount_perc'] = 0
+            except: 
+                item['discount_perc'] = 0
             
             raw_rules = item.get('Rules', '')
             item['Rules_List'] = [r.strip() for r in raw_rules.split('|')] if '|' in raw_rules else ([raw_rules.strip()] if raw_rules else ["ID Proof Required"])
@@ -96,8 +98,48 @@ def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
     settings = get_settings()
+    # Logic: Sold Out villas move to bottom
     sorted_villas = sorted(villas, key=lambda x: str(x.get('Status', '')).lower() == 'sold out')
     return render_template('index.html', villas=sorted_villas, tourist_places=places, settings=settings)
+
+@app.route('/villa/<villa_id>')
+def villa_details(villa_id):
+    villas = get_rows(sheet)
+    villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
+    if not villa: return "Villa Not Found", 404
+    
+    # Image gallery logic
+    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
+    if not imgs: imgs = [villa.get('Image_URL')]
+    
+    return render_template('villa_details.html', villa=villa, villa_images=imgs, settings=get_settings())
+
+@app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
+def enquiry(villa_id):
+    villas = get_rows(sheet)
+    villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
+    settings = get_settings()
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        dates = request.form.get('stay_dates')
+        guests = request.form.get('guests')
+        v_name = villa.get('Villa_Name', 'Villa') if villa else "Unknown Villa"
+        
+        if enquiry_sheet:
+            try: 
+                enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
+            except Exception as e: print(f"Sheet Error: {e}")
+            
+        alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
+        requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
+        
+        return render_template('success.html', name=name, villa_name=v_name, settings=settings)
+    
+    return render_template('enquiry.html', villa=villa, settings=settings)
+
+# --- Admin Routes ---
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_dashboard():
@@ -106,6 +148,7 @@ def admin_dashboard():
             session['admin_logged_in'] = True
         else:
             return "<script>alert('Incorrect Password!'); window.location='/admin';</script>"
+    
     if not session.get('admin_logged_in'):
         return render_template('admin_login.html')
 
@@ -117,7 +160,7 @@ def admin_dashboard():
             raw_enq = enquiry_sheet.get_all_values()
             if len(raw_enq) > 1:
                 headers = [h.strip() for h in raw_enq[0]]
-                rows = raw_enq[1:]; rows.reverse()
+                rows = raw_enq[1:]; rows.reverse() # Latest first
                 enquiries = [dict(zip(headers, r + [''] * (len(headers) - len(r)))) for r in rows]
         except: pass
     return render_template('admin.html', villas=villas, enquiries=enquiries, settings=settings)
@@ -125,7 +168,10 @@ def admin_dashboard():
 @app.route('/admin/update', methods=['POST'])
 def update_data():
     if not session.get('admin_logged_in'): return jsonify({"status": "error"}), 403
-    target, key, val, v_id = request.form.get('target'), request.form.get('key'), request.form.get('value'), request.form.get('villa_id')
+    target = request.form.get('target')
+    key = request.form.get('key')
+    val = request.form.get('value')
+    v_id = request.form.get('villa_id')
     try:
         if target == "settings" and settings_sheet:
             try:
@@ -141,54 +187,20 @@ def update_data():
         return jsonify({"status": "success"})
     except Exception as e: return jsonify({"status": "error", "message": str(e)})
 
-@app.route('/update-status/<v_id>/<new_status>')
-def update_villa_status(v_id, new_status):
-    if not session.get('admin_logged_in'): return redirect('/admin')
-    try:
-        cell = sheet.find(str(v_id).strip())
-        headers = sheet.row_values(1)
-        status_col = headers.index('Status') + 1
-        sheet.update_cell(cell.row, status_col, new_status)
-    except: pass
-    return redirect('/admin')
-
-@app.route('/villa/<villa_id>')
-def villa_details(villa_id):
-    villas = get_rows(sheet)
-    # Clean ID matching
-    villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
-    if not villa: return "Villa Not Found", 404
-    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')] or [villa.get('Image_URL')]
-    return render_template('villa_details.html', villa=villa, villa_images=imgs, settings=get_settings())
-
-@app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
-def enquiry(villa_id):
-    villas = get_rows(sheet)
-    villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
-    
-    if request.method == 'POST':
-        name, phone, dates, guests = request.form.get('name'), request.form.get('phone'), request.form.get('stay_dates'), request.form.get('guests')
-        v_name = villa.get('Villa_Name', 'Villa') if villa else "Villa"
-        if enquiry_sheet:
-            try: enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
-            except: pass
-        alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
-        requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
-        return render_template('success.html', name=name, villa_name=v_name, settings=get_settings())
-    
-    return render_template('enquiry.html', villa=villa, settings=get_settings())
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('index'))
 
 @app.route('/explore')
 def explore():
     return render_template('explore.html', tourist_places=get_rows(places_sheet), settings=get_settings())
 
-@app.route('/legal')
-def legal(): return render_template('legal.html', settings=get_settings())
-
 @app.route('/contact')
-def contact(): return render_template('contact.html', settings=get_settings())
+def contact(): 
+    return render_template('contact.html', settings=get_settings())
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-        
+    
