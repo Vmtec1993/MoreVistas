@@ -101,7 +101,7 @@ def index():
         
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
 
-# ✅ NEW ADMIN DASHBOARD ROUTE (Security + Analytics)
+# ✅ ADMIN DASHBOARD
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_dashboard():
     if request.method == 'POST':
@@ -131,26 +131,51 @@ def admin_dashboard():
             if len(raw_enq) > 1:
                 headers = [h.strip() for h in raw_enq[0]]
                 rows = raw_enq[1:]
-                rows.reverse() # Latest first
+                rows.reverse()
                 enquiries = [dict(zip(headers, r + [''] * (len(headers) - len(r)))) for r in rows]
         except: pass
 
     return render_template('admin.html', villas=villas, enquiries=enquiries)
+
+# ✅ NEW: UPDATE DATA FROM DASHBOARD
+@app.route('/admin/update', methods=['POST'])
+def update_data():
+    if not session.get('admin_logged_in'):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    target = request.form.get('target')
+    key = request.form.get('key')
+    val = request.form.get('value')
+    v_id = request.form.get('villa_id')
+
+    try:
+        if target == "settings" and settings_sheet:
+            cell = settings_sheet.find(key)
+            settings_sheet.update_cell(cell.row, 2, val)
+        
+        elif target == "villas" and sheet:
+            cell = sheet.find(v_id)
+            headers = sheet.row_values(1)
+            col_index = headers.index(key) + 1 # Key here is column name like 'Price'
+            sheet.update_cell(cell.row, col_index, val)
+
+        return jsonify({"status": "success"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 @app.route('/admin/logout')
 def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('index'))
 
+# --- Baki Routes ---
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     villas = get_rows(sheet)
     villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
-    
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not imgs: imgs = [villa.get('Image_URL')]
-    
     return render_template('villa_details.html', villa=villa, villa_images=imgs)
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
@@ -161,11 +186,9 @@ def enquiry(villa_id):
         name, phone = request.form.get('name'), request.form.get('phone')
         dates, guests = request.form.get('stay_dates'), request.form.get('guests')
         v_name = villa.get('Villa_Name', 'Villa') if villa else "Villa"
-        
         if enquiry_sheet:
             try: enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
             except: pass
-            
         alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
         requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
         return render_template('success.html', name=name, villa_name=v_name)
@@ -185,9 +208,6 @@ def contact():
     return render_template('contact.html')
 
 if __name__ == "__main__":
-    # Render automatically sets the PORT environment variable
     port = int(os.environ.get("PORT", 5000))
-    # '0.0.0.0' tells the OS to listen on all public IPs
     app.run(host='0.0.0.0', port=port)
-
-    
+            
