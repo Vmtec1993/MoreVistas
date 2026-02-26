@@ -77,11 +77,14 @@ def get_rows(target_sheet):
     except: return []
 
 def get_settings():
+    # ✅ Added default keys for Premium UI Control
     res = {
         'Offer_Text': "Welcome to MoreVistas", 
         'Contact': "8830024994", 
         'Logo_URL': '', 
-        'Logo_Width': '160', 
+        'Logo_Width': '160',
+        'Logo_Height': '45',
+        'Book_Now_Msg': 'I want to book a luxury villa',
         'Banner_URL': '', 
         'Banner_Status': 'OFF'
     }
@@ -147,16 +150,21 @@ def update_data():
                 cell = settings_sheet.find(key)
                 settings_sheet.update_cell(cell.row, 2, val)
             except:
+                # Agar setting nahi milti toh naya row add karega
                 settings_sheet.append_row([key, val])
         elif target == "villas" and sheet:
-            # FIX: More robust ID searching
-            cell = sheet.find(str(v_id))
-            headers = sheet.row_values(1)
-            if key in headers:
-                col_index = headers.index(key) + 1
-                sheet.update_cell(cell.row, col_index, val)
+            # ✅ Improved Villa Update Logic
+            all_ids = sheet.col_values(1)
+            if str(v_id) in all_ids:
+                row_index = all_ids.index(str(v_id)) + 1
+                headers = sheet.row_values(1)
+                if key in headers:
+                    col_index = headers.index(key) + 1
+                    sheet.update_cell(row_index, col_index, val)
+                else:
+                    return jsonify({"status": "error", "message": f"Column {key} not found"})
             else:
-                return jsonify({"status": "error", "message": f"Column {key} not found"})
+                return jsonify({"status": "error", "message": "Villa ID not found"})
         return jsonify({"status": "success"})
     except Exception as e: 
         return jsonify({"status": "error", "message": str(e)})
@@ -192,7 +200,7 @@ def enquiry(villa_id):
         
     return render_template('enquiry.html', villa=villa, settings=settings)
 
-@app.route('/admin-logout') # Link updated to match dashboard
+@app.route('/admin-logout')
 def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('index'))
@@ -206,6 +214,7 @@ def contact():
     return render_template('contact.html', settings=get_settings())
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    # ✅ Render Optimized Port Handling
+    port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
-                
+        
