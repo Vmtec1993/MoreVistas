@@ -32,7 +32,6 @@ def init_sheets():
             SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
             main_spreadsheet = client.open_by_key(SHEET_ID)
             
-            # Linking Worksheets
             sheet = main_spreadsheet.sheet1
             all_ws = {ws.title: ws for ws in main_spreadsheet.worksheets()}
             places_sheet = all_ws.get("Places")
@@ -56,7 +55,6 @@ def get_rows(target_sheet):
         for row in data[1:]:
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
-            # Price Calculation Logic
             try:
                 p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
@@ -67,7 +65,6 @@ def get_rows(target_sheet):
                 item['discount_perc'] = int(((original - current) / original) * 100) if original > current > 0 else 0
             except: item['discount_perc'] = 0
             
-            # Rules Formatting
             raw_rules = item.get('Rules', '')
             item['Rules_List'] = [r.strip() for r in raw_rules.split('|')] if '|' in raw_rules else ([raw_rules.strip()] if raw_rules else ["ID Proof Required"])
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
@@ -76,7 +73,6 @@ def get_rows(target_sheet):
     except: return []
 
 def get_settings():
-    # Default values in case sheet is empty or fails
     res = {
         'Offer_Text': "Welcome to MoreVistas", 
         'Contact': "8830024994", 
@@ -100,8 +96,7 @@ def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
     settings = get_settings()
-    # Sort Available villas to top
-    sorted_villas = sorted(villas, key=lambda x: x.get('Status') == 'Sold Out')
+    sorted_villas = sorted(villas, key=lambda x: str(x.get('Status', '')).lower() == 'sold out')
     return render_template('index.html', villas=sorted_villas, tourist_places=places, settings=settings)
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -111,9 +106,8 @@ def admin_dashboard():
             session['admin_logged_in'] = True
         else:
             return "<script>alert('Incorrect Password!'); window.location='/admin';</script>"
-
     if not session.get('admin_logged_in'):
-        return render_template('admin_login.html') # Ensure you have this or use the string form
+        return render_template('admin_login.html')
 
     villas = get_rows(sheet)
     settings = get_settings()
@@ -130,52 +124,39 @@ def admin_dashboard():
 
 @app.route('/admin/update', methods=['POST'])
 def update_data():
-    if not session.get('admin_logged_in'): return jsonify({"status": "error", "message": "Unauthorized"}), 403
-    
-    target = request.form.get('target')
-    key = request.form.get('key')
-    val = request.form.get('value')
-    v_id = request.form.get('villa_id')
-
+    if not session.get('admin_logged_in'): return jsonify({"status": "error"}), 403
+    target, key, val, v_id = request.form.get('target'), request.form.get('key'), request.form.get('value'), request.form.get('villa_id')
     try:
         if target == "settings" and settings_sheet:
             try:
                 cell = settings_sheet.find(key)
                 settings_sheet.update_cell(cell.row, 2, val)
-            except gspread.exceptions.CellNotFound:
+            except:
                 settings_sheet.append_row([key, val])
-                
         elif target == "villas" and sheet:
             cell = sheet.find(v_id)
             headers = sheet.row_values(1)
             col_index = headers.index(key) + 1
             sheet.update_cell(cell.row, col_index, val)
-            
         return jsonify({"status": "success"})
-    except Exception as e: 
-        return jsonify({"status": "error", "message": str(e)})
+    except Exception as e: return jsonify({"status": "error", "message": str(e)})
 
 @app.route('/update-status/<v_id>/<new_status>')
 def update_villa_status(v_id, new_status):
     if not session.get('admin_logged_in'): return redirect('/admin')
     try:
-        cell = sheet.find(str(v_id))
+        cell = sheet.find(str(v_id).strip())
         headers = sheet.row_values(1)
         status_col = headers.index('Status') + 1
         sheet.update_cell(cell.row, status_col, new_status)
-    except Exception as e:
-        print(f"Status Update Error: {e}")
+    except: pass
     return redirect('/admin')
-
-@app.route('/admin/logout')
-def admin_logout():
-    session.pop('admin_logged_in', None)
-    return redirect(url_for('index'))
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     villas = get_rows(sheet)
-    villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
+    # Clean ID matching
+    villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')] or [villa.get('Image_URL')]
     return render_template('villa_details.html', villa=villa, villa_images=imgs, settings=get_settings())
@@ -183,24 +164,20 @@ def villa_details(villa_id):
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
     villas = get_rows(sheet)
-    villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
+    villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
+    
     if request.method == 'POST':
-        name = request.form.get('name')
-        phone = request.form.get('phone')
-        dates = request.form.get('stay_dates')
-        guests = request.form.get('guests')
+        name, phone, dates, guests = request.form.get('name'), request.form.get('phone'), request.form.get('stay_dates'), request.form.get('guests')
         v_name = villa.get('Villa_Name', 'Villa') if villa else "Villa"
-        
         if enquiry_sheet:
             try: enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
             except: pass
-            
         alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
         requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
-        return render_template('success.html', name=name, villa_name=v_name)
-    return render_template('enquiry.html', villa=villa)
+        return render_template('success.html', name=name, villa_name=v_name, settings=get_settings())
+    
+    return render_template('enquiry.html', villa=villa, settings=get_settings())
 
-# --- Baki Routes ---
 @app.route('/explore')
 def explore():
     return render_template('explore.html', tourist_places=get_rows(places_sheet), settings=get_settings())
@@ -214,4 +191,4 @@ def contact(): return render_template('contact.html', settings=get_settings())
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    
+        
