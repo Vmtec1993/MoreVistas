@@ -77,7 +77,6 @@ def get_rows(target_sheet):
     except: return []
 
 def get_settings():
-    # ✅ Added default keys for Premium UI Control
     res = {
         'Offer_Text': "Welcome to MoreVistas", 
         'Contact': "8830024994", 
@@ -129,7 +128,8 @@ def admin_dashboard():
             raw_enq = enquiry_sheet.get_all_values()
             if len(raw_enq) > 1:
                 headers = [h.strip() for h in raw_enq[0]]
-                rows = [r for r in raw_enq[1:] if any(r)]
+                # ✅ FIX: Khali ya 'None' rows ko filter kiya
+                rows = [r for r in raw_enq[1:] if any(r) and len(r) > 1 and r[1].strip() != "" and r[1].lower() != "none"]
                 rows.reverse() 
                 enquiries = [dict(zip(headers, r + [''] * (len(headers) - len(r)))) for r in rows]
         except: pass
@@ -150,10 +150,8 @@ def update_data():
                 cell = settings_sheet.find(key)
                 settings_sheet.update_cell(cell.row, 2, val)
             except:
-                # Agar setting nahi milti toh naya row add karega
                 settings_sheet.append_row([key, val])
         elif target == "villas" and sheet:
-            # ✅ Improved Villa Update Logic
             all_ids = sheet.col_values(1)
             if str(v_id) in all_ids:
                 row_index = all_ids.index(str(v_id)) + 1
@@ -168,6 +166,13 @@ def update_data():
         return jsonify({"status": "success"})
     except Exception as e: 
         return jsonify({"status": "error", "message": str(e)})
+
+# ✅ Policy Routes Added
+@app.route('/privacy-policy')
+def privacy(): return "<h1>Privacy Policy</h1><p>Work in progress for MoreVistas.</p>"
+
+@app.route('/terms')
+def terms(): return "<h1>Terms & Conditions</h1><p>Work in progress for MoreVistas.</p>"
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
@@ -214,7 +219,6 @@ def contact():
     return render_template('contact.html', settings=get_settings())
 
 if __name__ == "__main__":
-    # ✅ Render Optimized Port Handling
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
         
