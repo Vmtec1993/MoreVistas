@@ -9,12 +9,12 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = "morevistas_secure_2026"
 
-# --- CONFIG ---
+# --- 1. CONFIGURATION (Sab yahan se control hoga) ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
 ADMIN_PASSWORD = "MoreVistas@2026"
 
-# --- Google Sheets Setup ---
+# --- 2. DATABASE / SHEETS CONNECTION ---
 creds_json = os.environ.get('GOOGLE_CREDS')
 sheet = None
 places_sheet = None
@@ -32,16 +32,19 @@ def init_sheets():
             SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
             main_spreadsheet = client.open_by_key(SHEET_ID)
             worksheets = main_spreadsheet.worksheets()
-            sheet = worksheets[0]
-            if len(worksheets) > 1: places_sheet = worksheets[1]
-            if len(worksheets) > 2: enquiry_sheet = worksheets[2]
-            if len(worksheets) > 3: settings_sheet = worksheets[3]
-            print("✅ Sheets Linked Successfully")
+            
+            # Sheets Allocation
+            sheet = worksheets[0]            # Villa Data
+            places_sheet = worksheets[1]     # Explore Lonavala
+            enquiry_sheet = worksheets[2]    # Enquiries
+            settings_sheet = worksheets[3]   # Banner & Logo Settings
+            print("✅ Master Sync: All Sheets Linked Successfully")
         except Exception as e:
-            print(f"❌ Sheet Init Error: {e}")
+            print(f"❌ Master Sync Error: {e}")
 
 init_sheets()
 
+# --- 3. DATA PROCESSING LOGIC (Automatic Updates) ---
 def get_rows(target_sheet):
     if not target_sheet: return []
     try:
@@ -54,19 +57,20 @@ def get_rows(target_sheet):
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
-            # --- RULES LIST LOGIC (For villa_details.html) ---
+            # Automatic Rule Sync: Yeh Rules_List banayega villa_details.html ke liye
             rules = []
             for i in range(1, 11):
                 r = item.get(f'Rule_{i}')
                 if r and r.strip(): rules.append(r.strip())
             item['Rules_List'] = rules
             
-            # --- DISCOUNT LOGIC (For Offer Banner in Details) ---
+            # Automatic Discount Sync: Yeh savings-badge ke liye hai
             try:
                 p = int(str(item.get('Price', 0)).replace(',',''))
                 op = int(str(item.get('Original_Price', 0)).replace(',',''))
                 if op > p:
                     item['discount_perc'] = round(((op - p) / op) * 100)
+                else: item['discount_perc'] = 0
             except: item['discount_perc'] = 0
                 
             final_list.append(item)
@@ -81,16 +85,18 @@ def get_settings():
             for r in data:
                 if len(r) >= 2:
                     key, val = r[0].strip(), r[1].strip()
+                    # URL Fix: Agar sheet mein https:// bhul gaye toh ye khud laga dega
                     if 'URL' in key and val and not val.startswith('http'): 
                         val = 'https://' + val
                     res[key] = val
         except: pass
     return res
 
-# --- ROUTES ---
+# --- 4. WEB ROUTES (Connected to your HTML) ---
 
 @app.route('/')
 def index():
+    # Index.html mein automatic banner aur villa cards active honge
     return render_template('index.html', villas=get_rows(sheet), settings=get_settings(), tourist_places=get_rows(places_sheet))
 
 @app.route('/villa/<villa_id>')
@@ -99,7 +105,7 @@ def villa_details(villa_id):
     villa = next((v for v in villas if str(v.get('Villa_ID')).strip() == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
     
-    # Gallery Images Logic
+    # Gallery images auto-sync
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not any(imgs): imgs = [villa.get('Image_URL')]
     
@@ -111,8 +117,16 @@ def enquiry(villa_id):
     villa = next((v for v in v_data if str(v.get('Villa_ID')).strip() == str(villa_id).strip()), None)
     if request.method == 'POST':
         name, phone = request.form.get('name'), request.form.get('phone')
+        dates, guests = request.form.get('stay_dates'), request.form.get('guests')
+        
+        # Save to Google Sheet
         if enquiry_sheet:
-            enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y"), name, phone, request.form.get('stay_dates'), request.form.get('guests'), villa.get('Villa_Name')])
+            enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y"), name, phone, dates, guests, villa.get('Villa_Name')])
+        
+        # Send Telegram Alert
+        msg = f"🆕 *New Enquiry!*\n\nVilla: {villa.get('Villa_Name')}\nName: {name}\nPhone: {phone}\nDates: {dates}\nGuests: {guests}"
+        requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage?chat_id={TELEGRAM_CHAT_ID}&text={msg}&parse_mode=Markdown")
+        
         return render_template('success.html', name=name, settings=get_settings())
     return render_template('enquiry.html', villa=villa, settings=get_settings())
 
@@ -134,7 +148,8 @@ def logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('index'))
 
-# --- RENDER PORT BINDING ---
+# --- 5. RENDER PORT AUTO-BINDING ---
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
+    
