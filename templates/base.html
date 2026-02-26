@@ -40,7 +40,6 @@
             margin-top: -5px;
         }
 
-        /* Menu Button */
         .btn-menu-dark {
             background: rgba(255,255,255,0.1);
             color: white; border: none;
@@ -67,7 +66,13 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 180, 216, 0); }
         }
 
-        .site-logo-nav { height: 40px; width: auto; filter: brightness(0) invert(1); margin-right: 10px; }
+        /* ✅ ADMIN CONTROLLED LOGO HEIGHT */
+        .site-logo-nav { 
+            height: {{ settings.Logo_Height if settings.Logo_Height else '40' }}px !important; 
+            width: auto; 
+            filter: brightness(0) invert(1); 
+            margin-right: 10px; 
+        }
 
         /* ✅ PREMIUM FOOTER */
         .premium-footer { background: #0a0a0a; color: #ffffff; padding: 60px 0 40px; text-align: center; }
@@ -102,7 +107,7 @@
                 </a>
             </div>
             
-            <a href="https://wa.me/91{{ settings.Contact }}?text=I%20want%20to%20book%20a%20luxury%20villa" class="btn btn-book-now rounded-pill px-4 py-2">
+            <a href="https://wa.me/91{{ settings.Contact }}?text={{ settings.Book_Now_Msg | urlencode if settings.Book_Now_Msg else 'I want to book a luxury villa' }}" class="btn btn-book-now rounded-pill px-4 py-2">
                 BOOK NOW
             </a>
         </div>
@@ -144,7 +149,7 @@
                 <a href="/legal" class="footer-nav-link">Legal</a>
             </div>
 
-            <div class="mb-2">
+            <div class="mb-2 text-center">
                 <a href="#" class="footer-social-icon"><i class="bi bi-instagram"></i></a>
                 <a href="#" class="footer-social-icon"><i class="bi bi-facebook"></i></a>
                 <a href="https://wa.me/91{{ settings.Contact }}" class="footer-social-icon"><i class="bi bi-whatsapp"></i></a>
