@@ -3,8 +3,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
     .flatpickr-calendar { border-radius: 15px !important; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
-    .input-group-text { border-right: none !important; }
-    .phone-input { border-left: none !important; }
 </style>
 
 <div class="container py-4">
@@ -23,27 +21,15 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-secondary">WhatsApp Number</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-light-subtle rounded-start-pill px-3 fw-bold text-primary">+91</span>
-                            <input type="tel" 
-                                   name="phone" 
-                                   class="form-control phone-input rounded-end-pill px-3 border-light-subtle shadow-sm" 
-                                   placeholder="9876543210" 
-                                   pattern="[0-9]{10}" 
-                                   maxlength="10"
-                                   oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-                                   title="Please enter only 10 digit mobile number" 
-                                   required>
-                        </div>
-                        <small class="text-muted ms-2" style="font-size: 0.7rem;">Enter 10-digit number without +91</small>
+                        <label class="form-label small fw-bold text-secondary">Phone Number</label>
+                        <input type="tel" name="phone" class="form-control rounded-pill px-4 border-light-subtle shadow-sm" placeholder="Enter mobile number" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-secondary">Select Stay Dates</label>
+                        <label class="form-label small fw-bold text-secondary">Select Stay Dates (Check-in to Check-out)</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white border-light-subtle rounded-start-pill px-3"><i class="bi bi-calendar-range text-primary"></i></span>
-                            <input type="text" name="stay_dates" id="stay_dates" class="form-control rounded-end-pill px-4 border-light-subtle shadow-sm" placeholder="Check-in to Check-out" required>
+                            <input type="text" name="stay_dates" id="stay_dates" class="form-control rounded-end-pill px-4 border-light-subtle shadow-sm" placeholder="Click to select dates" required>
                         </div>
                     </div>
 
@@ -59,8 +45,8 @@
 
                 <div class="mt-4 border-top pt-4">
                     <div class="d-flex flex-column gap-2">
-                        <a href="https://wa.me/91{{ settings.Contact if settings.Contact else '8830024994' }}?text=Hi%20MoreVistas,%20I%20am%20interested%20in%20booking%20{{ villa.Villa_Name|urlencode }}" target="_blank" class="btn btn-outline-success rounded-pill fw-bold">
-                            <i class="bi bi-whatsapp me-2"></i> Instant Help on WhatsApp
+                        <a href="https://wa.me/918830024994?text=Hi%20MoreVistas,%20I%20am%20interested%20in%20booking%20{{ villa.Villa_Name|urlencode }}" target="_blank" class="btn btn-outline-success rounded-pill fw-bold">
+                            <i class="bi bi-whatsapp me-2"></i> Chat on WhatsApp
                         </a>
                     </div>
                 </div>
@@ -75,7 +61,10 @@
         mode: "range",
         minDate: "today",
         dateFormat: "d-m-Y",
-        showMonths: 1
+        showMonths: 1,
+        onClose: function(selectedDates, dateStr, instance) {
+            console.log("Selected Range: " + dateStr);
+        }
     });
 </script>
 {% endblock %}
