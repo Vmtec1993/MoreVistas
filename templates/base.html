@@ -12,16 +12,16 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; color: #2d3436; }
 
-        /* ✅ PREMIUM DARK TOP BAR (NAVBAR) */
+        /* ✅ PREMIUM DARK TOP BAR */
         .navbar { 
-            background: #0a0a0a !important; /* Wahi dark black jo footer mein hai */
-            padding: 15px 0;
+            background: #0a0a0a !important; 
+            padding: 12px 0;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .nav-brand-name {
             font-family: 'Marcellus', serif;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             letter-spacing: 3px;
             text-transform: uppercase;
             background: linear-gradient(to right, #ffffff, #a1a1a1);
@@ -31,8 +31,8 @@
         }
 
         .nav-tagline {
-            font-size: 0.55rem;
-            letter-spacing: 3px;
+            font-size: 0.5rem;
+            letter-spacing: 2px;
             color: #00b4d8;
             font-weight: 700;
             text-transform: uppercase;
@@ -40,32 +40,47 @@
             margin-top: -5px;
         }
 
-        /* Menu Button for Dark Theme */
+        /* Menu Button */
         .btn-menu-dark {
             background: rgba(255,255,255,0.1);
-            color: white;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
+            color: white; border: none;
+            width: 40px; height: 40px; border-radius: 50%;
             transition: 0.3s;
         }
-        .btn-menu-dark:hover { background: rgba(255,255,255,0.2); }
 
-        /* Logo Size Control */
-        .site-logo-nav {
-            height: 45px; /* Top bar mein logo ki height fix kar di */
-            width: auto;
-            filter: brightness(0) invert(1); /* Logo ko white kar dega */
-            margin-right: 12px;
+        /* ✅ BOOK NOW PULSING ANIMATION */
+        .btn-book-now {
+            background: linear-gradient(45deg, #00b4d8, #0077b6);
+            color: white !important;
+            border: none;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            box-shadow: 0 0 0 0 rgba(0, 180, 216, 0.7);
+            animation: pulse-blue 2s infinite;
+            transition: 0.3s;
         }
 
-        /* Footer (Same Style) */
-        .premium-footer { background: #0a0a0a; color: #ffffff; padding: 60px 0 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); }
+        @keyframes pulse-blue {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 180, 216, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 180, 216, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 180, 216, 0); }
+        }
+
+        .site-logo-nav { height: 40px; width: auto; filter: brightness(0) invert(1); margin-right: 10px; }
+
+        /* ✅ PREMIUM FOOTER */
+        .premium-footer { background: #0a0a0a; color: #ffffff; padding: 60px 0 40px; text-align: center; }
         .footer-brand-name { font-family: 'Marcellus', serif; font-size: 2.2rem; letter-spacing: 4px; text-transform: uppercase; background: linear-gradient(to right, #ffffff, #a1a1a1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .footer-tagline { font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase; color: #00b4d8; font-weight: 700; display: block; margin-bottom: 25px; }
         .footer-nav-link { color: rgba(255, 255, 255, 0.7); text-decoration: none; margin: 0 15px; font-weight: 600; transition: 0.3s; }
-        .footer-social-icon { font-size: 1.5rem; color: white; margin: 0 12px; opacity: 0.8; }
+        .footer-nav-link:hover { color: #00b4d8; }
+        .footer-social-icon { font-size: 1.5rem; color: white; margin: 0 12px; opacity: 0.8; transition: 0.3s; }
+        .footer-social-icon:hover { opacity: 1; transform: translateY(-3px); }
+        
+        .legal-links-small { margin-top: 20px; font-size: 0.8rem; }
+        .legal-links-small a { color: rgba(255,255,255,0.4); text-decoration: none; margin: 0 10px; }
+        .legal-links-small a:hover { color: #00b4d8; }
     </style>
 </head>
 <body>
@@ -80,30 +95,30 @@
                     {% if settings.Logo_URL %}
                         <img src="{{ settings.Logo_URL }}" class="site-logo-nav" alt="Logo">
                     {% endif %}
-                    <div class="d-none d-sm-block">
+                    <div class="d-none d-md-block">
                         <span class="nav-brand-name">MoreVistas</span>
                         <span class="nav-tagline">The Art of Luxury Living</span>
                     </div>
                 </a>
             </div>
             
-            <a href="tel:+91{{ settings.Contact }}" class="btn btn-outline-light rounded-pill px-4 btn-sm fw-bold">
-                <i class="bi bi-telephone me-2"></i>CALL
+            <a href="https://wa.me/91{{ settings.Contact }}?text=I%20want%20to%20book%20a%20luxury%20villa" class="btn btn-book-now rounded-pill px-4 py-2">
+                BOOK NOW
             </a>
         </div>
     </nav>
 
     <div class="offcanvas offcanvas-start shadow-lg" tabindex="-1" id="sideMenu">
         <div class="offcanvas-header p-4 border-bottom">
-            <h5 class="fw-bold mb-0">Menu</h5>
+            <h5 class="fw-bold mb-0">Explore MoreVistas</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body p-4">
             <div class="list-group list-group-flush">
                 <a href="/" class="py-3 text-decoration-none text-dark fw-bold border-bottom"><i class="bi bi-house me-2"></i> Home</a>
-                <a href="/explore" class="py-3 text-decoration-none text-dark fw-bold border-bottom"><i class="bi bi-geo-alt me-2"></i> Explore</a>
-                <a href="/contact" class="py-3 text-decoration-none text-dark fw-bold border-bottom"><i class="bi bi-chat me-2"></i> Contact</a>
-                <a href="/legal" class="py-3 text-decoration-none text-dark fw-bold border-bottom"><i class="bi bi-shield-check me-2"></i> Legal</a>
+                <a href="/explore" class="py-3 text-decoration-none text-dark fw-bold border-bottom"><i class="bi bi-geo-alt me-2"></i> Explore Lonavala</a>
+                <a href="/contact" class="py-3 text-decoration-none text-dark fw-bold border-bottom"><i class="bi bi-chat-left-dots me-2"></i> Contact Us</a>
+                <a href="/legal" class="py-3 text-decoration-none text-dark fw-bold border-bottom"><i class="bi bi-shield-check me-2"></i> Terms & Privacy</a>
             </div>
         </div>
     </div>
@@ -137,7 +152,15 @@
 
             <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
 
-            <p class="small opacity-50 mb-0">© 2026 MOREVISTAS LUXURY VILLAS. ALL RIGHTS RESERVED.</p>
+            <div class="legal-links-small">
+                <a href="/legal#terms">Terms & Conditions</a> | 
+                <a href="/legal#privacy">Privacy Policy</a> | 
+                <a href="/legal#copyright">Copyright</a>
+            </div>
+
+            <p class="copyright-text mt-3" style="font-size: 0.7rem; opacity: 0.3; letter-spacing: 1px;">
+                © 2026 MOREVISTAS LUXURY VILLAS. ALL RIGHTS RESERVED.
+            </p>
         </div>
     </footer>
 
