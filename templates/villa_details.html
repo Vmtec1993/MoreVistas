@@ -21,12 +21,11 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
     
-    /* Rules Vertical List Style - FIXED Professional Look */
     .rule-item-box { 
         display: block; 
         width: 100%;
         border-left: 5px solid #ff4757; 
-        background: #fff; /* Changed to white for cleaner look */
+        background: #fff;
         padding: 15px; 
         border: 1px solid #eee;
         border-left: 5px solid #ff4757;
@@ -56,7 +55,7 @@
 
 <div class="container py-4">
     <div id="villaSlider" class="carousel slide shadow-sm position-relative mb-4" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden;">
-        {% if villa.Original_Price|int > villa.Price|int %}
+        {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
             <div class="offer-banner">🔥 SPECIAL OFFER LIVE</div>
         {% endif %}
         
@@ -107,7 +106,6 @@
                 <p class="text-secondary" style="line-height: 1.7; font-size: 1.05rem;">
                     Welcome to <b>{{ villa.Villa_Name }}</b> — a beautifully designed escape crafted for peaceful mountain getaways. 
                     Spend your day relaxing by your private pool and enjoy the cool mountain air of Lonavala. 
-                    Perfect for families and friends looking for exclusivity and luxury.
                 </p>
             </div>
 
@@ -121,7 +119,7 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="rule-item-box">Standard villa rules apply. Contact owner for details.</div>
+                        <div class="rule-item-box">Standard villa rules apply.</div>
                     {% endif %}
                 </div>
             </div>
@@ -133,16 +131,14 @@
                 
                 {% if villa.Price and villa.Price|int > 0 %}
                     <div class="mb-3">
-                        {% if villa.Original_Price|int > villa.Price|int %}
+                        {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
                             <div class="d-flex align-items-center mb-1">
                                 <span class="detail-original-price me-2">₹{{ villa.Original_Price }}</span>
-                                <span class="savings-badge">
-                                    {{ (((villa.Original_Price|int - villa.Price|int) / villa.Original_Price|int) * 100)|int }}% OFF
-                                </span>
+                                <span class="savings-badge">{{ villa.discount_perc }}% OFF</span>
                             </div>
                         {% endif %}
                         <div class="d-flex align-items-baseline">
-                            <span class="fs-1 fw-bold text-primary">₹{{ villa.Price|int }}</span>
+                            <span class="fs-1 fw-bold text-primary">₹{{ villa.Price }}</span>
                             <span class="text-muted ms-2">/ night</span>
                         </div>
                     </div>
@@ -151,18 +147,13 @@
                 {% endif %}
 
                 <div class="d-grid gap-3 mt-4">
-                    <a href="https://wa.me/918830024994?text=Hi,%20I%20am%20interested%20in%20booking%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill py-3 fw-bold shadow-sm">
+                    <a href="https://wa.me/91{{ settings.Contact }}?text=Hi, interested in {{ villa.Villa_Name }}" class="btn btn-success rounded-pill py-3 fw-bold shadow-sm">
                         <i class="bi bi-whatsapp me-2"></i>BOOK ON WHATSAPP
                     </a>
                     
-                    <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill py-3 fw-bold">
+                    <a href="/enquiry/{{ villa.get('Villa_ID') }}" class="btn btn-outline-primary rounded-pill py-3 fw-bold">
                         <i class="bi bi-envelope-paper me-2"></i>FILL ENQUIRY FORM
                     </a>
-                </div>
-
-                <div class="mt-4 p-3 bg-light rounded-3 text-center border">
-                    <h6 class="fw-bold text-success mb-1">⚡ 100% Verified Villa</h6>
-                    <small class="text-muted">Direct Booking • Best Price</small>
                 </div>
             </div>
         </div>
@@ -171,19 +162,15 @@
 
 <div class="mobile-booking-bar d-md-none">
     <div style="flex: 1;">
-        {% if villa.Price and villa.Price|int > 0 %}
-            <div class="fw-bold fs-4 text-primary">₹{{ villa.Price|int }}</div>
-            <small class="text-muted">per night</small>
-        {% else %}
-            <div class="fw-bold text-primary">Contact Us</div>
-        {% endif %}
+        <div class="fw-bold fs-4 text-primary">₹{{ villa.Price }}</div>
+        <small class="text-muted">per night</small>
     </div>
     <div style="display: flex; gap: 10px;">
-        <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-bold">
+        <a href="/enquiry/{{ villa.get('Villa_ID') }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-bold">
             <i class="bi bi-pencil-square"></i>
         </a>
-        <a href="https://wa.me/918830024994?text=I%20want%20to%20book%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow">
-            <i class="bi bi-whatsapp"></i> BOOK
+        <a href="https://wa.me/91{{ settings.Contact }}?text=Interested in {{ villa.Villa_Name }}" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow">
+            <i class="bi bi-whatsapp"></i>
         </a>
     </div>
 </div>
