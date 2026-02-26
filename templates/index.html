@@ -92,6 +92,36 @@
 </div>
 
 <div class="container mt-5 pt-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Why Stay With <span class="text-primary">MoreVistas?</span></h2>
+        <p class="text-muted">Experience luxury like never before with our premium services.</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon mx-auto"><i class="bi bi-shield-check"></i></div>
+                <h5 class="fw-bold">Verified Luxury</h5>
+                <p class="small text-muted">Every villa is personally inspected for quality and premium standards.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon mx-auto"><i class="bi bi-water"></i></div>
+                <h5 class="fw-bold">Private Pools</h5>
+                <p class="small text-muted">Complete privacy with clean, private swimming pools for your group.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon mx-auto"><i class="bi bi-headset"></i></div>
+                <h5 class="fw-bold">24/7 Concierge</h5>
+                <p class="small text-muted">A dedicated manager for your group to handle food and travel.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5 pt-5">
     <div class="d-flex justify-content-between align-items-end mb-4">
         <div>
             <h2 class="fw-bold mb-0">Explore <span class="text-primary">Lonavala</span></h2>
@@ -118,6 +148,14 @@
     </div>
 </div>
 
+<div class="container">
+    <div class="list-property-banner text-center shadow-lg">
+        <h2 class="display-6 fw-bold mb-3">Want to Earn from Your Villa?</h2>
+        <p class="lead opacity-75 mb-4">Partner with MoreVistas and let us manage your property for maximum returns.</p>
+        <a href="https://wa.me/91{{ settings.Contact }}?text=Hi, I want to list my villa with MoreVistas" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">List Your Property Now</a>
+    </div>
+</div>
+
 <div class="wa-widget" id="waWidget">
     <div class="wa-pull-tab" onclick="document.getElementById('waWidget').classList.toggle('active')">
         <i class="bi bi-whatsapp"></i>
@@ -130,7 +168,6 @@
 </div>
 
 <script>
-    // Weather API
     async function getLonavalaWeather() {
         try {
             const res = await fetch('https://api.openweathermap.org/data/2.5/weather?q=Lonavala&units=metric&appid=ff33d264f24db26d13749072556f8794');
@@ -142,7 +179,6 @@
     }
     getLonavalaWeather();
 
-    // Villa Search Logic
     document.getElementById('villaSearch').addEventListener('keyup', function() {
         let val = this.value.toLowerCase();
         document.querySelectorAll('.villa-item').forEach(item => {
