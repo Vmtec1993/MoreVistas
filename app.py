@@ -57,6 +57,8 @@ def get_rows(target_sheet):
             if not any(row): continue
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
+            
+            # Price Processing
             try:
                 p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
@@ -65,8 +67,10 @@ def get_rows(target_sheet):
                 item['Price'] = current
                 item['Original_Price'] = original
                 item['discount_perc'] = int(((original - current) / original) * 100) if original > current > 0 else 0
-            except: item['discount_perc'] = 0
+            except: 
+                item['discount_perc'] = 0
             
+            # Rules Processing
             raw_rules = item.get('Rules', '')
             item['Rules_List'] = [r.strip() for r in raw_rules.split('|')] if '|' in raw_rules else ([raw_rules.strip()] if raw_rules else ["ID Proof Required"])
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
@@ -79,21 +83,10 @@ def get_settings():
         'Offer_Text': "Welcome to MoreVistas", 
         'Contact': "8830024994", 
         'Logo_URL': '', 
-        'Logo_Width': '160',  # Default width
+        'Logo_Width': '160', 
         'Banner_URL': '', 
         'Banner_Status': 'OFF'
     }
-    if settings_sheet:
-        try:
-            data = settings_sheet.get_all_values()
-            for r in data:
-                if len(r) >= 2:
-                    key = r[0].strip()
-                    val = r[1].strip()
-                    if key: res[key] = val
-        except: pass
-    return res
-
     if settings_sheet:
         try:
             data = settings_sheet.get_all_values()
@@ -122,29 +115,35 @@ def admin_dashboard():
             session['admin_logged_in'] = True
         else:
             return "<script>alert('Incorrect Password!'); window.location='/admin';</script>"
+            
     if not session.get('admin_logged_in'):
         return render_template('admin_login.html')
 
     villas = get_rows(sheet)
     settings = get_settings()
     enquiries = []
+    
     if enquiry_sheet:
         try:
             raw_enq = enquiry_sheet.get_all_values()
-            # Sirf tabhi load karein jab header ke niche data ho
             if len(raw_enq) > 1:
                 headers = [h.strip() for h in raw_enq[0]]
-                # Filter empty rows and reverse for latest first
                 rows = [r for r in raw_enq[1:] if any(r)]
-                rows.reverse()
+                rows.reverse() # Latest entries first
                 enquiries = [dict(zip(headers, r + [''] * (len(headers) - len(r)))) for r in rows]
         except: pass
-    return render_template('admin.html', villas=villas, enquiries=enquiries, settings=settings)
+        
+    # Yahan render_template ka naam dashboard wali file par set kar diya
+    return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries, settings=settings)
 
 @app.route('/admin/update', methods=['POST'])
 def update_data():
     if not session.get('admin_logged_in'): return jsonify({"status": "error"}), 403
-    target, key, val, v_id = request.form.get('target'), request.form.get('key'), request.form.get('value'), request.form.get('villa_id')
+    target = request.form.get('target')
+    key = request.form.get('key')
+    val = request.form.get('value')
+    v_id = request.form.get('villa_id')
+    
     try:
         if target == "settings" and settings_sheet:
             try:
@@ -158,7 +157,8 @@ def update_data():
             col_index = headers.index(key) + 1
             sheet.update_cell(cell.row, col_index, val)
         return jsonify({"status": "success"})
-    except Exception as e: return jsonify({"status": "error", "message": str(e)})
+    except Exception as e: 
+        return jsonify({"status": "error", "message": str(e)})
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
@@ -174,14 +174,21 @@ def enquiry(villa_id):
     villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
     settings = get_settings()
     if request.method == 'POST':
-        name, phone, dates, guests = request.form.get('name'), request.form.get('phone'), request.form.get('stay_dates'), request.form.get('guests')
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        dates = request.form.get('stay_dates')
+        guests = request.form.get('guests')
         v_name = villa.get('Villa_Name', 'Villa') if villa else "Villa"
+        
         if enquiry_sheet:
-            try: enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
+            try: 
+                enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
             except: pass
+            
         alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
         requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
         return render_template('success.html', name=name, villa_name=v_name, settings=settings)
+        
     return render_template('enquiry.html', villa=villa, settings=settings)
 
 @app.route('/admin/logout')
@@ -194,9 +201,9 @@ def explore():
     return render_template('explore.html', tourist_places=get_rows(places_sheet), settings=get_settings())
 
 @app.route('/contact')
-def contact(): return render_template('contact.html', settings=get_settings())
+def contact(): 
+    return render_template('contact.html', settings=get_settings())
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    
