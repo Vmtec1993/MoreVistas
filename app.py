@@ -79,10 +79,21 @@ def get_settings():
         'Offer_Text': "Welcome to MoreVistas", 
         'Contact': "8830024994", 
         'Logo_URL': '', 
-        'Logo_Width': '160',
+        'Logo_Width': '160',  # Default width
         'Banner_URL': '', 
         'Banner_Status': 'OFF'
     }
+    if settings_sheet:
+        try:
+            data = settings_sheet.get_all_values()
+            for r in data:
+                if len(r) >= 2:
+                    key = r[0].strip()
+                    val = r[1].strip()
+                    if key: res[key] = val
+        except: pass
+    return res
+
     if settings_sheet:
         try:
             data = settings_sheet.get_all_values()
