@@ -201,6 +201,9 @@ def contact():
     return render_template('contact.html', settings=get_settings())
 
 if __name__ == "__main__":
+    # Render hamesha 'PORT' environment variable deta hai
     port = int(os.environ.get("PORT", 5000))
+    # '0.0.0.0' zaroori hai taaki external requests accept ho sakein
     app.run(host='0.0.0.0', port=port)
+
     
