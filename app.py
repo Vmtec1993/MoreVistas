@@ -228,6 +228,9 @@ def contact():
     return render_template('contact.html', settings=get_settings())
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000)) 
+    # Render hamesha 'PORT' environment variable deta hai
+    port = int(os.environ.get("PORT", 10000)) 
+    # '0.0.0.0' hona zaroori hai taaki Render ise bahar se access kar sake
     app.run(host='0.0.0.0', port=port)
+
                 
