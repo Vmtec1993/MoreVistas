@@ -10,55 +10,46 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; color: #2d3436; overflow-x: hidden; }
         
-        /* Navbar Styling */
-        .navbar { background: #0a0a0a !important; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        /* Navigation Bar - Premium Silver Look */
+        .navbar { background: #0a0a0a !important; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .nav-brand-group { display: flex; align-items: center; text-decoration: none; }
-        .nav-brand-name { font-family: 'Marcellus', serif; font-size: 1.3rem; letter-spacing: 2px; text-transform: uppercase; color: #ffffff; line-height: 1; }
-        .nav-tagline { font-size: 0.55rem; letter-spacing: 1.5px; color: #00b4d8; font-weight: 700; text-transform: uppercase; display: block; margin-top: 2px; }
+        
+        /* Top Navigation Brand Name (Silver Gradient) */
+        .nav-brand-name { 
+            font-family: 'Marcellus', serif; 
+            font-size: 1.4rem; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            background: linear-gradient(to bottom, #ffffff 0%, #999999 100%);
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            line-height: 1; 
+            font-weight: 700;
+        }
+        
+        .nav-tagline { font-size: 0.5rem; letter-spacing: 1.5px; color: #00b4d8; font-weight: 700; text-transform: uppercase; display: block; margin-top: 2px; }
         .brand-divider { height: 30px; width: 1px; background: rgba(255,255,255,0.2); margin: 0 12px; }
-        .site-logo-nav { height: {{ settings.Logo_Height if settings.Logo_Height else '40' }}px !important; width: auto; max-width: 150px; object-fit: contain; }
+        .site-logo-nav { height: 40px !important; width: auto; object-fit: contain; }
 
-        /* Premium Footer Fix (Matching your Image) */
+        /* Premium Footer */
         .premium-footer { background: #0a0a0a; color: #ffffff; padding: 60px 0 40px; text-align: center; border-top: 1px solid #222; }
-        .footer-logo { max-height: 70px; margin-bottom: 15px; }
         .footer-brand-name { 
             font-family: 'Marcellus', serif; font-size: 2.2rem; letter-spacing: 4px; text-transform: uppercase; 
             background: linear-gradient(to bottom, #ffffff 0%, #999999 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
+            font-weight: 700;
         }
-        .footer-tagline { font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase; color: #00b4d8; font-weight: 700; display: block; margin-bottom: 30px; }
-        .footer-nav-link { color: rgba(255, 255, 255, 0.6); text-decoration: none; margin: 0 15px; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
-        .footer-nav-link:hover { color: #00b4d8; }
-        .legal-links-small { margin-top: 40px; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 25px; color: #555; }
-        .legal-links-small a { color: #666; text-decoration: none; margin: 0 10px; }
-        .legal-links-small a:hover { color: #fff; }
 
-        /* SIDE-HIDDEN WHATSAPP WIDGET */
+        /* WhatsApp Side-Hidden Fix */
         .wa-side-tab {
-            position: fixed;
-            right: -130px; /* Chhupa hua */
-            bottom: 30px;
-            background: #25d366;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 50px 0 0 50px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            z-index: 9999;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed; right: -135px; bottom: 30px; background: #25d366; color: white;
+            padding: 12px 18px; border-radius: 50px 0 0 50px; display: flex; align-items: center;
+            gap: 12px; text-decoration: none; z-index: 9999; transition: 0.4s ease-in-out;
             box-shadow: -5px 5px 15px rgba(0,0,0,0.2);
         }
-        .wa-side-tab:hover {
-            right: 0; /* Bahar aa jayega */
-            color: white;
-        }
-        .wa-side-tab i { font-size: 24px; }
-        .wa-side-tab span { font-weight: 700; font-size: 0.9rem; white-space: nowrap; }
+        .wa-side-tab:hover { right: 0; color: white; }
 
-        .btn-book-now { background: linear-gradient(45deg, #00b4d8, #0077b6); color: white !important; border: none; font-weight: 800; font-size: 0.7rem; letter-spacing: 1px; animation: pulse-blue 2s infinite; }
+        .btn-book-now { background: linear-gradient(45deg, #00b4d8, #0077b6); color: white !important; font-weight: 800; font-size: 0.7rem; letter-spacing: 1px; animation: pulse-blue 2s infinite; border: none; }
         @keyframes pulse-blue { 0% { transform: scale(1); } 70% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
@@ -67,11 +58,11 @@
     <nav class="navbar sticky-top">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <button class="btn-menu-dark me-2 me-md-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" style="background: rgba(255,255,255,0.1); color: white; border: none; width: 40px; height: 40px; border-radius: 50%;">
+                <button class="btn-menu-dark me-2 me-md-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" style="background: rgba(255,255,255,0.1); color: white; border: none; width: 38px; height: 38px; border-radius: 50%;">
                     <i class="bi bi-list fs-4"></i>
                 </button>
                 <a class="nav-brand-group" href="/">
-                    {% if settings.Logo_URL and settings.Logo_URL != "" %}
+                    {% if settings.Logo_URL %}
                         <img src="{{ settings.Logo_URL }}" class="site-logo-nav" alt="Logo">
                     {% endif %}
                     <div class="brand-divider"></div>
@@ -87,19 +78,16 @@
 
     <div class="offcanvas offcanvas-start" tabindex="-1" id="sideMenu">
         <div class="offcanvas-header p-4 border-bottom">
-            <h5 class="fw-bold mb-0">MENU</h5>
+            <h5 class="fw-bold mb-0">NAVIGATION</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
-        <div class="offcanvas-body p-0 text-center py-4">
-            {% if settings.Logo_URL %}<img src="{{ settings.Logo_URL }}" style="height: 60px; margin-bottom: 20px;">{% endif %}
+        <div class="offcanvas-body p-0 py-4 text-center">
+            {% if settings.Logo_URL %}<img src="{{ settings.Logo_URL }}" style="height: 50px; margin-bottom: 15px;">{% endif %}
             <div class="list-group list-group-flush text-start">
-                <a href="/" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold"><i class="bi bi-house me-3"></i> Home</a>
-                <a href="/#tourist-section" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold"><i class="bi bi-compass me-3"></i> Explore Lonavala</a>
-                <a href="/privacy-policy" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold"><i class="bi bi-shield-check me-3"></i> Privacy Policy</a>
-                <a href="/terms-conditions" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold"><i class="bi bi-file-earmark-text me-3"></i> Terms & Conditions</a>
-                {% if session.get('admin_logged_in') %}
-                <a href="/admin/dashboard" class="list-group-item py-3 px-4 border-0 fs-6 fw-bold text-danger"><i class="bi bi-speedometer2 me-3"></i> Admin Dashboard</a>
-                {% endif %}
+                <a href="/" class="list-group-item py-3 px-4 border-0 fw-bold"><i class="bi bi-house me-3"></i> Home</a>
+                <a href="/#tourist-section" class="list-group-item py-3 px-4 border-0 fw-bold"><i class="bi bi-compass me-3"></i> Explore Lonavala</a>
+                <a href="/privacy-policy" class="list-group-item py-3 px-4 border-0 fw-bold"><i class="bi bi-shield-check me-3"></i> Privacy Policy</a>
+                <a href="/terms-conditions" class="list-group-item py-3 px-4 border-0 fw-bold"><i class="bi bi-file-earmark-text me-3"></i> Terms & Conditions</a>
             </div>
         </div>
     </div>
@@ -108,25 +96,18 @@
 
     <footer class="premium-footer">
         <div class="container">
-            {% if settings.Logo_URL %}<img src="{{ settings.Logo_URL }}" class="footer-logo">{% endif %}
+            {% if settings.Logo_URL %}<img src="{{ settings.Logo_URL }}" style="max-height: 60px; margin-bottom: 10px;">{% endif %}
             <h2 class="footer-brand-name">MoreVistas</h2>
             <span class="footer-tagline">The Art of Luxury Living</span>
-            
-            <div class="mt-4">
-                <a href="/" class="footer-nav-link">Home</a>
-                <a href="/#tourist-section" class="footer-nav-link">Explore</a>
-                <a href="https://wa.me/91{{ settings.Contact }}" class="footer-nav-link">Contact</a>
-            </div>
-
-            <div class="legal-links-small">
-                <a href="/terms-conditions">Terms & Conditions</a> | 
-                <a href="/privacy-policy">Privacy Policy</a>
-                <p class="mt-4 opacity-50" style="font-size: 0.65rem;">© 2026 MOREVISTAS LUXURY VILLAS LONAVALA. ALL RIGHTS RESERVED.</p>
+            <div class="legal-links-small mt-4">
+                <a href="/terms-conditions" class="text-white-50 text-decoration-none mx-2">Terms</a> | 
+                <a href="/privacy-policy" class="text-white-50 text-decoration-none mx-2">Privacy</a>
+                <p class="mt-3 opacity-25" style="font-size: 0.6rem;">© 2026 MOREVISTAS LUXURY. ALL RIGHTS RESERVED.</p>
             </div>
         </div>
     </footer>
 
-    <a href="https://wa.me/91{{ settings.Contact }}?text=Hi, I am looking for a luxury villa in Lonavala" class="wa-side-tab" id="waSideTab">
+    <a href="https://wa.me/91{{ settings.Contact }}" class="wa-side-tab">
         <i class="bi bi-whatsapp"></i>
         <span>Chat with Concierge</span>
     </a>
