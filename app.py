@@ -88,8 +88,9 @@ def index():
 
 # ... (Add other routes: admin, enquiry, explore, contact etc. exactly as you had them)
 
-if __name__ == "__main__":
-    # RENDER FIX: Must use port from env and 0.0.0.0
-    port = int(os.environ.get("PORT", 10000)) 
+if __name__ == '__main__':
+    import os
+    # Render automatically sets a PORT environment variable
+    port = int(os.environ.get("PORT", 10000))
+    # '0.0.0.0' is required for Render to find the app
     app.run(host='0.0.0.0', port=port)
-    
