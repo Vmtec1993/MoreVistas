@@ -1,19 +1,26 @@
 {% extends 'base.html' %}
 {% block content %}
 
+{% if settings.Banner_Status == 'ON' %}
 <div class="container-fluid p-0 mb-4">
     <div class="position-relative shadow-lg overflow-hidden">
-        <img src="https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg" 
+        <img src="{{ settings.Banner_URL if settings.Banner_URL else 'https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg' }}" 
              class="w-100 d-block holi-banner-img" 
-             alt="Holi Luxury Villa Offer">
+             alt="Luxury Villa Offer">
+        
         <div class="position-absolute top-0 end-0 m-3">
-            <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm animate-pulse">🎨 HOLI OFFER LIVE</span>
+            <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm animate-pulse text-uppercase">
+                🎨 {{ settings.Offer_Tag if settings.Offer_Tag else 'OFFER LIVE' }}
+            </span>
         </div>
+
         <div class="position-absolute bottom-0 start-0 w-100 p-3 text-center" style="background: linear-gradient(transparent, rgba(0,0,0,0.6));">
-            <a href="#villaContainer" class="btn btn-light btn-lg rounded-pill fw-bold px-5 shadow-lg border-0 text-danger">BOOK HOLI PARTY 🚀</a>
+            <p class="text-white fw-bold mb-2 d-none d-md-block">{{ settings.Offer_Text }}</p>
+            <a href="#villaContainer" class="btn btn-light btn-lg rounded-pill fw-bold px-5 shadow-lg border-0 text-danger">BOOK NOW 🚀</a>
         </div>
     </div>
 </div>
+{% endif %}
 
 <div class="container mb-4">
     <div class="bg-white p-3 rounded-4 shadow-sm border d-flex align-items-center justify-content-center">
@@ -24,7 +31,7 @@
 </div>
 
 <style>
-    .holi-banner-img { height: auto; max-height: 480px; min-height: 250px; object-fit: cover; }
+    .holi-banner-img { height: auto; max-height: 480px; min-height: 250px; object-fit: cover; width: 100%; }
     .animate-pulse { animation: pulse-red 2s infinite; }
     @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .villa-title-main { background: linear-gradient(45deg, #ff416c, #ff4b2b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 850; font-size: 1.3rem; }
@@ -32,8 +39,6 @@
     .off-tag { background: #28a745; color: white; font-size: 0.75rem; padding: 2px 10px; border-radius: 5px; font-weight: bold; }
     .sold-out-overlay { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: bold; z-index: 5; border: 1px solid rgba(255,255,255,0.3); }
     .floating-wa { position: fixed; bottom: 30px; right: 20px; width: 65px; height: 65px; background-color: #25d366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; z-index: 1000; box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); }
-    .highlight-card { border: none; transition: 0.3s; background: #f8f9fa; border-radius: 20px; }
-    .highlight-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
 </style>
 
 <div class="container mt-4 text-center">
@@ -47,7 +52,6 @@
             {% for villa in villas %}
             <div class="col-md-4">
                 <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
-                    
                     {% if villa.Status|lower == 'sold out' %}
                     <div class="sold-out-overlay text-uppercase">🚫 Sold Out</div>
                     {% endif %}
@@ -62,13 +66,11 @@
                                 <div class="d-flex align-items-center mb-1">
                                     {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
                                     <span class="price-cut">₹{{ villa.Original_Price }}</span>
-                                    <span class="off-tag">
-                                        {{ (((villa.Original_Price|int - villa.Price|int) / villa.Original_Price|int) * 100)|int }}% OFF
-                                    </span>
+                                    <span class="off-tag">{{ villa.discount_perc }}% OFF</span>
                                     {% endif %}
                                 </div>
                                 <div class="d-flex align-items-baseline">
-                                    <span class="fs-4 fw-bold text-primary">₹{{ villa.Price|int }}</span>
+                                    <span class="fs-4 fw-bold text-primary">₹{{ villa.Price }}</span>
                                     <small class="text-muted ms-1">/night</small>
                                 </div>
                             {% else %}
@@ -103,24 +105,24 @@
         <h3 class="fw-bold mb-5 text-center">Why Stay With <span class="text-primary">MoreVistas?</span></h3>
         <div class="row g-4 text-center">
             <div class="col-md-4">
-                <div class="p-4 highlight-card h-100">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100">
                     <i class="bi bi-shield-check-fill fs-1 text-primary"></i>
                     <h5 class="fw-bold mt-3">Verified Properties</h5>
-                    <p class="small text-muted mb-0">Every villa is hand-picked and personally verified for your comfort.</p>
+                    <p class="small text-muted mb-0">Every villa is personally verified for your comfort.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="p-4 highlight-card h-100">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100">
                     <i class="bi bi-cash-stack fs-1 text-success"></i>
-                    <h5 class="fw-bold mt-3">Owner Direct Pricing</h5>
-                    <p class="small text-muted mb-0">No hidden fees or commissions. Get the lowest rates guaranteed.</p>
+                    <h5 class="fw-bold mt-3">Best Price</h5>
+                    <p class="small text-muted mb-0">Owner direct pricing. No hidden fees.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="p-4 highlight-card h-100">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100">
                     <i class="bi bi-geo-alt-fill fs-1 text-danger"></i>
                     <h5 class="fw-bold mt-3">Local Support</h5>
-                    <p class="small text-muted mb-0">Our team is on-ground in Lonavala to assist you 24/7 during your stay.</p>
+                    <p class="small text-muted mb-0">24/7 on-ground assistance in Lonavala.</p>
                 </div>
             </div>
         </div>
@@ -135,21 +137,19 @@
             <div class="col-6 col-md-3">
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden text-center h-100">
                     <img src="{{ place.Image_URL }}" class="card-img-top" style="height:120px; object-fit:cover;">
-                    <div class="p-2 text-truncate">
-                        <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">{{ place.Place_Name }}</h6>
+                    <div class="p-2">
+                        <h6 class="fw-bold mb-0 text-truncate" style="font-size: 0.8rem;">{{ place.Place_Name }}</h6>
                     </div>
                 </div>
             </div>
             {% endfor %}
-        {% else %}
-            <div class="col-12 text-center py-4">
-                <div class="text-muted">Lonavala attractions loading...</div>
-            </div>
         {% endif %}
     </div>
 </div>
 
-<a href="https://wa.me/918830024994" class="floating-wa shadow-lg"><i class="bi bi-whatsapp"></i></a>
+<a href="https://wa.me/91{{ settings.Contact if settings.Contact else '8830024994' }}" class="floating-wa shadow-lg">
+    <i class="bi bi-whatsapp"></i>
+</a>
 
 <script>
     async function getLonavalaWeather() {
@@ -160,10 +160,7 @@
             document.getElementById('weather-desc').innerText = data.weather[0].description;
             const iconCode = data.weather[0].icon;
             document.getElementById('weather-icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${iconCode}.png" width="40">`;
-        } catch (e) { 
-            console.log("Weather error"); 
-            document.getElementById('temp').innerText = "28"; 
-        }
+        } catch (e) { document.getElementById('temp').innerText = "28"; }
     }
     getLonavalaWeather();
 </script>
