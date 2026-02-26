@@ -1,110 +1,204 @@
-import os, json, gspread, requests
-from flask import Flask, render_template, request, session, redirect, url_for
-from oauth2client.service_account import ServiceAccountCredentials
-from datetime import datetime
+{% extends 'base.html' %}
+{% block content %}
 
-app = Flask(__name__)
-app.secret_key = "morevistas_2026_master_key"
+<style>
+    /* Premium Typography & Colors */
+    .villa-title-detail {
+        background: linear-gradient(45deg, #ff416c, #ff4b2b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 850; font-size: 2.2rem;
+    }
+    .carousel-item img { height: 500px; object-fit: cover; border-radius: 20px; }
+    @media (max-width: 768px) { .carousel-item img { height: 280px; } .villa-title-detail { font-size: 1.8rem; } }
 
-# --- CONFIG ---
-ADMIN_PASSWORD = "MoreVistas@2026"
-TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
-TELEGRAM_CHAT_ID = "6746178673"
-SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
+    .highlight-badge-card { 
+        background: #ffffff; 
+        border: 1px solid #eee; 
+        border-radius: 15px; 
+        padding: 12px; 
+        text-align: center; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    
+    /* New Premium Rule Styling */
+    .rule-item-premium {
+        background: #fdfdfd;
+        border: 1px solid #f1f1f1;
+        border-left: 4px solid #00b4d8;
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        transition: 0.3s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .rule-item-premium:hover {
+        transform: translateX(8px);
+        background: #ffffff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .rule-check-icon {
+        min-width: 24px; height: 24px;
+        background: #e6f7ff; color: #00b4d8;
+        border-radius: 6px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem; margin-right: 12px;
+    }
+    
+    .detail-original-price { text-decoration: line-through; color: #adb5bd; font-size: 1.1rem; }
+    .savings-badge { background: #28a745; color: white; padding: 4px 12px; border-radius: 5px; font-size: 0.85rem; font-weight: bold; }
+    .offer-banner { position: absolute; top: 20px; left: 20px; z-index: 10; background: #ff4757; color: white; padding: 5px 15px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; }
 
-# --- SMART DATA FETCH ---
-def get_master_data(tab_name):
-    try:
-        creds_json = os.environ.get('GOOGLE_CREDS')
-        info = json.loads(creds_json)
-        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
-        client = gspread.authorize(creds)
+    /* Mobile Booking Bar */
+    @media (max-width: 767px) {
+        .mobile-booking-bar {
+            position: fixed; bottom: 0; left: 0; right: 0; background: white;
+            padding: 10px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            z-index: 1000; display: flex; justify-content: space-between; align-items: center;
+        }
+        body { padding-bottom: 70px; }
+    }
+</style>
+
+<div class="container py-4">
+    <div id="villaSlider" class="carousel slide shadow-sm position-relative mb-4" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden;">
+        {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
+            <div class="offer-banner">🔥 SPECIAL OFFER LIVE</div>
+        {% endif %}
         
-        sheet = client.open_by_key(SHEET_ID).worksheet(tab_name)
-        data = sheet.get_all_values()
-        if not data: return []
-        
-        headers = [h.strip() for h in data[0]]
-        rows = []
-        for row in data[1:]:
-            if any(row):
-                item = dict(zip(headers, row + [''] * (len(headers) - len(row))))
-                # Rules List logic (Villa Details ke liye)
-                item['Rules_List'] = [v.strip() for k, v in item.items() if 'rule' in k.lower() and v.strip()]
-                # Discount Logic (Offer Tags ke liye)
-                try:
-                    p, op = int(str(item.get('Price', 0))), int(str(item.get('Original_Price', 0)))
-                    if op > p: item['discount_perc'] = round(((op - p) / op) * 100)
-                except: item['discount_perc'] = 0
-                rows.append(item)
-        return rows
-    except Exception as e:
-        print(f"Error in {tab_name}: {e}")
-        return []
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{{ villa.Image_URL }}" class="d-block w-100" alt="Main Image">
+            </div>
+            {% for img in villa_images %}
+                {% if img != villa.Image_URL %}
+                <div class="carousel-item">
+                    <img src="{{ img }}" class="d-block w-100" alt="Gallery">
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#villaSlider" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+        <button class="carousel-control-next" type="button" data-bs-target="#villaSlider" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+    </div>
 
-def get_settings():
-    # Default fallback values
-    res = {'Banner_Status': 'OFF', 'Contact': '8830024994', 'Logo_Height': '50', 'Offer_Tag': 'OFFER'}
-    try:
-        data = get_master_data("Settings") # Apne Sheet tab ka naam "Settings" rakhein
-        for item in data:
-            # Column A ki key aur Column B ki value
-            key = list(item.values())[0].strip()
-            val = list(item.values())[1].strip()
-            if 'URL' in key and val and not val.startswith('http'): val = 'https://' + val
-            res[key] = val
-    except: pass
-    return res
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="villa-title-detail mb-1">{{ villa.Villa_Name }}</h1>
+            <p class="text-muted mb-4"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, Maharashtra</p>
 
-# --- ROUTES ---
+            <div class="row g-3 mb-5">
+                <div class="col-4 text-center">
+                    <div class="highlight-badge-card">
+                        <i class="bi bi-people fs-3 text-primary"></i>
+                        <div class="fw-bold small mt-1">{{ villa.Guests }} Guests</div>
+                    </div>
+                </div>
+                <div class="col-4 text-center">
+                    <div class="highlight-badge-card">
+                        <i class="bi bi-door-open fs-3 text-primary"></i>
+                        <div class="fw-bold small mt-1">{{ villa.BHK }} BHK</div>
+                    </div>
+                </div>
+                <div class="col-4 text-center">
+                    <div class="highlight-badge-card">
+                        <i class="bi bi-water fs-3 text-primary"></i>
+                        <div class="fw-bold small mt-1">Private Pool</div>
+                    </div>
+                </div>
+            </div>
 
-@app.route('/')
-def index():
-    # Villas aur Places tab se data uthayega
-    return render_template('index.html', villas=get_master_data("Villas"), settings=get_settings(), tourist_places=get_master_data("Places"))
+            <div class="description-section mb-5">
+                <h4 class="fw-bold mb-3">✨ Experience Private Pool Luxury</h4>
+                <p class="text-secondary" style="line-height: 1.7; font-size: 1.05rem;">
+                    Welcome to <b>{{ villa.Villa_Name }}</b> — a beautifully designed escape crafted for peaceful mountain getaways. 
+                    Spend your day relaxing by your private pool and enjoy the cool mountain air of Lonavala. 
+                </p>
+            </div>
 
-@app.route('/villa/<villa_id>')
-def villa_details(villa_id):
-    villas = get_master_data("Villas")
-    villa = next((v for v in villas if str(v.get('Villa_ID')).strip() == str(villa_id).strip()), None)
-    if not villa: return "Villa Not Found", 404
-    
-    # Image Gallery logic
-    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
-    if not any(imgs): imgs = [villa.get('Image_URL')]
-    
-    return render_template('villa_details.html', villa=villa, villa_images=imgs, settings=get_settings())
+            <div class="rules-section mb-5">
+                <h4 class="fw-bold mb-4"><i class="bi bi-shield-check-fill text-primary me-2"></i>Stay Rules & Policies</h4>
+                <div class="row g-3">
+                    {% if villa.Rules_List %}
+                        {% for rule in villa.Rules_List %}
+                        <div class="col-md-6">
+                            <div class="rule-item-premium">
+                                <div class="rule-check-icon">
+                                    <i class="bi bi-check-lg"></i>
+                                </div>
+                                <span class="fw-semibold text-dark small">{{ rule }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12 text-muted">Standard villa rules apply.</div>
+                    {% endif %}
+                </div>
 
-# Term, Privacy, Enquiry Routes (Inhe mat hatana)
-@app.route('/privacy-policy')
-def privacy_policy(): return render_template('privacy_policy.html', settings=get_settings())
+                <div class="mt-4 p-3 rounded-4" style="background: #fff9db; border: 1px dashed #fab005;">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="min-width: 40px; height: 40px;">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </div>
+                        <div>
+                            <p class="mb-0 fw-bold text-dark small">Security Deposit Required</p>
+                            <p class="mb-0 text-muted" style="font-size: 0.75rem;">A refundable deposit is collected at check-in for villa safety.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-@app.route('/terms-conditions')
-def terms_conditions(): return render_template('terms_conditions.html', settings=get_settings())
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg rounded-4 p-4 sticky-top" style="top: 100px; z-index: 10;">
+                <h5 class="fw-bold mb-3">Pricing & Booking</h5>
+                
+                {% if villa.Price and villa.Price|int > 0 %}
+                    <div class="mb-3">
+                        {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="detail-original-price me-2">₹{{ villa.Original_Price }}</span>
+                                <span class="savings-badge">{{ villa.discount_perc }}% OFF</span>
+                            </div>
+                        {% endif %}
+                        <div class="d-flex align-items-baseline">
+                            <span class="fs-1 fw-bold text-primary">₹{{ villa.Price }}</span>
+                            <span class="text-muted ms-2">/ night</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <h3 class="text-primary fw-bold mb-4">Price on Request</h3>
+                {% endif %}
 
-@app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
-def enquiry(villa_id):
-    villas = get_master_data("Villas")
-    villa = next((v for v in villas if str(v.get('Villa_ID')).strip() == str(villa_id).strip()), None)
-    if request.method == 'POST':
-        # Enquiry Sheet logic...
-        return render_template('success.html', name=request.form.get('name'), settings=get_settings())
-    return render_template('enquiry.html', villa=villa, settings=get_settings())
+                <div class="d-grid gap-3 mt-4">
+                    <a href="https://wa.me/91{{ settings.Contact }}?text=Hi, interested in {{ villa.Villa_Name }}" class="btn btn-success rounded-pill py-3 fw-bold shadow-sm">
+                        <i class="bi bi-whatsapp me-2"></i>BOOK ON WHATSAPP
+                    </a>
+                    
+                    <a href="/enquiry/{{ villa.get('Villa_ID') }}" class="btn btn-outline-primary rounded-pill py-3 fw-bold">
+                        <i class="bi bi-envelope-paper me-2"></i>FILL ENQUIRY FORM
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-@app.route('/admin', methods=['GET', 'POST'])
-def admin_login():
-    if request.method == 'POST' and request.form.get('password') == ADMIN_PASSWORD:
-        session['admin_logged_in'] = True
-        return redirect(url_for('admin_dashboard'))
-    return render_template('admin_login.html')
+<div class="mobile-booking-bar d-md-none">
+    <div style="flex: 1;">
+        <div class="fw-bold fs-4 text-primary">₹{{ villa.Price }}</div>
+        <small class="text-muted">per night</small>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="/enquiry/{{ villa.get('Villa_ID') }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-bold">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+        <a href="https://wa.me/91{{ settings.Contact }}?text=Interested in {{ villa.Villa_Name }}" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow">
+            <i class="bi bi-whatsapp"></i>
+        </a>
+    </div>
+</div>
 
-@app.route('/admin/dashboard')
-def admin_dashboard():
-    if not session.get('admin_logged_in'): return redirect(url_for('admin_login'))
-    return render_template('admin_dashboard.html', enquiries=get_master_data("Enquiries"))
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
-    
+{% endblock %}
