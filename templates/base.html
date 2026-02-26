@@ -28,24 +28,25 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loader-text { color: white; margin-top: 20px; font-weight: bold; letter-spacing: 2px; }
 
-        /* ✅ PROFESSIONAL LOGO & BRANDING - UPDATED */
-.site-logo { 
-    /* Sheet se width uthayega, default 150px rahegi */
-    width: {{ settings.Logo_Width if settings.Logo_Width else '150' }}px !important; 
-    height: auto; 
-    /* max-height ko hata diya ya 'none' kar diya taaki size badh sake */
-    max-height: none !important; 
-    object-fit: contain; 
-}
+        /* ✅ DYNAMIC LOGO CSS - FIXED BY Gemini */
+        .site-logo { 
+            /* Ye direct admin panel se width lega */
+            width: {{ settings.Logo_Width if settings.Logo_Width else '150' }}px !important; 
+            height: auto !important; 
+            max-height: none !important; 
+            object-fit: contain; 
+            transition: 0.3s ease; /* Smooth size change */
+        }
 
-/* Mobile ke liye thoda control */
-@media (max-width: 768px) { 
-    .site-logo { 
-        /* Mobile par sheet ki width ka 70% dikhayega taaki screen se bahar na jaye */
-        width: calc({{ settings.Logo_Width if settings.Logo_Width else '150' }}px * 0.7) !important; 
-    }
-}
-
+        /* Mobile ke liye smart scaling */
+        @media (max-width: 768px) { 
+            .site-logo { 
+                /* Mobile par auto-scale karega taaki screen se bahar na jaye */
+                max-width: 80vw !important; 
+                /* Agar width 200px se zyada hai toh mobile par use 140px tak restrict karega */
+                width: min({{ settings.Logo_Width if settings.Logo_Width else '150' }}px, 140px) !important;
+            }
+        }
 
         .brand-text-container {
             display: flex;
@@ -74,7 +75,6 @@
         }
 
         @media (max-width: 768px) { 
-            .site-logo { max-width: 50px; }
             .brand-name { font-size: 1.2rem; }
             .brand-tagline { font-size: 0.5rem; letter-spacing: 2px; }
             .brand-text-container { padding-left: 8px; margin-left: 8px; }
