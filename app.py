@@ -32,30 +32,38 @@ def init_sheets():
             SHEET_ID = "1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao"
             main_spreadsheet = client.open_by_key(SHEET_ID)
             
-            all_ws = {ws.title: ws for ws in main_spreadsheet.worksheets()}
-            sheet = all_ws.get("Sheet1") # Ensure this matches your main villa sheet name
-            places_sheet = all_ws.get("Places")
-            enquiry_sheet = all_ws.get("Enquiries")
-            settings_sheet = all_ws.get("Settings")
-            print("✅ All Sheets Linked Successfully")
+            # ✅ IMPROVED: Index se sheet uthana (taaki naam badalne par error na aaye)
+            # Make sure sequence in Google Sheet is: 1. Villas, 2. Places, 3. Enquiries, 4. Settings
+            worksheets = main_spreadsheet.worksheets()
+            sheet = worksheets[0]
+            if len(worksheets) > 1: places_sheet = worksheets[1]
+            if len(worksheets) > 2: enquiry_sheet = worksheets[2]
+            if len(worksheets) > 3: settings_sheet = worksheets[3]
+            
+            print(f"✅ Successfully linked {len(worksheets)} sheets!")
         except Exception as e:
             print(f"❌ Sheet Init Error: {e}")
 
-# Call once at startup
+# Call at startup
 init_sheets()
 
 # --- Utility Functions ---
 
 def get_rows(target_sheet):
-    if not target_sheet: return []
+    if not target_sheet: 
+        print("⚠️ Warning: target_sheet is None")
+        return []
     try:
         data = target_sheet.get_all_values()
         if not data or len(data) < 1: return []
+        
         headers = [h.strip() for h in data[0]]
         final_list = []
         for row in data[1:]:
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
+            
+            # Clean numeric data safely
             try:
                 p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
@@ -65,14 +73,20 @@ def get_rows(target_sheet):
                 item['Original_Price'] = original
                 item['discount_perc'] = int(((original - current) / original) * 100) if original > current > 0 else 0
             except: 
+                item['Price'] = 0
                 item['discount_perc'] = 0
             
+            # Format Rules List
             raw_rules = item.get('Rules', '')
             item['Rules_List'] = [r.strip() for r in raw_rules.split('|')] if '|' in raw_rules else ([raw_rules.strip()] if raw_rules else ["ID Proof Required"])
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
             final_list.append(item)
+        
+        print(f"✅ Fetched {len(final_list)} rows from {target_sheet.title}")
         return final_list
-    except: return []
+    except Exception as e:
+        print(f"❌ Error fetching rows: {e}")
+        return []
 
 def get_settings():
     res = {
@@ -83,22 +97,25 @@ def get_settings():
         'Banner_URL': '', 
         'Banner_Status': 'OFF'
     }
-    if settings_sheet:
-        try:
+    try:
+        if settings_sheet:
             data = settings_sheet.get_all_values()
             for r in data:
                 if len(r) >= 2: res[r[0].strip()] = r[1].strip()
-        except: pass
+    except: pass
     return res
 
 # --- Routes ---
 
 @app.route('/')
 def index():
+    # Force reconnect if sheet is lost
+    if not sheet: init_sheets()
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
     settings = get_settings()
-    # Logic: Sold Out villas move to bottom
+    
+    # Sort: Available on top, Sold Out at bottom
     sorted_villas = sorted(villas, key=lambda x: str(x.get('Status', '')).lower() == 'sold out')
     return render_template('index.html', villas=sorted_villas, tourist_places=places, settings=settings)
 
@@ -108,7 +125,6 @@ def villa_details(villa_id):
     villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
     
-    # Image gallery logic
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not imgs: imgs = [villa.get('Image_URL')]
     
@@ -121,16 +137,13 @@ def enquiry(villa_id):
     settings = get_settings()
 
     if request.method == 'POST':
-        name = request.form.get('name')
-        phone = request.form.get('phone')
-        dates = request.form.get('stay_dates')
-        guests = request.form.get('guests')
+        name, phone, dates, guests = request.form.get('name'), request.form.get('phone'), request.form.get('stay_dates'), request.form.get('guests')
         v_name = villa.get('Villa_Name', 'Villa') if villa else "Unknown Villa"
         
         if enquiry_sheet:
             try: 
                 enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
-            except Exception as e: print(f"Sheet Error: {e}")
+            except: pass
             
         alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
         requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
@@ -139,8 +152,7 @@ def enquiry(villa_id):
     
     return render_template('enquiry.html', villa=villa, settings=settings)
 
-# --- Admin Routes ---
-
+# --- Admin Dash ---
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_dashboard():
     if request.method == 'POST':
@@ -160,7 +172,7 @@ def admin_dashboard():
             raw_enq = enquiry_sheet.get_all_values()
             if len(raw_enq) > 1:
                 headers = [h.strip() for h in raw_enq[0]]
-                rows = raw_enq[1:]; rows.reverse() # Latest first
+                rows = raw_enq[1:]; rows.reverse()
                 enquiries = [dict(zip(headers, r + [''] * (len(headers) - len(r)))) for r in rows]
         except: pass
     return render_template('admin.html', villas=villas, enquiries=enquiries, settings=settings)
@@ -168,10 +180,7 @@ def admin_dashboard():
 @app.route('/admin/update', methods=['POST'])
 def update_data():
     if not session.get('admin_logged_in'): return jsonify({"status": "error"}), 403
-    target = request.form.get('target')
-    key = request.form.get('key')
-    val = request.form.get('value')
-    v_id = request.form.get('villa_id')
+    target, key, val, v_id = request.form.get('target'), request.form.get('key'), request.form.get('value'), request.form.get('villa_id')
     try:
         if target == "settings" and settings_sheet:
             try:
@@ -180,7 +189,7 @@ def update_data():
             except:
                 settings_sheet.append_row([key, val])
         elif target == "villas" and sheet:
-            cell = sheet.find(v_id)
+            cell = sheet.find(str(v_id))
             headers = sheet.row_values(1)
             col_index = headers.index(key) + 1
             sheet.update_cell(cell.row, col_index, val)
@@ -201,9 +210,6 @@ def contact():
     return render_template('contact.html', settings=get_settings())
 
 if __name__ == "__main__":
-    # Render hamesha 'PORT' environment variable deta hai
     port = int(os.environ.get("PORT", 5000))
-    # '0.0.0.0' zaroori hai taaki external requests accept ho sakein
     app.run(host='0.0.0.0', port=port)
-
-    
+        
