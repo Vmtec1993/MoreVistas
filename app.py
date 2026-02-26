@@ -58,7 +58,7 @@ def get_rows(target_sheet):
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
-            # Price Calculation Logic
+            # --- Price & Discount Logic ---
             try:
                 p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
@@ -69,6 +69,15 @@ def get_rows(target_sheet):
                 item['discount_perc'] = int(((original - current) / original) * 100) if original > current > 0 else 0
             except: 
                 item['discount_perc'] = 0
+
+            # --- Rules List Logic (Sheet se automatic todna) ---
+            raw_rules = item.get('Rules', '')
+            if raw_rules and '|' in raw_rules:
+                item['Rules_List'] = [r.strip() for r in raw_rules.split('|')]
+            elif raw_rules:
+                item['Rules_List'] = [raw_rules.strip()]
+            else:
+                item['Rules_List'] = ["Contact for house rules"]
             
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
             final_list.append(item)
@@ -103,10 +112,10 @@ def get_settings():
 def index():
     settings = get_settings()
     villas = get_rows(sheet)
-    # Why Stay Here and Tourist points are handled in index.html, 
-    # ensuring villas are sorted by availability
+    # Tourist places ko pass kiya taaki photos dikhein
+    places = get_rows(places_sheet)
     sorted_villas = sorted(villas, key=lambda x: str(x.get('Status', '')).lower() == 'sold out')
-    return render_template('index.html', villas=sorted_villas, settings=settings)
+    return render_template('index.html', villas=sorted_villas, tourist_places=places, settings=settings)
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_dashboard():
@@ -128,13 +137,13 @@ def admin_dashboard():
             raw_enq = enquiry_sheet.get_all_values()
             if len(raw_enq) > 1:
                 headers = [h.strip() for h in raw_enq[0]]
-                # ✅ FILTER: Removing empty rows or rows with 'None' string
                 rows = [r for r in raw_enq[1:] if any(r) and len(r) > 1 and r[1].strip() != "" and r[1].lower() != "none"]
-                rows.reverse() # Newest leads first
+                rows.reverse() 
                 enquiries = [dict(zip(headers, r + [''] * (len(headers) - len(r)))) for r in rows]
         except: pass
         
-    return render_template('admin.html', villas=villas, enquiries=enquiries, settings=settings)
+    # Yahan 'admin_dashboard.html' use kiya hai
+    return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries, settings=settings)
 
 @app.route('/admin/update', methods=['POST'])
 def update_data():
@@ -163,7 +172,6 @@ def update_data():
     except Exception as e: 
         return jsonify({"status": "error", "message": str(e)})
 
-# ✅ ADVANCED LEGAL PAGES (FIXED)
 @app.route('/privacy-policy')
 def privacy():
     return render_template('legal.html', type='privacy', settings=get_settings())
@@ -177,9 +185,10 @@ def villa_details(villa_id):
     villas = get_rows(sheet)
     villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
-    # Handling multiple images
+    
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not imgs or not any(imgs): imgs = [villa.get('Image_URL')]
+    
     return render_template('villa_details.html', villa=villa, villa_images=imgs, settings=get_settings())
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
@@ -219,6 +228,6 @@ def contact():
     return render_template('contact.html', settings=get_settings())
 
 if __name__ == "__main__":
-    # Render automatically sets the PORT environment variable
     port = int(os.environ.get("PORT", 5000)) 
     app.run(host='0.0.0.0', port=port)
+                
