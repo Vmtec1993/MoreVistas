@@ -4,40 +4,40 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-800 mb-0">Admin <span class="text-primary">Dashboard</span></h2>
-            <p class="text-muted small">Welcome back! Here's what's happening today.</p>
+            <p class="text-muted small">Full Control: Manage Enquiries, Prices & Banners.</p>
         </div>
         <a href="/admin/logout" class="btn btn-outline-danger btn-sm rounded-pill px-4">
             <i class="bi bi-box-arrow-right me-2"></i>Logout
         </a>
     </div>
 
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4 text-center">
         <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 p-3 text-center h-100">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
                 <div class="text-primary mb-2"><i class="bi bi-chat-left-dots fs-3"></i></div>
                 <h4 class="fw-bold mb-0">{{ enquiries|length }}</h4>
-                <small class="text-muted">Total Enquiries</small>
+                <small class="text-muted">Enquiries</small>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 p-3 text-center h-100">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
                 <div class="text-success mb-2"><i class="bi bi-house-check fs-3"></i></div>
                 <h4 class="fw-bold mb-0">{{ villas|length }}</h4>
                 <small class="text-muted">Villas Live</small>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 p-3 text-center h-100" style="background: #f0f7ff;">
-                <div class="text-info mb-2"><i class="bi bi-calendar-event fs-3"></i></div>
-                <h4 class="fw-bold mb-0">Holi 2026</h4>
-                <small class="text-muted">Current Season</small>
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100" style="background: #f0f7ff;">
+                <div class="text-info mb-2"><i class="bi bi-megaphone fs-3"></i></div>
+                <h4 class="fw-bold mb-0">Active</h4>
+                <small class="text-muted">Promo Banner</small>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 p-3 text-center h-100">
-                <div class="text-warning mb-2"><i class="bi bi-star fs-3"></i></div>
-                <h4 class="fw-bold mb-0">Premium</h4>
-                <small class="text-muted">Account Status</small>
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+                <div class="text-warning mb-2"><i class="bi bi-shield-lock fs-3"></i></div>
+                <h4 class="fw-bold mb-0">Secure</h4>
+                <small class="text-muted">Admin Access</small>
             </div>
         </div>
     </div>
@@ -46,10 +46,13 @@
         <div class="card-body p-4">
             <ul class="nav nav-pills mb-4 bg-light p-2 rounded-pill" id="adminTab" role="tablist" style="width: fit-content;">
                 <li class="nav-item">
-                    <button class="nav-link active rounded-pill px-4 me-2 border-0" data-bs-toggle="tab" data-bs-target="#enq-tab">Recent Enquiries</button>
+                    <button class="nav-link active rounded-pill px-4 me-2 border-0" data-bs-toggle="tab" data-bs-target="#enq-tab">Enquiries</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link rounded-pill px-4 border-0" data-bs-toggle="tab" data-bs-target="#villas-tab">Manage Villas</button>
+                    <button class="nav-link rounded-pill px-4 me-2 border-0" data-bs-toggle="tab" data-bs-target="#villas-tab">Prices</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link rounded-pill px-4 border-0" data-bs-toggle="tab" data-bs-target="#settings-tab">Banner Settings</button>
                 </li>
             </ul>
 
@@ -59,33 +62,25 @@
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Date & Time</th>
-                                    <th>Customer Name</th>
-                                    <th>Villa Selected</th>
-                                    <th>Stay Dates</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Villa</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% if enquiries %}
-                                    {% for e in enquiries %}
-                                    <tr>
-                                        <td class="small text-muted">{{ e.Timestamp }}</td>
-                                        <td><strong>{{ e.Name }}</strong></td>
-                                        <td><span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ e.Villa_Name }}</span></td>
-                                        <td class="small">{{ e.stay_dates }}</td>
-                                        <td>
-                                            <a href="https://wa.me/91{{ e.Phone }}?text=Hi%20{{ e.Name }},%20regarding%20your%20enquiry%20for%20{{ e.Villa_Name }}..." target="_blank" class="btn btn-success btn-sm rounded-pill px-3">
-                                                <i class="bi bi-whatsapp me-1"></i> Reply
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr>
-                                        <td colspan="5" class="text-center py-5 text-muted">No enquiries found yet.</td>
-                                    </tr>
-                                {% endif %}
+                                {% for e in enquiries %}
+                                <tr>
+                                    <td class="small text-muted">{{ e.Timestamp }}</td>
+                                    <td><strong>{{ e.Name }}</strong><br><small>{{ e.Phone }}</small></td>
+                                    <td><span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ e.Villa_Name }}</span></td>
+                                    <td>
+                                        <a href="https://wa.me/91{{ e.Phone }}?text=Hi%20{{ e.Name }},%20regarding%20your%20enquiry..." target="_blank" class="btn btn-success btn-sm rounded-pill px-3">
+                                            <i class="bi bi-whatsapp"></i> Reply
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -97,9 +92,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Villa Name</th>
-                                    <th>Current Price</th>
-                                    <th>Discount</th>
-                                    <th>Status</th>
+                                    <th>Price (₹)</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -107,30 +100,92 @@
                                 {% for v in villas %}
                                 <tr>
                                     <td><strong>{{ v.Villa_Name }}</strong></td>
-                                    <td>₹{{ v.Price }}</td>
-                                    <td><span class="text-success">{{ v.discount_perc }}% Off</span></td>
+                                    <td><input type="number" class="form-control form-control-sm w-100px" id="price-{{ v.Villa_ID }}" value="{{ v.Price }}"></td>
                                     <td>
-                                        <span class="badge {% if v.Status == 'Available' %}bg-success{% else %}bg-danger{% endif %} rounded-pill">
-                                            {{ v.Status }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="https://docs.google.com/spreadsheets/d/1wXlMNAUuW2Fr4L05ahxvUNn0yvMedcVosTRJzZf_1ao" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill">
-                                            <i class="bi bi-pencil-square me-1"></i> Edit
-                                        </a>
+                                        <button onclick="updateVilla('{{ v.Villa_ID }}', 'Price')" class="btn btn-primary btn-sm rounded-pill px-3">Save</button>
                                     </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <div class="alert alert-info rounded-4 mt-3 border-0">
-                        <small><i class="bi bi-info-circle me-2"></i><strong>Tip:</strong> Google Sheet mein data update karke yahan refresh karein, change turant dikhega.</small>
+                </div>
+
+                <div class="tab-pane fade" id="settings-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="fw-bold mb-2">Offer Banner Text</label>
+                                <input type="text" id="offer-text" class="form-control rounded-3" value="Holi Special: 20% Off on All Villas!">
+                                <button onclick="updateSettings('Offer_Text', 'offer-text')" class="btn btn-primary mt-2 btn-sm rounded-pill px-4">Update Text</button>
+                            </div>
+                            <div class="mb-4">
+                                <label class="fw-bold mb-2">Banner Image URL</label>
+                                <input type="text" id="banner-url" class="form-control rounded-3" placeholder="Paste PostImg Link Here">
+                                <button onclick="updateSettings('Banner_URL', 'banner-url')" class="btn btn-primary mt-2 btn-sm rounded-pill px-4">Update Image</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 border-start ps-md-4">
+                            <label class="fw-bold mb-2">Banner Visibility</label>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="bannerSwitch" checked onchange="toggleBanner(this.checked)">
+                                <label class="form-check-label" for="bannerSwitch">Show Offer Banner on Site</label>
+                            </div>
+                            <div class="p-3 bg-light rounded-4 border">
+                                <small class="text-muted d-block mb-2">Current Preview:</small>
+                                <img src="https://i.postimg.cc/zXL98fC7/20260222-141917.jpg" id="preview-img" class="img-fluid rounded-3" style="max-height: 150px;">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function updateSettings(key, inputId) {
+    const val = document.getElementById(inputId).value;
+    saveData('settings', key, val);
+}
+
+function updateVilla(vId, column) {
+    const val = document.getElementById('price-' + vId).value;
+    saveData('villas', column, val, vId);
+}
+
+function toggleBanner(isChecked) {
+    const val = isChecked ? "ON" : "OFF";
+    saveData('settings', 'Banner_Status', val);
+}
+
+function saveData(target, key, val, vId = '') {
+    const formData = new FormData();
+    formData.append('target', target);
+    formData.append('key', key);
+    formData.append('value', val);
+    if(vId) formData.append('villa_id', vId);
+
+    fetch('/admin/update', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === 'success') {
+            alert('✅ Updated Successfully!');
+            if(key === 'Banner_URL') document.getElementById('preview-img').src = val;
+        } else {
+            alert('❌ Error: ' + data.message);
+        }
+    });
+}
+</script>
+
+<style>
+    .w-100px { width: 120px; }
+    .nav-pills .nav-link.active { background-color: #0d6efd; color: white; }
+    .nav-pills .nav-link { color: #666; font-weight: 600; }
+</style>
+
 {% endblock %}
-                
