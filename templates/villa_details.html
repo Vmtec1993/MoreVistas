@@ -21,22 +21,31 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
     
-    .rule-item-box { 
-        display: block; 
-        width: 100%;
-        border-left: 5px solid #ff4757; 
-        background: #fff;
-        padding: 15px; 
-        border: 1px solid #eee;
-        border-left: 5px solid #ff4757;
-        border-radius: 8px; 
-        margin-bottom: 12px; 
-        font-size: 0.95rem; 
-        font-weight: 500;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    /* New Premium Rule Styling */
+    .rule-item-premium {
+        background: #fdfdfd;
+        border: 1px solid #f1f1f1;
+        border-left: 4px solid #00b4d8;
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
         transition: 0.3s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
-    .rule-item-box:hover { transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .rule-item-premium:hover {
+        transform: translateX(8px);
+        background: #ffffff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .rule-check-icon {
+        min-width: 24px; height: 24px;
+        background: #e6f7ff; color: #00b4d8;
+        border-radius: 6px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem; margin-right: 12px;
+    }
     
     .detail-original-price { text-decoration: line-through; color: #adb5bd; font-size: 1.1rem; }
     .savings-badge { background: #28a745; color: white; padding: 4px 12px; border-radius: 5px; font-size: 0.85rem; font-weight: bold; }
@@ -110,17 +119,34 @@
             </div>
 
             <div class="rules-section mb-5">
-                <h4 class="fw-bold mb-4"><i class="bi bi-shield-check text-primary me-2"></i>Stay Rules</h4>
-                <div class="d-flex flex-column">
+                <h4 class="fw-bold mb-4"><i class="bi bi-shield-check-fill text-primary me-2"></i>Stay Rules & Policies</h4>
+                <div class="row g-3">
                     {% if villa.Rules_List %}
                         {% for rule in villa.Rules_List %}
-                        <div class="rule-item-box">
-                            <i class="bi bi-dot fs-1 text-danger me-2"></i> {{ rule }}
+                        <div class="col-md-6">
+                            <div class="rule-item-premium">
+                                <div class="rule-check-icon">
+                                    <i class="bi bi-check-lg"></i>
+                                </div>
+                                <span class="fw-semibold text-dark small">{{ rule }}</span>
+                            </div>
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="rule-item-box">Standard villa rules apply.</div>
+                        <div class="col-12 text-muted">Standard villa rules apply.</div>
                     {% endif %}
+                </div>
+
+                <div class="mt-4 p-3 rounded-4" style="background: #fff9db; border: 1px dashed #fab005;">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="min-width: 40px; height: 40px;">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </div>
+                        <div>
+                            <p class="mb-0 fw-bold text-dark small">Security Deposit Required</p>
+                            <p class="mb-0 text-muted" style="font-size: 0.75rem;">A refundable deposit is collected at check-in for villa safety.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
