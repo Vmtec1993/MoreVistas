@@ -236,7 +236,12 @@ def admin_logout():
     session.pop('logged_in', None)
     return redirect(url_for('index'))
 
+import os
+
 if __name__ == "__main__":
+    # Render automatically sets the PORT environment variable
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    # '0.0.0.0' is required for Render to find the app
+    app.run(host='0.0.0.0', port=port)
+
     
