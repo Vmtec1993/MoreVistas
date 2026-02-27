@@ -20,26 +20,45 @@
         text-align: center; 
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
-    
-    /* Rules Vertical List Style - FIXED (Line-by-Line alignment) */
-    .rule-item-box { 
-        display: flex; /* Yahan Flex kiya taaki rule niche na dabe */
-        align-items: flex-start;
-        width: 100%;
-        background: #fff; 
-        padding: 15px; 
-        border: 1px solid #eee;
-        border-left: 5px solid #ff4757;
-        border-radius: 8px; 
-        margin-bottom: 12px; 
-        font-size: 0.95rem; 
-        font-weight: 500;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        transition: 0.3s;
+
+    /* 🌟 MODERN PREMIUM RULES SECTION */
+    .premium-rules-container {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid #f0f0f0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        margin-top: 20px;
     }
-    .rule-item-box:hover { transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    .rule-icon-fix { color: #ff4757; margin-right: 12px; font-size: 1.2rem; flex-shrink: 0; line-height: 1; }
+    .modern-rule-item {
+        display: flex;
+        align-items: center;
+        background: #fbfcfe;
+        padding: 15px 18px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        border: 1px solid #f1f4f8;
+        transition: 0.3s ease;
+    }
+    .modern-rule-item:hover {
+        transform: translateX(5px);
+        background: #fff;
+        border-color: #ff4757;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .rule-icon-box {
+        width: 35px; height: 35px;
+        background: rgba(255, 71, 87, 0.1);
+        color: #ff4757;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        margin-right: 15px; flex-shrink: 0;
+    }
+    .rule-text-content { font-size: 0.95rem; color: #444; font-weight: 500; }
     
+    /* Highlight for Deposit */
+    .deposit-box { background: #fff9f9; border: 1px dashed #ff4757; }
+
     .detail-original-price { text-decoration: line-through; color: #adb5bd; font-size: 1.1rem; }
     .savings-badge { background: #28a745; color: white; padding: 4px 12px; border-radius: 5px; font-size: 0.85rem; font-weight: bold; }
     .offer-banner { position: absolute; top: 20px; left: 20px; z-index: 10; background: #ff4757; color: white; padding: 5px 15px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; }
@@ -113,19 +132,27 @@
             </div>
 
             <div class="rules-section mb-5">
-                <h4 class="fw-bold mb-4"><i class="bi bi-shield-check text-primary me-2"></i>Stay Rules</h4>
-                <div class="d-flex flex-column">
+                <h4 class="fw-bold mb-4"><i class="bi bi-shield-check text-primary me-2"></i>Guest Guidelines</h4>
+                <div class="premium-rules-container">
                     {% if villa.Rules_List %}
                         {% for rule in villa.Rules_List %}
                             {% if rule.strip() %}
-                            <div class="rule-item-box">
-                                <i class="bi bi-check-circle-fill rule-icon-fix"></i> 
-                                <span>{{ rule.strip() }}</span>
+                            {% set r = rule.replace('•', '').strip() %}
+                            <div class="modern-rule-item {% if 'Deposit' in r or 'deposit' in r %}deposit-box{% endif %}">
+                                <div class="rule-icon-box">
+                                    {% if 'Smoking' in r %}<i class="bi bi-no-backdrop"></i>
+                                    {% elif 'music' in r or '10:00' in r %}<i class="bi bi-volume-mute"></i>
+                                    {% elif 'Pool' in r %}<i class="bi bi-water"></i>
+                                    {% elif 'ID' in r %}<i class="bi bi-person-badge"></i>
+                                    {% elif 'Deposit' in r %}<i class="bi bi-cash-stack"></i>
+                                    {% else %}<i class="bi bi-check2-circle"></i>{% endif %}
+                                </div>
+                                <div class="rule-text-content">{{ r }}</div>
                             </div>
                             {% endif %}
                         {% endfor %}
                     {% else %}
-                        <div class="rule-item-box">Standard villa rules apply. Contact owner for details.</div>
+                        <div class="modern-rule-item">Standard rules apply.</div>
                     {% endif %}
                 </div>
             </div>
@@ -134,15 +161,12 @@
         <div class="col-md-4">
             <div class="card border-0 shadow-lg rounded-4 p-4 sticky-top" style="top: 100px; z-index: 10;">
                 <h5 class="fw-bold mb-3">Pricing & Booking</h5>
-                
                 {% if villa.Price and villa.Price|int > 0 %}
                     <div class="mb-3">
                         {% if villa.Original_Price|int > villa.Price|int %}
                             <div class="d-flex align-items-center mb-1">
                                 <span class="detail-original-price me-2">₹{{ villa.Original_Price }}</span>
-                                <span class="savings-badge">
-                                    {{ (((villa.Original_Price|int - villa.Price|int) / villa.Original_Price|int) * 100)|int }}% OFF
-                                </span>
+                                <span class="savings-badge">{{ (((villa.Original_Price|int - villa.Price|int) / villa.Original_Price|int) * 100)|int }}% OFF</span>
                             </div>
                         {% endif %}
                         <div class="d-flex align-items-baseline">
@@ -158,12 +182,10 @@
                     <a href="https://wa.me/918830024994?text=Hi,%20I%20am%20interested%20in%20booking%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill py-3 fw-bold shadow-sm">
                         <i class="bi bi-whatsapp me-2"></i>BOOK ON WHATSAPP
                     </a>
-                    
                     <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill py-3 fw-bold">
                         <i class="bi bi-envelope-paper me-2"></i>FILL ENQUIRY FORM
                     </a>
                 </div>
-
                 <div class="mt-4 p-3 bg-light rounded-3 text-center border">
                     <h6 class="fw-bold text-success mb-1">⚡ 100% Verified Villa</h6>
                     <small class="text-muted">Direct Booking • Best Price</small>
@@ -183,12 +205,8 @@
         {% endif %}
     </div>
     <div style="display: flex; gap: 10px;">
-        <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-bold">
-            <i class="bi bi-pencil-square"></i>
-        </a>
-        <a href="https://wa.me/918830024994?text=I%20want%20to%20book%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow">
-            <i class="bi bi-whatsapp"></i> BOOK
-        </a>
+        <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-bold"><i class="bi bi-pencil-square"></i></a>
+        <a href="https://wa.me/918830024994?text=I%20want%20to%20book%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow"><i class="bi bi-whatsapp"></i> BOOK</a>
     </div>
 </div>
 
