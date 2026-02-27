@@ -10,20 +10,19 @@
     <meta property="og:title" content="MoreVistas - Luxury Private Pool Villas in Lonavala">
     <meta property="og:description" content="Experience the best private pool villas for parties, families, and celebrations. Book your stay now!">
     
-    <meta property="og:image" content="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png"> 
-    <meta property="og:image:secure_url" content="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png">
+    <meta property="og:image" content="https://i.postimg.cc/Zq2y9WVB/1000190673-removebg-preview.png"> 
+    <meta property="og:image:secure_url" content="https://i.postimg.cc/Zq2y9WVB/1000190673-removebg-preview.png">
     <meta property="og:image:type" content="image/png">
-    <meta property="og:image:width" content="300">
-    <meta property="og:image:height" content="300">
+    <meta property="og:image:width" content="500">
+    <meta property="og:image:height" content="500">
     
     <meta property="og:url" content="https://morevistas.onrender.com"> 
     <meta property="og:type" content="website">
 
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="MoreVistas Luxury Villas">
-    <meta name="twitter:image" content="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png">
+    <meta name="twitter:image" content="https://i.postimg.cc/Zq2y9WVB/1000190673-removebg-preview.png">
 
-    <link rel="icon" type="image/png" href="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/Zq2y9WVB/1000190673-removebg-preview.png">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -38,30 +37,24 @@
 
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; overflow-x: hidden; }
 
-        /* ✅ LUXURY TYPOGRAPHY */
         h1, h2, h3, .navbar-brand, .footer-logo-text { font-family: 'Marcellus', serif !important; text-transform: uppercase; letter-spacing: 4px; }
 
-        /* ✅ OPEN LOGO MONOGRAM */
-        .mv-open-logo { display: inline-flex; align-items: center; justify-content: center; font-family: 'Marcellus', serif; font-weight: 800; line-height: 1; position: relative; }
-        .m-text { font-size: 2.2rem; background: linear-gradient(180deg, #333 0%, #000 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; z-index: 2; }
-        .v-text { font-size: 2.2rem; background: var(--luxury-blue); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-left: -12px; margin-top: 10px; z-index: 1; }
+        /* ✅ LOGO STYLING */
+        .brand-logo-img { height: 55px; width: auto; object-fit: contain; }
+        .footer-logo-img { height: 80px; width: auto; margin-bottom: 15px; }
+        .loader-logo-img { height: 100px; width: auto; animation: logo-glow 2s ease-in-out infinite; }
 
-        /* ✅ LOADER WITH LOGO */
+        /* ✅ LOADER */
         #loader-wrapper {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 99999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.6s ease;
         }
-        .loader-logo .m-text { background: var(--silver-text); -webkit-background-clip: text; font-size: 3.5rem; }
-        .loader-logo .v-text { font-size: 3.5rem; margin-left: -18px; margin-top: 15px; }
         
-        .loader-glow {
-            animation: logo-glow 2s ease-in-out infinite;
-        }
         @keyframes logo-glow {
-            0%, 100% { opacity: 0.5; transform: scale(0.98); }
-            50% { opacity: 1; transform: scale(1.02); filter: drop-shadow(0 0 15px rgba(0, 180, 216, 0.4)); }
+            0%, 100% { opacity: 0.6; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); filter: drop-shadow(0 0 20px rgba(0, 180, 216, 0.4)); }
         }
 
         .spinner-luxury {
@@ -71,13 +64,11 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ✅ NAVBAR & SIDE MENU */
         .navbar { background: #fff; border-bottom: 1px solid #eee; padding: 12px 0; }
         .offcanvas { width: 320px !important; border-right: 1px solid #333; transition: 0.4s; }
         .hover-link { transition: 0.3s; letter-spacing: 2px; font-size: 0.85rem; font-weight: 600; }
         .hover-link:hover { padding-left: 15px !important; background: #111; color: var(--luxury-blue) !important; opacity: 1 !important; }
 
-        /* ✅ WHATSAPP SIDE TAB */
         .wa-tab { 
             position: fixed; right: -40px; bottom: 20%; background: #25d366; 
             color: white; padding: 12px 18px; border-radius: 12px 0 0 12px; 
@@ -88,7 +79,6 @@
         .wa-tab:hover { right: 0; }
         .wa-tab i { font-size: 22px; }
 
-        /* ✅ FOOTER & FORMS */
         footer { background: var(--dark-bg); color: white; padding: 80px 0 30px; text-align: center; }
         .copyright-text { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
         
@@ -102,20 +92,14 @@
 <body>
 
     <div id="loader-wrapper">
-        <div class="mv-open-logo loader-logo loader-glow">
-            <span class="m-text">M</span>
-            <span class="v-text">V</span>
-        </div>
+        <img src="https://i.postimg.cc/Zq2y9WVB/1000190673-removebg-preview.png" alt="MV Logo" class="loader-logo-img">
         <div class="spinner-luxury"></div>
         <div class="text-white mt-4" style="letter-spacing: 6px; font-size: 0.7rem; opacity: 0.7;">MOREVISTAS LUXURY</div>
     </div>
 
     <div class="offcanvas offcanvas-start bg-black text-white" tabindex="-1" id="sideMenu">
         <div class="offcanvas-header p-4 border-bottom border-secondary">
-            <div class="mv-open-logo">
-                <span class="m-text" style="background: white; -webkit-background-clip: text;">M</span>
-                <span class="v-text">V</span>
-            </div>
+            <img src="https://i.postimg.cc/Zq2y9WVB/1000190673-removebg-preview.png" alt="MV Logo" style="height: 45px;">
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body p-0 pt-3">
@@ -140,10 +124,10 @@
                     <i class="bi bi-list fs-4"></i>
                 </button>
                 <a class="navbar-brand d-flex align-items-center text-decoration-none" href="/">
-                    <div class="mv-open-logo"><span class="m-text">M</span><span class="v-text">V</span></div>
+                    <img src="https://i.postimg.cc/Zq2y9WVB/1000190673-removebg-preview.png" alt="MoreVistas Logo" class="brand-logo-img">
                     <div class="ms-2 d-flex flex-column">
-                        <span style="font-weight:800; font-size:1.5rem; color:#000; line-height:1;">MoreVistas</span>
-                        <span style="font-size:0.5rem; letter-spacing:3px; color:var(--luxury-blue); font-weight:700;">THE ART OF LUXURY LIVING</span>
+                        <span style="font-weight:800; font-size:1.4rem; color:#000; line-height:1;">MoreVistas</span>
+                        <span style="font-size:0.45rem; letter-spacing:2px; color:var(--luxury-blue); font-weight:700;">THE ART OF LUXURY LIVING</span>
                     </div>
                 </a>
             </div>
@@ -164,10 +148,7 @@
 
     <footer>
         <div class="container">
-            <div class="mv-open-logo mb-3">
-                <span class="m-text" style="background: var(--silver-text); -webkit-background-clip: text; font-size: 3rem;">M</span>
-                <span class="v-text" style="background: var(--silver-text); -webkit-background-clip: text; font-size: 3rem; opacity:0.6;">V</span>
-            </div>
+            <img src="https://i.postimg.cc/Zq2y9WVB/1000190673-removebg-preview.png" alt="MoreVistas Logo" class="footer-logo-img">
             <h2 style="background: var(--silver-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.2rem; margin-bottom: 0;">MoreVistas</h2>
             <p style="color: var(--luxury-blue); letter-spacing: 6px; font-weight: 700; font-size: 0.7rem;" class="mb-5">THE ART OF LUXURY LIVING</p>
             
@@ -185,7 +166,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // LOADER SCRIPT
         window.addEventListener("load", function() {
             const loader = document.getElementById("loader-wrapper");
             setTimeout(() => {
@@ -194,7 +174,6 @@
             }, 1200); 
         });
 
-        // AUTO +91 COUNTRY CODE SCRIPT
         document.addEventListener("DOMContentLoaded", function() {
             const phoneInputs = document.querySelectorAll('input[type="tel"], input[name*="phone"], input[name*="mobile"]');
             phoneInputs.forEach(input => {
