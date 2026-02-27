@@ -1,17 +1,21 @@
 import os
 import json
 import gspread
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session # ✅ session add kiya
 from oauth2client.service_account import ServiceAccountCredentials
 import requests
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "morevistas_secure_2026"
+app.secret_key = "morevistas_secure_2026" # ✅ Session ke liye zaruri hai
 
 # --- CONFIG ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
+
+# ✅ ADMIN CREDENTIALS (Aapke HTML ke hisaab se)
+ADMIN_USER = "Admin"
+ADMIN_PASS = "MV@2026" 
 
 # --- Google Sheets Setup ---
 creds_json = os.environ.get('GOOGLE_CREDS')
@@ -55,7 +59,6 @@ def get_rows(target_sheet):
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
-            # --- Price & Offer Logic ---
             try:
                 p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
@@ -63,14 +66,10 @@ def get_rows(target_sheet):
                 original = int(float(op_val)) if op_val and op_val.lower() != 'nan' else 0
                 item['Price'] = current
                 item['Original_Price'] = original
-                if original > current > 0:
-                    item['discount_perc'] = int(((original - current) / original) * 100)
-                else:
-                    item['discount_perc'] = 0
+                item['discount_perc'] = int(((original - current) / original) * 100) if original > current > 0 else 0
             except:
                 item['discount_perc'] = 0
 
-            # --- Rules Splitting ---
             raw_rules = item.get('Rules', '')
             if '|' in raw_rules:
                 item['Rules_List'] = [r.strip() for r in raw_rules.split('|')]
@@ -98,11 +97,27 @@ def index():
         except: pass
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
 
-# ✅ NEW: ADMIN DASHBOARD ROUTE (Google Sheets Data Included)
+# ✅ NEW: LOGIN LOGIC (Checks your HTML form)
+@app.route('/admin-login', methods=['GET', 'POST'])
+def admin_login():
+    error = None
+    if request.method == 'POST':
+        u = request.form.get('username')
+        p = request.form.get('password')
+        if u == ADMIN_USER and p == ADMIN_PASS:
+            session['logged_in'] = True
+            return redirect(url_for('admin_dashboard'))
+        else:
+            error = "Invalid Username or Password"
+    return render_template('admin_login.html', error=error)
+
+# ✅ ADMIN DASHBOARD (With Protection)
 @app.route('/admin')
 def admin_dashboard():
+    if not session.get('logged_in'):
+        return redirect(url_for('admin_login'))
+    
     villas = get_rows(sheet)
-    # Fetching Enquiries from the Enquiries sheet
     enquiries = []
     if enquiry_sheet:
         try:
@@ -112,17 +127,15 @@ def admin_dashboard():
                 for row in data[1:]:
                     enquiries.append(dict(zip(headers, row)))
         except: pass
-    
-    # Dashboard ko data bhej rahe hain
-    return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries[::-1]) # [::-1] for latest first
+    return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries[::-1])
 
-# ✅ NEW: UPDATE VILLA STATUS LOGIC (Updates Google Sheet)
+# ✅ UPDATE STATUS (Security Added)
 @app.route('/update-status/<villa_id>/<status>')
 def update_status(villa_id, status):
+    if not session.get('logged_in'): return redirect(url_for('admin_login'))
     if sheet:
         try:
             data = sheet.get_all_values()
-            # Find Villa_ID column index
             headers = data[0]
             id_idx = headers.index('Villa_ID') if 'Villa_ID' in headers else 0
             status_idx = headers.index('Status') if 'Status' in headers else -1
@@ -174,12 +187,12 @@ def legal():
 def contact():
     return render_template('contact.html')
 
-# Simple Logout Route
 @app.route('/admin-logout')
 def admin_logout():
+    session.pop('logged_in', None)
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-                
+            
