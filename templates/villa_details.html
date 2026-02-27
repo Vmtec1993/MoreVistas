@@ -21,12 +21,12 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
     
-    /* Rules Vertical List Style - FIXED Professional Look */
+    /* Rules Vertical List Style - FIXED (Line-by-Line alignment) */
     .rule-item-box { 
-        display: block; 
+        display: flex; /* Yahan Flex kiya taaki rule niche na dabe */
+        align-items: flex-start;
         width: 100%;
-        border-left: 5px solid #ff4757; 
-        background: #fff; /* Changed to white for cleaner look */
+        background: #fff; 
         padding: 15px; 
         border: 1px solid #eee;
         border-left: 5px solid #ff4757;
@@ -38,6 +38,7 @@
         transition: 0.3s;
     }
     .rule-item-box:hover { transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .rule-icon-fix { color: #ff4757; margin-right: 12px; font-size: 1.2rem; flex-shrink: 0; line-height: 1; }
     
     .detail-original-price { text-decoration: line-through; color: #adb5bd; font-size: 1.1rem; }
     .savings-badge { background: #28a745; color: white; padding: 4px 12px; border-radius: 5px; font-size: 0.85rem; font-weight: bold; }
@@ -116,9 +117,12 @@
                 <div class="d-flex flex-column">
                     {% if villa.Rules_List %}
                         {% for rule in villa.Rules_List %}
-                        <div class="rule-item-box">
-                            <i class="bi bi-dot fs-1 text-danger me-2"></i> {{ rule }}
-                        </div>
+                            {% if rule.strip() %}
+                            <div class="rule-item-box">
+                                <i class="bi bi-check-circle-fill rule-icon-fix"></i> 
+                                <span>{{ rule.strip() }}</span>
+                            </div>
+                            {% endif %}
                         {% endfor %}
                     {% else %}
                         <div class="rule-item-box">Standard villa rules apply. Contact owner for details.</div>
