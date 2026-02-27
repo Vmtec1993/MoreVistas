@@ -3,14 +3,18 @@
 
 <div class="container-fluid p-0 mb-4">
     <div class="position-relative shadow-lg overflow-hidden">
-        <img src="https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg" 
+        <img src="{{ settings.get('Banner_URL', 'https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg') }}" 
              class="w-100 d-block holi-banner-img" 
-             alt="Holi Luxury Villa Offer">
+             alt="Luxury Offer">
+             
         <div class="position-absolute top-0 end-0 m-3">
-            <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm animate-pulse">🎨 HOLI OFFER LIVE</span>
+            <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm animate-pulse">
+                {{ settings.get('Offer_Text', '🎨 HOLI OFFER LIVE') }}
+            </span>
         </div>
+        
         <div class="position-absolute bottom-0 start-0 w-100 p-3 text-center" style="background: linear-gradient(transparent, rgba(0,0,0,0.6));">
-            <a href="#villaContainer" class="btn btn-light btn-lg rounded-pill fw-bold px-5 shadow-lg border-0 text-danger">BOOK HOLI PARTY 🚀</a>
+            <a href="#villaContainer" class="btn btn-light btn-lg rounded-pill fw-bold px-5 shadow-lg border-0 text-danger">BOOK NOW 🚀</a>
         </div>
     </div>
 </div>
