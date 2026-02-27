@@ -241,7 +241,27 @@ def contact(): return render_template('contact.html')
 def admin_logout():
     session.pop('logged_in', None)
     return redirect(url_for('index'))
+@app.route('/sitemap.xml', methods=['GET'])
+def sitemap():
+    """Automatic Sitemap Generate karne ke liye"""
+    pages = []
+    # Static Pages
+    host = request.host_url.rstrip('/')
+    for rule in app.url_map.iter_rules():
+        if "GET" in rule.methods and len(rule.arguments) == 0:
+            pages.append([host + str(rule.rule), datetime.now().strftime('%Y-%m-%d')])
 
+    # Dynamic Villa Pages (Har villa ka link automatic add hoga)
+    villas = get_rows(sheet)
+    for villa in villas:
+        url = host + '/villa/' + str(villa.get('Villa_ID'))
+        pages.append([url, datetime.now().strftime('%Y-%m-%d')])
+
+    sitemap_xml = render_template('sitemap_template.xml', pages=pages)
+    response = app.make_response(sitemap_xml)
+    response.headers["Content-Type"] = "application/xml"
+    return response
+    
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
