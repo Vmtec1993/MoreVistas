@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta property="og:title" content="MoreVistas - Luxury Private Pool Villas in Lonavala">
-<meta property="og:description" content="Experience the best private pool villas for parties, families, and celebrations. Book your stay now!">
-<meta property="og:image" content="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png"> <meta property="og:url" content="https://morevistas.onrender.com"> <meta property="og:type" content="website">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png">
-
-<link rel="icon" type="image/png" href="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png">
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>{% if villa %}{{ villa.Villa_Name }}{% else %}MoreVistas Luxury{% endif %}</title>
+    <meta property="og:title" content="MoreVistas - Luxury Private Pool Villas in Lonavala">
+    <meta property="og:description" content="Experience the best private pool villas for parties, families, and celebrations. Book your stay now!">
+    <meta property="og:image" content="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png"> 
+    <meta property="og:url" content="https://morevistas.onrender.com"> 
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png">
+
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -62,7 +64,6 @@
 
         /* ✅ NAVBAR & SIDE MENU */
         .navbar { background: #fff; border-bottom: 1px solid #eee; padding: 12px 0; }
-        
         .offcanvas { width: 320px !important; border-right: 1px solid #333; transition: 0.4s; }
         .hover-link { transition: 0.3s; letter-spacing: 2px; font-size: 0.85rem; font-weight: 600; }
         .hover-link:hover { padding-left: 15px !important; background: #111; color: var(--luxury-blue) !important; opacity: 1 !important; }
@@ -82,7 +83,6 @@
         footer { background: var(--dark-bg); color: white; padding: 80px 0 30px; text-align: center; }
         .copyright-text { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
         
-        /* Form Country Code Styling */
         .input-group-text { 
             background: #f1f3f5; border: 1px solid #ced4da; 
             font-weight: 800; color: #495057; border-radius: 10px 0 0 10px !important; 
@@ -189,7 +189,6 @@
         document.addEventListener("DOMContentLoaded", function() {
             const phoneInputs = document.querySelectorAll('input[type="tel"], input[name*="phone"], input[name*="mobile"]');
             phoneInputs.forEach(input => {
-                // Check if already has a group to avoid duplicates
                 if (!input.parentElement.classList.contains('input-group')) {
                     const group = document.createElement('div');
                     group.className = 'input-group mb-3';
