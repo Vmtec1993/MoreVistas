@@ -6,7 +6,7 @@
     
     <meta name="google-site-verification" content="sbNKVZ6hM4EJeasYusT6SFgEurdJ_v-kMMiXEgU-Mn0" />
 
-    <title>{% if villa %}{{ villa.Villa_Name }} | MoreVistas Luxury{% else %}MoreVistas | Luxury Villas in Lonavala with Private Pool{% endif %}</title>
+    <title>{% if villa %}{{ villa.Villa_Name }} | MoreVistas Luxury{% else %}MoreVistas | Luxury Villas in Lonavala{% endif %}</title>
     <meta name="description" content="Book the best luxury villas in Lonavala for staycations. Private pool, BHK options, and best prices at MoreVistas.">
     <meta name="keywords" content="Lonavala Villas, Private Pool Villa Lonavala, MoreVistas Booking">
     
@@ -18,73 +18,50 @@
     <link rel="icon" type="image/png" href="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&family=Marcellus&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root { --luxury-blue: #00b4d8; }
+        :root { --luxury-blue: #00b4d8; --hologram-gold: #e0b15c; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; overflow-x: hidden; }
 
         /* ✅ 1. LUXURY LOADER STYLING */
-        #loader-wrapper {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 999999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.6s ease;
-        }
-        .loader-logo { 
-            height: 100px; width: auto; 
-            animation: logo-glow 1.5s ease-in-out infinite; 
-        }
-        @keyframes logo-glow {
-            0%, 100% { opacity: 0.5; transform: scale(0.95); filter: drop-shadow(0 0 5px rgba(0,180,216,0.2)); }
-            50% { opacity: 1; transform: scale(1.05); filter: drop-shadow(0 0 20px rgba(0,180,216,0.5)); }
-        }
+        #loader-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s ease; }
+        .loader-logo { height: 100px; width: auto; animation: logo-glow 1.5s ease-in-out infinite; }
+        @keyframes logo-glow { 0%, 100% { opacity: 0.5; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
 
-        /* ✅ 2. SPLIT NAVBAR */
-        .navbar { padding: 0 !important; background: #fff; border-bottom: 2px solid #eee; height: 90px; overflow: hidden; }
+        /* ✅ 2. PREMIUM 3D HOLOGRAM TEXT (RESIZED) */
+        .hologram-3d-text {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #fff 0%, var(--hologram-gold) 50%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .hologram-subtext { font-size: 0.45rem; color: var(--luxury-blue); letter-spacing: 3px; font-weight: 700; text-transform: uppercase; margin-top: -5px; opacity: 0.9; }
+
+        /* ✅ 3. NAVBAR & SIDE MENU */
+        .navbar { padding: 0 !important; background: #fff; border-bottom: 2px solid #eee; height: 85px; overflow: hidden; }
         .nav-split-container { display: flex; width: 100%; height: 100%; align-items: center; }
-        
-        .logo-area { 
-            background: #fff; padding: 0 25px; height: 100%; 
-            display: flex; align-items: center; z-index: 10; flex-shrink: 0;
-            position: relative;
-        }
-
-        .nav-design-area {
-            flex-grow: 1; height: 100%;
-            background-color: #ffffff;
-            background-image: 
-                radial-gradient(var(--luxury-blue) 0.8px, transparent 0.8px), 
-                linear-gradient(135deg, #ffffff 0%, #f7f9fa 100%);
-            background-size: 18px 18px, 100% 100%;
-            position: relative; display: flex; align-items: center; justify-content: flex-end; padding-right: 30px;
-        }
-
-        .logo-area::after {
-            content: ""; position: absolute; right: -20px; top: 0; 
-            width: 20px; height: 100%; background: linear-gradient(to right, #fff, transparent);
-            z-index: 5;
-        }
-
-        .brand-logo-img { height: 65px; width: auto; }
-        .hologram-text { font-size: 0.5rem; color: var(--luxury-blue); letter-spacing: 2px; font-weight: 800; text-transform: uppercase; margin-top: -5px; }
-
-        /* ✅ 3. WHATSAPP SIDE TAB */
-        .whatsapp-side-tab {
-            position: fixed; right: -115px; bottom: 25%; z-index: 9999;
-            background: #25d366; color: white; padding: 12px 18px;
-            border-radius: 30px 0 0 30px; font-weight: bold;
-            display: flex; align-items: center; text-decoration: none;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            box-shadow: -4px 4px 15px rgba(0,0,0,0.15);
-        }
-        .whatsapp-side-tab:hover { right: 0; }
-        .whatsapp-side-tab i { font-size: 1.6rem; margin-right: 12px; }
+        .logo-area { background: #fff; padding: 0 20px; height: 100%; display: flex; align-items: center; flex-shrink: 0; }
+        .brand-logo-img { height: 60px; width: auto; margin-right: 12px; }
 
         .offcanvas { background-color: #000; color: white; width: 300px !important; }
         .nav-link-custom { color: rgba(255,255,255,0.8); font-size: 1rem; padding: 15px 25px; border-bottom: 1px solid #222; display: block; text-decoration: none; transition: 0.3s; }
         .nav-link-custom:hover { background: #111; color: var(--luxury-blue); padding-left: 30px; }
+
+        /* ✅ 4. WHATSAPP SIDE TAB */
+        .whatsapp-side-tab { position: fixed; right: -115px; bottom: 25%; z-index: 9999; background: #25d366; color: white; padding: 12px 18px; border-radius: 30px 0 0 30px; font-weight: bold; display: flex; align-items: center; text-decoration: none; transition: all 0.4s; box-shadow: -4px 4px 15px rgba(0,0,0,0.15); }
+        .whatsapp-side-tab:hover { right: 0; }
+
+        /* ✅ 5. FOOTER STYLING */
         footer { background: #0a0a0a; color: white; padding: 60px 0 30px; text-align: center; }
+        .footer-logo { height: 75px; width: auto; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -105,10 +82,6 @@
             <a href="/list-property" class="nav-link-custom"><i class="bi bi-building-up me-3"></i>List Your Property</a>
             <a href="/legal#privacy" class="nav-link-custom"><i class="bi bi-shield-check me-3"></i>Privacy Policy</a>
             <a href="/legal#terms" class="nav-link-custom"><i class="bi bi-file-earmark-text me-3"></i>Terms & Conditions</a>
-            <div class="p-4 mt-4">
-                <p class="small text-muted mb-1">24/7 Support</p>
-                <a href="tel:+918830024994" class="text-white text-decoration-none fw-bold fs-5">+91 88300 24994</a>
-            </div>
         </div>
     </div>
 
@@ -118,16 +91,16 @@
                 <button class="btn btn-light border rounded-circle me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
                     <i class="bi bi-list fs-4"></i>
                 </button>
-                <a href="/" class="d-flex flex-column text-decoration-none">
+                <a href="/" class="d-flex align-items-center text-decoration-none">
                     <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" class="brand-logo-img">
-                    <span class="hologram-text">LUXURY REIMAGINED</span>
+                    <div class="d-flex flex-column">
+                        <span class="hologram-3d-text">MoreVistas</span>
+                        <span class="hologram-subtext">LUXURY REIMAGINED</span>
+                    </div>
                 </a>
             </div>
-
-            <div class="nav-design-area">
-                <div class="d-none d-md-block">
-                    <a href="https://wa.me/918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold shadow-sm">BOOK NOW</a>
-                </div>
+            <div style="flex-grow:1; text-align:right; padding-right:25px;">
+                <a href="https://wa.me/918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold shadow-sm d-none d-md-inline-block">BOOK NOW</a>
             </div>
         </div>
     </nav>
@@ -140,18 +113,17 @@
 
     <footer>
         <div class="container">
-            <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" style="height: 80px;" class="mb-3">
-            <p class="small opacity-50 mb-4">© 2026 MOREVISTAS LUXURY VILLAS. ALL RIGHTS RESERVED.</p>
-            <div class="d-flex justify-content-center gap-4 small opacity-75">
-                <a href="/legal#privacy" class="text-white text-decoration-none">Privacy Policy</a>
-                <a href="/legal#terms" class="text-white text-decoration-none">Terms & Conditions</a>
+            <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" class="footer-logo">
+            <div class="mb-3">
+                <span class="hologram-3d-text" style="font-size: 1.8rem;">MoreVistas</span>
+                <span class="hologram-subtext" style="font-size: 0.6rem; letter-spacing: 5px; display: block;">LUXURY VILLAS</span>
             </div>
+            <p class="small opacity-50 mt-4">© 2026 MOREVISTAS LUXURY VILLAS. ALL RIGHTS RESERVED.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ✅ LOADER SCRIPT
         window.addEventListener("load", function() {
             setTimeout(() => {
                 const loader = document.getElementById("loader-wrapper");
@@ -159,18 +131,7 @@
                     loader.style.opacity = "0";
                     setTimeout(() => { loader.style.display = "none"; }, 600);
                 }
-            }, 1200);
-        });
-
-        // ✅ Country Code +91 Fix
-        document.addEventListener('DOMContentLoaded', function() {
-            const phoneInputs = document.querySelectorAll('input[type="tel"]');
-            phoneInputs.forEach(input => {
-                if(!input.value) input.value = "+91 ";
-                input.addEventListener('input', function() {
-                    if(!this.value.startsWith('+91 ')) this.value = '+91 ';
-                });
-            });
+            }, 1000);
         });
     </script>
 </body>
