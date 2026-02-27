@@ -3,139 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>{% if villa %}{{ villa.Villa_Name }}{% else %}MoreVistas Luxury{% endif %}</title>
-    
-    <meta property="og:site_name" content="MoreVistas Luxury">
-    <meta property="og:title" content="MoreVistas - Luxury Private Pool Villas in Lonavala">
-    <meta property="og:description" content="Experience the best private pool villas. Book your stay now!">
-    <meta property="og:image" content="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png"> 
-    <meta property="og:url" content="https://morevistas.onrender.com"> 
-    <meta property="og:type" content="website">
 
     <link rel="icon" type="image/png" href="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png">
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Marcellus&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&family=Marcellus&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --luxury-blue: #00b4d8;
-            --dark-bg: #0a0a0a;
+        :root { --luxury-blue: #00b4d8; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; }
+
+        /* ✅ NAVBAR POOL BACKGROUND FIX */
+        .navbar { 
+            background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), 
+                        url('https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover; background-position: center; border-bottom: 1px solid #eee; 
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; overflow-x: hidden; }
+        .brand-logo-img { height: 60px; width: auto; }
+        .hologram-text { font-size: 0.55rem; color: var(--luxury-blue); letter-spacing: 3px; font-weight: 800; }
 
-        /* ✅ LOGO & HOLOGRAM STYLING */
-        .brand-container { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: flex-start; 
-            position: relative; 
-            text-decoration: none;
+        /* ✅ SIDE MENU (OFFCANVAS) STYLE */
+        .offcanvas { background-color: #000; color: white; width: 300px !important; }
+        .nav-link-custom { 
+            color: rgba(255,255,255,0.8); font-size: 1rem; padding: 15px 20px; 
+            border-bottom: 1px solid #222; display: block; text-decoration: none; transition: 0.3s;
         }
-        
-        .brand-logo-img { 
-            height: 65px; 
-            width: auto; 
-            object-fit: contain;
-        }
+        .nav-link-custom:hover { background: #111; color: var(--luxury-blue); }
 
-        .hologram-text {
-            font-size: 0.55rem;
-            color: var(--luxury-blue);
-            font-weight: 800;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-top: -5px;
-            padding-left: 2px;
-            animation: hologram-glow 2s infinite alternate ease-in-out;
+        /* ✅ WHATSAPP SIDE HIDE POPUP */
+        .whatsapp-side-tab {
+            position: fixed; right: -110px; bottom: 20%; z-index: 9999;
+            background: #25d366; color: white; padding: 10px 15px;
+            border-radius: 30px 0 0 30px; font-weight: bold;
+            display: flex; align-items: center; text-decoration: none;
+            transition: all 0.4s ease; box-shadow: -2px 4px 10px rgba(0,0,0,0.2);
         }
+        .whatsapp-side-tab:hover { right: 0; } /* Hover par pura bahar aayega */
+        .whatsapp-side-tab i { font-size: 1.8rem; margin-right: 10px; }
 
-        @keyframes hologram-glow {
-            0% { opacity: 0.7; filter: drop-shadow(0 0 2px rgba(0, 180, 216, 0.3)); }
-            100% { opacity: 1; filter: drop-shadow(0 0 8px rgba(0, 180, 216, 0.8)); }
-        }
-
-        /* Footer Logo (No White Filter - Original Color) */
-        .footer-logo-img { 
-            height: 100px; 
-            width: auto; 
-            margin-bottom: 20px; 
-            /* Filter hataya gaya hai taaki original color dikhe */
-        }
-
-        /* ✅ LOADER */
-        #loader-wrapper {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 99999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        
-        .loader-logo { 
-            height: 110px; 
-            animation: logo-glow 1.5s ease-in-out infinite; 
-        }
-        
-        @keyframes logo-glow {
-            0%, 100% { opacity: 0.6; transform: scale(0.95); }
-            50% { opacity: 1; transform: scale(1.05); }
-        }
-
-        .navbar { background: #fff; border-bottom: 1px solid #eee; padding: 12px 0; }
-        footer { background: var(--dark-bg); color: white; padding: 70px 0 30px; text-align: center; }
+        footer { background: #0a0a0a; color: white; padding: 60px 0 30px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div id="loader-wrapper">
-        <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" class="loader-logo">
-        <div class="text-white mt-4" style="letter-spacing: 5px; font-size: 0.7rem; opacity: 0.7;">MOREVISTAS LUXURY</div>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sideMenu">
+        <div class="offcanvas-header border-bottom border-secondary">
+            <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" style="height: 50px;">
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <a href="/" class="nav-link-custom"><i class="bi bi-house-door me-3"></i>Home</a>
+            <a href="/explore" class="nav-link-custom"><i class="bi bi-geo-alt me-3"></i>Tourist Points</a>
+            <a href="/list-property" class="nav-link-custom"><i class="bi bi-building-up me-3"></i>List Your Property</a>
+            <a href="/legal#privacy" class="nav-link-custom"><i class="bi bi-shield-check me-3"></i>Privacy Policy</a>
+            <a href="/legal#terms" class="nav-link-custom"><i class="bi bi-file-earmark-text me-3"></i>Terms & Conditions</a>
+            <div class="p-4 mt-4">
+                <p class="small text-muted mb-1">Contact Us</p>
+                <a href="tel:+918830024994" class="text-white text-decoration-none fw-bold">+91 88300 24994</a>
+            </div>
+        </div>
     </div>
 
-    <nav class="navbar sticky-top shadow-sm">
+    <nav class="navbar sticky-top shadow-sm py-2">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <button class="btn btn-light border rounded-circle me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
                     <i class="bi bi-list fs-4"></i>
                 </button>
-                
-                <a href="/" class="brand-container">
-                    <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" alt="MoreVistas Logo" class="brand-logo-img">
-                    <span class="hologram-text">Luxury Reimagined</span>
+                <a href="/" class="d-flex flex-column text-decoration-none">
+                    <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" class="brand-logo-img">
+                    <span class="hologram-text">LUXURY REIMAGINED</span>
                 </a>
             </div>
-
             <div class="d-none d-lg-block">
-                <a href="tel:+918830024994" class="btn btn-outline-dark rounded-pill px-4 fw-bold me-2">+91 88300 24994</a>
-                <a href="https://wa.me/918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold shadow-sm">BOOK NOW</a>
+                <a href="https://wa.me/918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold">BOOK NOW</a>
             </div>
         </div>
     </nav>
 
     <main>{% block content %}{% endblock %}</main>
 
+    <a href="https://wa.me/918830024994" class="whatsapp-side-tab">
+        <i class="bi bi-whatsapp"></i> Chat with Us
+    </a>
+
     <footer>
         <div class="container">
-            <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" alt="MoreVistas Logo" class="footer-logo-img">
-            <p style="color: var(--luxury-blue); letter-spacing: 6px; font-weight: 700; font-size: 0.7rem;" class="mb-5 text-uppercase">The Art of Luxury Living</p>
-            
-            <div class="border-top border-secondary pt-4 opacity-50">
-                <p class="small">© 2026 MOREVISTAS LUXURY VILLAS LONAVALA. ALL RIGHTS RESERVED.</p>
+            <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" style="height: 80px;" class="mb-3">
+            <p class="small opacity-50 mb-4">© 2026 MOREVISTAS LUXURY VILLAS. ALL RIGHTS RESERVED.</p>
+            <div class="d-flex justify-content-center gap-4 small opacity-75">
+                <a href="/legal#privacy" class="text-white text-decoration-none">Privacy Policy</a>
+                <a href="/legal#terms" class="text-white text-decoration-none">Terms & Conditions</a>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        window.addEventListener("load", function() {
-            setTimeout(() => {
-                const loader = document.getElementById("loader-wrapper");
-                loader.style.opacity = "0";
-                loader.style.transition = "opacity 0.5s ease";
-                setTimeout(() => { loader.style.display = "none"; }, 500);
-            }, 1000); 
+        // ✅ Country Code +91 Fix for all Phone Inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInputs = document.querySelectorAll('input[type="tel"]');
+            phoneInputs.forEach(input => {
+                if(!input.value) input.value = "+91 ";
+                input.addEventListener('input', function() {
+                    if(!this.value.startsWith('+91 ')) this.value = '+91 ';
+                });
+            });
         });
     </script>
 </body>
