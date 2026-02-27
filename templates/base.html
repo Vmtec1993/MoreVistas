@@ -6,17 +6,21 @@
     
     <title>{% if villa %}{{ villa.Villa_Name }}{% else %}MoreVistas Luxury{% endif %}</title>
     
+    <meta property="og:site_name" content="MoreVistas Luxury">
     <meta property="og:title" content="MoreVistas - Luxury Private Pool Villas in Lonavala">
     <meta property="og:description" content="Experience the best private pool villas for parties, families, and celebrations. Book your stay now!">
+    
     <meta property="og:image" content="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png"> 
     <meta property="og:image:secure_url" content="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png">
     <meta property="og:image:type" content="image/png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <meta property="og:image:width" content="300">
+    <meta property="og:image:height" content="300">
+    
     <meta property="og:url" content="https://morevistas.onrender.com"> 
     <meta property="og:type" content="website">
 
-    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="MoreVistas Luxury Villas">
     <meta name="twitter:image" content="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png">
 
     <link rel="icon" type="image/png" href="https://i.postimg.cc/85R1F6k8/More-Vistas-Logo.png">
@@ -181,7 +185,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ✅ LOADER SCRIPT
+        // LOADER SCRIPT
         window.addEventListener("load", function() {
             const loader = document.getElementById("loader-wrapper");
             setTimeout(() => {
@@ -190,7 +194,7 @@
             }, 1200); 
         });
 
-        // ✅ AUTO +91 COUNTRY CODE SCRIPT
+        // AUTO +91 COUNTRY CODE SCRIPT
         document.addEventListener("DOMContentLoaded", function() {
             const phoneInputs = document.querySelectorAll('input[type="tel"], input[name*="phone"], input[name*="mobile"]');
             phoneInputs.forEach(input => {
