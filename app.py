@@ -88,7 +88,7 @@ def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
     # Default settings
-    settings = {'Offer_Text': "Welcome to MoreVistas Lonavala", 'Banner_URL': "https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg"}
+    settings = {'Offer_Text': "Welcome to MoreVistas Lonavala", 'Banner_URL': "https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg", 'Banner_Show': 'TRUE'}
     if settings_sheet:
         try:
             s_data = settings_sheet.get_all_values()
@@ -97,7 +97,6 @@ def index():
         except: pass
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
 
-# ✅ Naya Route: List Property Page
 @app.route('/list-property')
 def list_property():
     return render_template('list_property.html')
@@ -121,6 +120,16 @@ def admin_dashboard():
         return redirect(url_for('admin_login'))
     
     villas = get_rows(sheet)
+    
+    # ✅ SETTINGS FETCHING FOR DASHBOARD
+    settings = {'Offer_Text': "", 'Banner_URL': "", 'Banner_Show': 'FALSE'}
+    if settings_sheet:
+        try:
+            s_data = settings_sheet.get_all_values()
+            for r in s_data:
+                if len(r) >= 2: settings[r[0].strip()] = r[1].strip()
+        except: pass
+
     enquiries = []
     if enquiry_sheet:
         try:
@@ -130,7 +139,40 @@ def admin_dashboard():
                 for row in data[1:]:
                     enquiries.append(dict(zip(headers, row)))
         except: pass
-    return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries[::-1])
+    
+    # Pass 'settings' to the template
+    return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries[::-1], settings=settings)
+
+# ✅ NEW ROUTE: UPDATE BANNER SETTINGS FROM DASHBOARD
+@app.route('/update-settings', methods=['POST'])
+def update_settings():
+    if not session.get('logged_in'): 
+        return redirect(url_for('admin_login'))
+    
+    if settings_sheet:
+        try:
+            b_url = request.form.get('banner_url')
+            o_text = request.form.get('offer_text')
+            # If checkbox is checked it returns 'on', otherwise None
+            b_show = 'TRUE' if request.form.get('banner_show') else 'FALSE'
+            
+            s_data = settings_sheet.get_all_values()
+            # Update matching keys in Google Sheet
+            for i, row in enumerate(s_data, start=1):
+                key = row[0].strip()
+                if key == 'Banner_URL':
+                    settings_sheet.update_cell(i, 2, b_url)
+                elif key == 'Offer_Text':
+                    settings_sheet.update_cell(i, 2, o_text)
+                elif key == 'Banner_Show':
+                    settings_sheet.update_cell(i, 2, b_show)
+            
+            return redirect(url_for('admin_dashboard'))
+        except Exception as e:
+            print(f"Settings Update Error: {e}")
+            return "Error updating settings", 500
+            
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/update-status/<villa_id>/<status>')
 def update_status(villa_id, status):
@@ -197,4 +239,4 @@ def admin_logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-            
+    
