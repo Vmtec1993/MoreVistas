@@ -3,56 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoreVistas - Luxury Villas</title>
+    <title>{% if villa %}{{ villa.Villa_Name }}{% else %}MoreVistas Luxury{% endif %}</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Marcellus&display=swap" rel="stylesheet">
 
     <style>
-        :root { --luxury-blue: #00b4d8; --premium-silver: linear-gradient(180deg, #ffffff 0%, #a1a1a1 100%); }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; }
+        :root {
+            --luxury-blue: #00b4d8;
+            --dark-bg: #0a0a0a;
+            --silver-text: linear-gradient(180deg, #ffffff 0%, #a1a1a1 100%);
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; overflow-x: hidden; }
 
         /* ✅ LUXURY TYPOGRAPHY */
-        .premium-logo-text, .footer-logo-text { font-family: 'Marcellus', serif; text-transform: uppercase; letter-spacing: 3px; font-weight: 800; }
+        h1, h2, h3, .navbar-brand, .footer-logo-text { font-family: 'Marcellus', serif !important; text-transform: uppercase; letter-spacing: 4px; }
 
-        /* ✅ MODERN OPEN ICON (NO BOX) */
-        .mv-monogram { display: inline-flex; align-items: center; justify-content: center; position: relative; font-family: 'Marcellus', serif; font-weight: 800; line-height: 1; margin-right: 12px; }
-        .m-char { font-size: 2rem; background: linear-gradient(180deg, #2d3436 0%, #000 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .v-char { font-size: 2rem; background: var(--luxury-blue); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-left: -10px; margin-top: 6px; }
+        /* ✅ OPEN LOGO MONOGRAM */
+        .mv-open-logo { display: inline-flex; align-items: center; justify-content: center; font-family: 'Marcellus', serif; font-weight: 800; line-height: 1; position: relative; }
+        .m-text { font-size: 2.2rem; background: linear-gradient(180deg, #333 0%, #000 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; z-index: 2; }
+        .v-text { font-size: 2.2rem; background: var(--luxury-blue); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-left: -12px; margin-top: 10px; z-index: 1; }
 
-        /* ✅ NAVBAR FIX */
-        .navbar { background: #fff !important; border-bottom: 1px solid #eee; padding: 10px 0; }
-        .nav-tagline { font-size: 0.5rem; letter-spacing: 2px; color: var(--luxury-blue); font-weight: 700; display: block; }
+        /* ✅ LOADER WITH LOGO */
+        #loader-wrapper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.6s ease;
+        }
+        .loader-logo .m-text { background: var(--silver-text); -webkit-background-clip: text; font-size: 3.5rem; }
+        .loader-logo .v-text { font-size: 3.5rem; margin-left: -18px; margin-top: 15px; }
+        
+        .loader-glow {
+            animation: logo-glow 2s ease-in-out infinite;
+        }
+        @keyframes logo-glow {
+            0%, 100% { opacity: 0.5; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1.02); filter: drop-shadow(0 0 15px rgba(0, 180, 216, 0.4)); }
+        }
 
-        /* ✅ WHATSAPP POPUP FIX (Corner mein subtle placement) */
-        .wa-float { position: fixed; bottom: 20px; right: 20px; background: #25d366; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); text-decoration: none; transition: 0.3s; }
-        .wa-float:hover { transform: scale(1.1); color: #fff; }
+        .spinner-luxury {
+            width: 40px; height: 40px; border: 2px solid rgba(255,255,255,0.1);
+            border-top: 2px solid var(--luxury-blue); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-top: 30px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ✅ ENQUIRY FORM +91 STYLE */
-        .input-group-text { background: #f8f9fa; border-right: none; font-weight: bold; color: #444; }
-        .phone-field { border-left: none !important; }
+        /* ✅ NAVBAR & SIDE MENU */
+        .navbar { background: #fff; border-bottom: 1px solid #eee; padding: 12px 0; }
+        
+        .offcanvas { width: 320px !important; border-right: 1px solid #333; transition: 0.4s; }
+        .hover-link { transition: 0.3s; letter-spacing: 2px; font-size: 0.85rem; font-weight: 600; }
+        .hover-link:hover { padding-left: 15px !important; background: #111; color: var(--luxury-blue) !important; opacity: 1 !important; }
 
-        /* SIDE MENU (OFFCANVAS) STYLE */
-        .offcanvas { width: 300px !important; }
-        .menu-link { padding: 15px 25px; display: block; text-decoration: none; color: #2d3436; font-weight: 600; border-bottom: 1px solid #f0f0f0; }
-        .menu-link:hover { background: #f8f9fa; color: var(--luxury-blue); }
+        /* ✅ WHATSAPP SIDE TAB */
+        .wa-tab { 
+            position: fixed; right: -40px; bottom: 20%; background: #25d366; 
+            color: white; padding: 12px 18px; border-radius: 12px 0 0 12px; 
+            display: flex; align-items: center; cursor: pointer; z-index: 1000; 
+            transition: 0.4s ease-in-out; text-decoration: none;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+        }
+        .wa-tab:hover { right: 0; }
+        .wa-tab i { font-size: 22px; }
+
+        /* ✅ FOOTER & FORMS */
+        footer { background: var(--dark-bg); color: white; padding: 80px 0 30px; text-align: center; }
+        .copyright-text { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
+        
+        /* Form Country Code Styling */
+        .input-group-text { 
+            background: #f1f3f5; border: 1px solid #ced4da; 
+            font-weight: 800; color: #495057; border-radius: 10px 0 0 10px !important; 
+        }
+        .phone-input { border-radius: 0 10px 10px 0 !important; }
     </style>
 </head>
 <body>
 
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="sideMenu">
-        <div class="offcanvas-header border-bottom">
-            <h5 class="premium-logo-text mb-0">MoreVistas</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    <div id="loader-wrapper">
+        <div class="mv-open-logo loader-logo loader-glow">
+            <span class="m-text">M</span>
+            <span class="v-text">V</span>
         </div>
-        <div class="offcanvas-body p-0">
-            <a href="/" class="menu-link">Home</a>
-            <a href="/explore" class="menu-link">Explore Lonavala</a>
-            <a href="/list-property" class="menu-link">List Your Property</a>
-            <a href="/contact" class="menu-link">Contact Us</a>
+        <div class="spinner-luxury"></div>
+        <div class="text-white mt-4" style="letter-spacing: 6px; font-size: 0.7rem; opacity: 0.7;">MOREVISTAS LUXURY</div>
+    </div>
+
+    <div class="offcanvas offcanvas-start bg-black text-white" tabindex="-1" id="sideMenu">
+        <div class="offcanvas-header p-4 border-bottom border-secondary">
+            <div class="mv-open-logo">
+                <span class="m-text" style="background: white; -webkit-background-clip: text;">M</span>
+                <span class="v-text">V</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0 pt-3">
+            <a href="/" class="p-4 d-block text-white text-decoration-none border-bottom border-secondary opacity-75 hover-link">HOME</a>
+            <a href="/explore" class="p-4 d-block text-white text-decoration-none border-bottom border-secondary opacity-75 hover-link">EXPLORE LONAVALA</a>
+            <a href="/list-property" class="p-4 d-block text-white text-decoration-none border-bottom border-secondary opacity-75 hover-link">LIST YOUR PROPERTY</a>
+            <a href="/legal" class="p-4 d-block text-white text-decoration-none border-bottom border-secondary opacity-75 hover-link">PRIVACY POLICY</a>
+            <a href="/legal#terms" class="p-4 d-block text-white text-decoration-none border-bottom border-secondary opacity-75 hover-link">TERMS & CONDITIONS</a>
+            
             <div class="p-4 mt-5">
-                <a href="tel:+918830024994" class="btn btn-dark w-100 rounded-pill mb-3">+91 88300 24994</a>
+                <p class="small text-muted mb-2">Enquiries:</p>
+                <a href="tel:+918830024994" class="text-white text-decoration-none fw-bold fs-5">+91 88300 24994</a>
+                <p class="copyright-text mt-4">© 2026 MOREVISTAS LUXURY</p>
             </div>
         </div>
     </div>
@@ -64,49 +122,81 @@
                     <i class="bi bi-list fs-4"></i>
                 </button>
                 <a class="navbar-brand d-flex align-items-center text-decoration-none" href="/">
-                    <div class="mv-monogram"><span class="m-char">M</span><span class="v-char">V</span></div>
-                    <div class="d-flex flex-column">
-                        <span class="premium-logo-text" style="font-size: 1.4rem; line-height: 1;">MoreVistas</span>
-                        <span class="nav-tagline">THE ART OF LUXURY LIVING</span>
+                    <div class="mv-open-logo"><span class="m-text">M</span><span class="v-text">V</span></div>
+                    <div class="ms-2 d-flex flex-column">
+                        <span style="font-weight:800; font-size:1.5rem; color:#000; line-height:1;">MoreVistas</span>
+                        <span style="font-size:0.5rem; letter-spacing:3px; color:var(--luxury-blue); font-weight:700;">THE ART OF LUXURY LIVING</span>
                     </div>
                 </a>
             </div>
-            
             <div class="d-none d-lg-block">
                 <a href="/list-property" class="text-dark text-decoration-none fw-bold me-4">List Your Property</a>
+                <a href="tel:+918830024994" class="btn btn-outline-dark rounded-pill px-4 fw-bold me-2">+91 88300 24994</a>
                 <a href="https://wa.me/918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold">BOOK NOW</a>
             </div>
         </div>
     </nav>
 
-    <main>
-        <div class="container my-5" style="max-width: 500px;">
-            <h5>Quick Enquiry</h5>
-            <div class="input-group mb-3">
-                <span class="input-group-text">+91</span>
-                <input type="text" class="form-control phone-field" placeholder="Mobile Number">
-            </div>
-        </div>
-        
-        {% block content %}{% endblock %}
-    </main>
+    <a href="https://wa.me/918830024994" class="wa-tab">
+        <i class="bi bi-whatsapp"></i>
+        <span class="ms-2 fw-bold d-none d-md-inline">WhatsApp</span>
+    </a>
 
-    <footer class="bg-dark text-white py-5 text-center">
+    <main>{% block content %}{% endblock %}</main>
+
+    <footer>
         <div class="container">
-            <h2 class="premium-logo-text mb-2" style="background: var(--premium-silver); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">MoreVistas</h2>
-            <p style="color: var(--luxury-blue); letter-spacing: 5px; font-size: 0.7rem;" class="mb-4">THE ART OF LUXURY LIVING</p>
-            <div class="mb-4">
-                <a href="/list-property" class="text-white-50 text-decoration-none mx-3">List Property</a>
-                <a href="/explore" class="text-white-50 text-decoration-none mx-3">Explore</a>
+            <div class="mv-open-logo mb-3">
+                <span class="m-text" style="background: var(--silver-text); -webkit-background-clip: text; font-size: 3rem;">M</span>
+                <span class="v-text" style="background: var(--silver-text); -webkit-background-clip: text; font-size: 3rem; opacity:0.6;">V</span>
             </div>
-            <p class="small opacity-50">© 2026 MoreVistas Luxury. +91 88300 24994</p>
+            <h2 style="background: var(--silver-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.2rem; margin-bottom: 0;">MoreVistas</h2>
+            <p style="color: var(--luxury-blue); letter-spacing: 6px; font-weight: 700; font-size: 0.7rem;" class="mb-5">THE ART OF LUXURY LIVING</p>
+            
+            <div class="row pt-5 border-top border-secondary mx-0 align-items-center">
+                <div class="col-md-7 text-md-start">
+                    <p class="copyright-text mb-0">© 2026 MOREVISTAS LUXURY VILLAS LONAVALA. ALL RIGHTS RESERVED.</p>
+                </div>
+                <div class="col-md-5 text-md-end mt-3 mt-md-0">
+                    <a href="/legal" class="text-white-50 text-decoration-none small mx-2">Privacy Policy</a>
+                    <a href="/legal#terms" class="text-white-50 text-decoration-none small mx-2">Terms & Conditions</a>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <a href="https://wa.me/918830024994" class="wa-float" target="_blank">
-        <i class="bi bi-whatsapp"></i>
-    </a>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ✅ LOADER SCRIPT
+        window.addEventListener("load", function() {
+            const loader = document.getElementById("loader-wrapper");
+            setTimeout(() => {
+                loader.style.opacity = "0";
+                setTimeout(() => { loader.style.display = "none"; }, 600);
+            }, 1200); 
+        });
+
+        // ✅ AUTO +91 COUNTRY CODE SCRIPT
+        document.addEventListener("DOMContentLoaded", function() {
+            const phoneInputs = document.querySelectorAll('input[type="tel"], input[name*="phone"], input[name*="mobile"]');
+            phoneInputs.forEach(input => {
+                // Check if already has a group to avoid duplicates
+                if (!input.parentElement.classList.contains('input-group')) {
+                    const group = document.createElement('div');
+                    group.className = 'input-group mb-3';
+                    input.parentNode.insertBefore(group, input);
+                    
+                    const span = document.createElement('span');
+                    span.className = 'input-group-text';
+                    span.innerText = '+91';
+                    
+                    group.appendChild(span);
+                    group.appendChild(input);
+                    input.classList.add('phone-input', 'form-control');
+                    input.setAttribute('placeholder', 'Enter Mobile Number');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
