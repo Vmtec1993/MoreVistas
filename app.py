@@ -87,7 +87,6 @@ def get_rows(target_sheet):
 def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
-    # Default settings
     settings = {'Offer_Text': "Welcome to MoreVistas Lonavala", 'Banner_URL': "https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg", 'Banner_Show': 'TRUE'}
     if settings_sheet:
         try:
@@ -118,10 +117,7 @@ def admin_login():
 def admin_dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('admin_login'))
-    
     villas = get_rows(sheet)
-    
-    # ✅ SETTINGS FETCHING FOR DASHBOARD
     settings = {'Offer_Text': "", 'Banner_URL': "", 'Banner_Show': 'FALSE'}
     if settings_sheet:
         try:
@@ -129,7 +125,6 @@ def admin_dashboard():
             for r in s_data:
                 if len(r) >= 2: settings[r[0].strip()] = r[1].strip()
         except: pass
-
     enquiries = []
     if enquiry_sheet:
         try:
@@ -139,39 +134,25 @@ def admin_dashboard():
                 for row in data[1:]:
                     enquiries.append(dict(zip(headers, row)))
         except: pass
-    
-    # Pass 'settings' to the template
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries[::-1], settings=settings)
 
-# ✅ NEW ROUTE: UPDATE BANNER SETTINGS FROM DASHBOARD
 @app.route('/update-settings', methods=['POST'])
 def update_settings():
-    if not session.get('logged_in'): 
-        return redirect(url_for('admin_login'))
-    
+    if not session.get('logged_in'): return redirect(url_for('admin_login'))
     if settings_sheet:
         try:
             b_url = request.form.get('banner_url')
             o_text = request.form.get('offer_text')
-            # If checkbox is checked it returns 'on', otherwise None
             b_show = 'TRUE' if request.form.get('banner_show') else 'FALSE'
-            
             s_data = settings_sheet.get_all_values()
-            # Update matching keys in Google Sheet
             for i, row in enumerate(s_data, start=1):
                 key = row[0].strip()
-                if key == 'Banner_URL':
-                    settings_sheet.update_cell(i, 2, b_url)
-                elif key == 'Offer_Text':
-                    settings_sheet.update_cell(i, 2, o_text)
-                elif key == 'Banner_Show':
-                    settings_sheet.update_cell(i, 2, b_show)
-            
+                if key == 'Banner_URL': settings_sheet.update_cell(i, 2, b_url)
+                elif key == 'Offer_Text': settings_sheet.update_cell(i, 2, o_text)
+                elif key == 'Banner_Show': settings_sheet.update_cell(i, 2, b_show)
             return redirect(url_for('admin_dashboard'))
         except Exception as e:
-            print(f"Settings Update Error: {e}")
             return "Error updating settings", 500
-            
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/update-status/<villa_id>/<status>')
@@ -183,14 +164,41 @@ def update_status(villa_id, status):
             headers = data[0]
             id_idx = headers.index('Villa_ID') if 'Villa_ID' in headers else 0
             status_idx = headers.index('Status') if 'Status' in headers else -1
-            
             if status_idx != -1:
                 for i, row in enumerate(data[1:], start=2):
                     if str(row[id_idx]).strip() == str(villa_id).strip():
                         sheet.update_cell(i, status_idx + 1, status)
                         break
+        except Exception as e: print(f"Update Error: {e}")
+    return redirect(url_for('admin_dashboard'))
+
+# 🚀 NEW ROUTE: UPDATE ALL VILLA DETAILS (Price, Images, Description etc.)
+@app.route('/update-full-villa', methods=['POST'])
+def update_full_villa():
+    if not session.get('logged_in'): return redirect(url_for('admin_login'))
+    if sheet:
+        try:
+            villa_id = request.form.get('Villa_ID')
+            data = sheet.get_all_values()
+            headers = [h.strip() for h in data[0]]
+            
+            # Modal Form se data collect karna
+            updated_fields = request.form.to_dict()
+            
+            # Row dhoondhna
+            id_idx = headers.index('Villa_ID') if 'Villa_ID' in headers else 0
+            for i, row in enumerate(data[1:], start=2):
+                if str(row[id_idx]).strip() == str(villa_id).strip():
+                    # Har field ko sheet ke sahi column mein update karna
+                    for key, val in updated_fields.items():
+                        if key in headers:
+                            col_idx = headers.index(key) + 1
+                            sheet.update_cell(i, col_idx, val)
+                    break
+            return redirect(url_for('admin_dashboard'))
         except Exception as e:
             print(f"Update Error: {e}")
+            return f"Error: {e}", 500
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/villa/<villa_id>')
@@ -224,24 +232,17 @@ def explore():
     return render_template('explore.html', tourist_places=places)
 
 @app.route('/legal')
-def legal():
-    return render_template('legal.html')
+def legal(): return render_template('legal.html')
 
 @app.route('/contact')
-def contact():
-    return render_template('contact.html')
+def contact(): return render_template('contact.html')
 
 @app.route('/admin-logout')
 def admin_logout():
     session.pop('logged_in', None)
     return redirect(url_for('index'))
 
-import os
-
 if __name__ == "__main__":
-    # Render automatically sets the PORT environment variable
     port = int(os.environ.get("PORT", 5000))
-    # '0.0.0.0' is required for Render to find the app
     app.run(host='0.0.0.0', port=port)
-
     
