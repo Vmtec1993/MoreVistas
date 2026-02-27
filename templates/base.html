@@ -12,36 +12,77 @@
 
     <style>
         :root { --luxury-blue: #00b4d8; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; overflow-x: hidden; }
 
-        /* ✅ NAVBAR POOL BACKGROUND FIX */
+        /* ✅ SPLIT NAVBAR: Logo Left (White) | Pool Image Right (Clear) */
         .navbar { 
-            background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), 
-                        url('https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1200&q=80');
-            background-size: cover; background-position: center; border-bottom: 1px solid #eee; 
+            padding: 0 !important; 
+            background: #fff; 
+            border-bottom: 2px solid #eee;
+            height: 90px;
+            overflow: hidden;
         }
 
-        .brand-logo-img { height: 60px; width: auto; }
-        .hologram-text { font-size: 0.55rem; color: var(--luxury-blue); letter-spacing: 3px; font-weight: 800; }
-
-        /* ✅ SIDE MENU (OFFCANVAS) STYLE */
-        .offcanvas { background-color: #000; color: white; width: 300px !important; }
-        .nav-link-custom { 
-            color: rgba(255,255,255,0.8); font-size: 1rem; padding: 15px 20px; 
-            border-bottom: 1px solid #222; display: block; text-decoration: none; transition: 0.3s;
+        .nav-split-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
         }
-        .nav-link-custom:hover { background: #111; color: var(--luxury-blue); }
+
+        .logo-area {
+            background: #fff;
+            padding: 0 25px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .pool-image-area {
+            flex-grow: 1;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 30px;
+        }
+
+        /* Image pe halka sa fade taaki logo area se smooth dikhe */
+        .pool-image-area::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 0; height: 100%; width: 50px;
+            background: linear-gradient(to right, #fff, transparent);
+        }
+
+        .brand-logo-img { height: 65px; width: auto; }
+        .hologram-text { font-size: 0.5rem; color: var(--luxury-blue); letter-spacing: 2px; font-weight: 800; text-transform: uppercase; margin-top: -5px; }
 
         /* ✅ WHATSAPP SIDE HIDE POPUP */
         .whatsapp-side-tab {
-            position: fixed; right: -110px; bottom: 20%; z-index: 9999;
-            background: #25d366; color: white; padding: 10px 15px;
+            position: fixed; right: -115px; bottom: 25%; z-index: 9999;
+            background: #25d366; color: white; padding: 12px 18px;
             border-radius: 30px 0 0 30px; font-weight: bold;
             display: flex; align-items: center; text-decoration: none;
-            transition: all 0.4s ease; box-shadow: -2px 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: -4px 4px 15px rgba(0,0,0,0.15);
         }
-        .whatsapp-side-tab:hover { right: 0; } /* Hover par pura bahar aayega */
-        .whatsapp-side-tab i { font-size: 1.8rem; margin-right: 10px; }
+        .whatsapp-side-tab:hover { right: 0; }
+        .whatsapp-side-tab i { font-size: 1.6rem; margin-right: 12px; }
+
+        /* Offcanvas (Side Menu) Customization */
+        .offcanvas { background-color: #000; color: white; width: 300px !important; }
+        .nav-link-custom { 
+            color: rgba(255,255,255,0.8); font-size: 1rem; padding: 15px 25px; 
+            border-bottom: 1px solid #222; display: block; text-decoration: none; transition: 0.3s;
+        }
+        .nav-link-custom:hover { background: #111; color: var(--luxury-blue); padding-left: 30px; }
 
         footer { background: #0a0a0a; color: white; padding: 60px 0 30px; text-align: center; }
     </style>
@@ -60,15 +101,15 @@
             <a href="/legal#privacy" class="nav-link-custom"><i class="bi bi-shield-check me-3"></i>Privacy Policy</a>
             <a href="/legal#terms" class="nav-link-custom"><i class="bi bi-file-earmark-text me-3"></i>Terms & Conditions</a>
             <div class="p-4 mt-4">
-                <p class="small text-muted mb-1">Contact Us</p>
-                <a href="tel:+918830024994" class="text-white text-decoration-none fw-bold">+91 88300 24994</a>
+                <p class="small text-muted mb-1">24/7 Support</p>
+                <a href="tel:+918830024994" class="text-white text-decoration-none fw-bold fs-5">+91 88300 24994</a>
             </div>
         </div>
     </div>
 
-    <nav class="navbar sticky-top shadow-sm py-2">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
+    <nav class="navbar sticky-top shadow-sm">
+        <div class="nav-split-container">
+            <div class="logo-area">
                 <button class="btn btn-light border rounded-circle me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
                     <i class="bi bi-list fs-4"></i>
                 </button>
@@ -77,8 +118,9 @@
                     <span class="hologram-text">LUXURY REIMAGINED</span>
                 </a>
             </div>
-            <div class="d-none d-lg-block">
-                <a href="https://wa.me/918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold">BOOK NOW</a>
+
+            <div class="pool-image-area d-none d-md-flex">
+                <a href="https://wa.me/918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold shadow">BOOK NOW</a>
             </div>
         </div>
     </nav>
@@ -102,13 +144,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ✅ Country Code +91 Fix for all Phone Inputs
+        // ✅ Form +91 Country Code Auto-Fix
         document.addEventListener('DOMContentLoaded', function() {
             const phoneInputs = document.querySelectorAll('input[type="tel"]');
             phoneInputs.forEach(input => {
                 if(!input.value) input.value = "+91 ";
                 input.addEventListener('input', function() {
-                    if(!this.value.startsWith('+91 ')) this.value = '+91 ';
+                    if(!this.value.startsWith('+91 ')) {
+                        this.value = '+91 ' + this.value.replace(/^\+?91?\s?/, '');
+                    }
                 });
             });
         });
