@@ -33,6 +33,27 @@
             letter-spacing: 3px;
         }
 
+        /* ✅ Coding se bana Silver MV Icon */
+        .mv-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(145deg, #1a1a1a, #000);
+            border: 1.5px solid #888; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; margin-right: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .mv-icon::before {
+            content: "M"; font-family: 'Marcellus', serif; font-weight: 800; font-size: 1.1rem;
+            background: linear-gradient(180deg, #fff 0%, #bbb 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            position: absolute; left: 6px; top: 4px;
+        }
+        .mv-icon::after {
+            content: "V"; font-family: 'Marcellus', serif; font-weight: 800; font-size: 1.1rem;
+            background: linear-gradient(180deg, #fff 0%, #888 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            position: absolute; right: 6px; bottom: 4px;
+        }
+
         /* ✅ Loader Styling */
         #loader-wrapper {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -46,7 +67,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loader-text { color: white; margin-top: 20px; font-weight: 300; letter-spacing: 5px; font-size: 0.8rem; }
 
-        /* ✅ Navbar Styling - Premium White */
+        /* ✅ Navbar Styling */
         .navbar { background-color: #ffffff !important; border-bottom: 1px solid #eee; padding: 12px 0; }
         
         .premium-logo-text {
@@ -57,21 +78,12 @@
             font-size: 1.5rem;
             display: block;
         }
-        .nav-tagline {
-            font-size: 0.5rem;
-            letter-spacing: 2px;
-            color: var(--luxury-blue);
-            font-weight: 700;
-        }
+        .nav-tagline { font-size: 0.5rem; letter-spacing: 2px; color: var(--luxury-blue); font-weight: 700; }
 
-        /* ✅ Fix: BHK/Guest Text Visibility */
-        .villa-card-meta, .card-text, .villa-meta-item { 
-            color: #2d3436 !important; 
-            font-weight: 600 !important; 
-            opacity: 1 !important;
-        }
+        /* ✅ BHK/Guest Visibility */
+        .villa-card-meta, .card-text, .villa-meta-item { color: #2d3436 !important; font-weight: 600 !important; }
 
-        /* ✅ Side Menu Styling */
+        /* ✅ Side Menu */
         .offcanvas { background-color: #ffffff; border-radius: 0 25px 25px 0 !important; width: 320px !important; }
         .menu-link { 
             border: none !important; padding: 16px 25px !important; 
@@ -81,7 +93,7 @@
         }
         .menu-link:hover { background: #f8f9fa !important; color: var(--luxury-blue) !important; transform: translateX(8px); }
 
-        /* ✅ Footer Styling - Modern Premium */
+        /* ✅ Footer */
         footer { background: var(--dark-bg); color: white; padding: 80px 0 40px; text-align: center; }
         .footer-logo-text {
             font-size: 2.5rem;
@@ -102,7 +114,6 @@
             color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000;
             transition: 0.4s;
         }
-        .wa-float:hover { transform: scale(1.1) rotate(10deg); color: white; }
     </style>
 </head>
 <body>
@@ -114,9 +125,12 @@
 
     <div class="offcanvas offcanvas-start shadow-lg" tabindex="-1" id="sideMenu">
         <div class="offcanvas-header p-4 border-bottom">
-            <div>
-                <span class="premium-logo-text">MoreVistas</span>
-                <span class="nav-tagline">THE ART OF LUXURY LIVING</span>
+            <div class="d-flex align-items-center">
+                <div class="mv-icon"></div>
+                <div>
+                    <span class="premium-logo-text">MoreVistas</span>
+                    <span class="nav-tagline">THE ART OF LUXURY LIVING</span>
+                </div>
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
@@ -124,17 +138,9 @@
             <div class="list-group list-group-flush">
                 <a href="/" class="menu-link"><i class="bi bi-house-door me-3"></i> Home</a>
                 <a href="/explore" class="menu-link"><i class="bi bi-geo-alt me-3"></i> Explore Lonavala</a>
+                <a href="/list-property" class="menu-link"><i class="bi bi-plus-circle me-3"></i> List Your Property</a>
                 <a href="/legal" class="menu-link"><i class="bi bi-shield-check me-3"></i> Terms & Policies</a>
                 <a href="/contact" class="menu-link"><i class="bi bi-chat-left-dots me-3"></i> Contact Us</a>
-            </div>
-            <div class="mt-5 pt-4 border-top">
-                <p class="small text-muted mb-3">Booking Hotline:</p>
-                <a href="tel:+918830024994" class="btn btn-dark w-100 rounded-pill fw-bold py-3 mb-3">
-                    <i class="bi bi-telephone me-2"></i>+91 88300 24994
-                </a>
-                <a href="https://wa.me/918830024994" class="btn btn-outline-success w-100 rounded-pill fw-bold py-3">
-                    <i class="bi bi-whatsapp me-2"></i>WhatsApp Us
-                </a>
             </div>
         </div>
     </div>
@@ -145,12 +151,16 @@
                 <button class="btn btn-light border shadow-sm rounded-circle me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
                     <i class="bi bi-list fs-4"></i>
                 </button>
-                <a class="navbar-brand d-flex flex-column text-decoration-none" href="/">
-                    <span class="premium-logo-text">MoreVistas</span>
-                    <span class="nav-tagline">THE ART OF LUXURY LIVING</span>
+                <a class="navbar-brand d-flex align-items-center text-decoration-none" href="/">
+                    <div class="mv-icon"></div>
+                    <div class="d-flex flex-column">
+                        <span class="premium-logo-text">MoreVistas</span>
+                        <span class="nav-tagline">THE ART OF LUXURY LIVING</span>
+                    </div>
                 </a>
             </div>
             <div class="d-none d-lg-block">
+                <a href="/list-property" class="text-dark text-decoration-none fw-bold me-4">List Your Property</a>
                 <a href="tel:+918830024994" class="text-dark text-decoration-none fw-800 me-4">
                     <i class="bi bi-telephone-fill text-info me-1"></i> +91 88300 24994
                 </a>
@@ -165,30 +175,29 @@
 
     <footer>
         <div class="container">
+            <div class="mv-icon mx-auto mb-3" style="width:60px; height:60px;"></div>
             <h2 class="footer-logo-text">MoreVistas</h2>
             <p class="text-info small fw-bold mb-4" style="letter-spacing: 4px; font-size: 0.7rem;">THE ART OF LUXURY LIVING</p>
             
             <div class="footer-links mb-5">
                 <a href="/" class="footer-link mx-3">HOME</a>
                 <a href="/explore" class="footer-link mx-3">EXPLORE</a>
+                <a href="/list-property" class="footer-link mx-3">LIST PROPERTY</a>
                 <a href="/contact" class="footer-link mx-3">CONTACT</a>
             </div>
 
             <div class="mb-5">
                 <a href="https://wa.me/918830024994" class="text-white mx-3 fs-4 transition"><i class="bi bi-whatsapp"></i></a>
                 <a href="#" class="text-white mx-3 fs-4 transition"><i class="bi bi-instagram"></i></a>
-                <a href="tel:+918830024994" class="text-white mx-3 fs-4 transition"><i class="bi bi-telephone"></i></a>
             </div>
-
-            <hr class="my-5 opacity-10 border-white">
             
-            <div class="row align-items-center opacity-50">
+            <div class="row align-items-center opacity-50 pt-4 border-top border-secondary">
                 <div class="col-md-6 text-md-start text-center">
-                    <p class="small mb-0">© 2026 MoreVistas Luxury Villas Lonavala. All Rights Reserved.</p>
+                    <p class="small mb-0">© 2026 MoreVistas Luxury Villas Lonavala.</p>
                 </div>
-                <div class="col-md-6 text-md-end text-center mt-3 mt-md-0">
-                    <a href="/legal" class="footer-link me-3" style="font-size: 0.7rem;">Terms & Conditions</a>
-                    <a href="/legal#privacy" class="footer-link" style="font-size: 0.7rem;">Privacy Policy</a>
+                <div class="col-md-6 text-md-end text-center">
+                    <a href="/legal" class="footer-link me-3">Terms</a>
+                    <a href="/legal#privacy" class="footer-link">Privacy</a>
                 </div>
             </div>
         </div>
@@ -200,7 +209,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Loader Control
         window.addEventListener("load", function() {
             const loader = document.getElementById("loader-wrapper");
             setTimeout(() => {
