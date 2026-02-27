@@ -1,19 +1,18 @@
 import os
 import json
 import gspread
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session # ✅ session add kiya
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from oauth2client.service_account import ServiceAccountCredentials
 import requests
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "morevistas_secure_2026" # ✅ Session ke liye zaruri hai
+app.secret_key = "morevistas_secure_2026" 
 
 # --- CONFIG ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
 
-# ✅ ADMIN CREDENTIALS (Aapke HTML ke hisaab se)
 ADMIN_USER = "Admin"
 ADMIN_PASS = "MV@2026" 
 
@@ -88,7 +87,8 @@ def get_rows(target_sheet):
 def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
-    settings = {'Offer_Text': "Welcome to MoreVistas Lonavala", 'Contact': "8830024994"}
+    # Default settings
+    settings = {'Offer_Text': "Welcome to MoreVistas Lonavala", 'Banner_URL': "https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg"}
     if settings_sheet:
         try:
             s_data = settings_sheet.get_all_values()
@@ -97,7 +97,11 @@ def index():
         except: pass
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
 
-# ✅ NEW: LOGIN LOGIC (Checks your HTML form)
+# ✅ Naya Route: List Property Page
+@app.route('/list-property')
+def list_property():
+    return render_template('list_property.html')
+
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
     error = None
@@ -111,7 +115,6 @@ def admin_login():
             error = "Invalid Username or Password"
     return render_template('admin_login.html', error=error)
 
-# ✅ ADMIN DASHBOARD (With Protection)
 @app.route('/admin')
 def admin_dashboard():
     if not session.get('logged_in'):
@@ -129,7 +132,6 @@ def admin_dashboard():
         except: pass
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries[::-1])
 
-# ✅ UPDATE STATUS (Security Added)
 @app.route('/update-status/<villa_id>/<status>')
 def update_status(villa_id, status):
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
