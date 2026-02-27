@@ -1,7 +1,7 @@
 import os
 import json
 import gspread
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from oauth2client.service_account import ServiceAccountCredentials
 import requests
 from datetime import datetime
@@ -89,8 +89,6 @@ def get_rows(target_sheet):
 def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
-    
-    # Settings Sheet Logic for Holi Banner & Text
     settings = {'Offer_Text': "Welcome to MoreVistas Lonavala", 'Contact': "8830024994"}
     if settings_sheet:
         try:
@@ -98,18 +96,53 @@ def index():
             for r in s_data:
                 if len(r) >= 2: settings[r[0].strip()] = r[1].strip()
         except: pass
-        
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
+
+# ✅ NEW: ADMIN DASHBOARD ROUTE (Google Sheets Data Included)
+@app.route('/admin')
+def admin_dashboard():
+    villas = get_rows(sheet)
+    # Fetching Enquiries from the Enquiries sheet
+    enquiries = []
+    if enquiry_sheet:
+        try:
+            data = enquiry_sheet.get_all_values()
+            if len(data) > 1:
+                headers = data[0]
+                for row in data[1:]:
+                    enquiries.append(dict(zip(headers, row)))
+        except: pass
+    
+    # Dashboard ko data bhej rahe hain
+    return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries[::-1]) # [::-1] for latest first
+
+# ✅ NEW: UPDATE VILLA STATUS LOGIC (Updates Google Sheet)
+@app.route('/update-status/<villa_id>/<status>')
+def update_status(villa_id, status):
+    if sheet:
+        try:
+            data = sheet.get_all_values()
+            # Find Villa_ID column index
+            headers = data[0]
+            id_idx = headers.index('Villa_ID') if 'Villa_ID' in headers else 0
+            status_idx = headers.index('Status') if 'Status' in headers else -1
+            
+            if status_idx != -1:
+                for i, row in enumerate(data[1:], start=2):
+                    if str(row[id_idx]).strip() == str(villa_id).strip():
+                        sheet.update_cell(i, status_idx + 1, status)
+                        break
+        except Exception as e:
+            print(f"Update Error: {e}")
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
     villas = get_rows(sheet)
     villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
-    
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not imgs: imgs = [villa.get('Image_URL')]
-    
     return render_template('villa_details.html', villa=villa, villa_images=imgs)
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
@@ -120,11 +153,9 @@ def enquiry(villa_id):
         name, phone = request.form.get('name'), request.form.get('phone')
         dates, guests = request.form.get('stay_dates'), request.form.get('guests')
         v_name = villa.get('Villa_Name', 'Villa') if villa else "Villa"
-        
         if enquiry_sheet:
             try: enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, dates, guests, v_name])
             except: pass
-            
         alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {v_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {dates}\n👥 *Guests:* {guests}"
         requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
         return render_template('success.html', name=name, villa_name=v_name)
@@ -135,7 +166,6 @@ def explore():
     places = get_rows(places_sheet)
     return render_template('explore.html', tourist_places=places)
 
-# ✅ LEGAL ROUTE (For Terms & Privacy Tabs)
 @app.route('/legal')
 def legal():
     return render_template('legal.html')
@@ -144,7 +174,12 @@ def legal():
 def contact():
     return render_template('contact.html')
 
+# Simple Logout Route
+@app.route('/admin-logout')
+def admin_logout():
+    return redirect(url_for('index'))
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-
+                
