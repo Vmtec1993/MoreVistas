@@ -20,89 +20,81 @@
         :root {
             --luxury-blue: #00b4d8;
             --dark-bg: #0a0a0a;
-            --premium-silver: linear-gradient(180deg, #2d3436 0%, #636e72 100%);
-            --footer-silver: linear-gradient(180deg, #ffffff 0%, #a1a1a1 100%);
+            --premium-silver: linear-gradient(180deg, #ffffff 0%, #a1a1a1 100%);
         }
 
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; color: #2d3436; }
 
-        /* ✅ Luxury Typography */
+        /* ✅ LUXURY TYPOGRAPHY */
         h1, h2, h3, .navbar-brand, .footer-logo-text { 
             font-family: 'Marcellus', serif !important; 
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
         }
 
-        /* ✅ Coding se bana Silver MV Icon */
-        .mv-icon {
-            width: 42px; height: 42px;
-            background: linear-gradient(145deg, #1a1a1a, #000);
-            border: 1.5px solid #888; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            position: relative; margin-right: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        /* ✅ NEW MODERN OPEN ICON (NO BOX) */
+        .mv-monogram {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-family: 'Marcellus', serif;
+            font-weight: 800;
+            line-height: 1;
+            margin-right: 15px;
         }
-        .mv-icon::before {
-            content: "M"; font-family: 'Marcellus', serif; font-weight: 800; font-size: 1.1rem;
-            background: linear-gradient(180deg, #fff 0%, #bbb 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            position: absolute; left: 6px; top: 4px;
-        }
-        .mv-icon::after {
-            content: "V"; font-family: 'Marcellus', serif; font-weight: 800; font-size: 1.1rem;
-            background: linear-gradient(180deg, #fff 0%, #888 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            position: absolute; right: 6px; bottom: 4px;
-        }
-
-        /* ✅ Loader Styling */
-        #loader-wrapper {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; z-index: 99999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        .spinner {
-            width: 50px; height: 50px; border: 2px solid rgba(255, 255, 255, 0.1);
-            border-left-color: #ffffff; border-radius: 50%; animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loader-text { color: white; margin-top: 20px; font-weight: 300; letter-spacing: 5px; font-size: 0.8rem; }
-
-        /* ✅ Navbar Styling */
-        .navbar { background-color: #ffffff !important; border-bottom: 1px solid #eee; padding: 12px 0; }
-        
-        .premium-logo-text {
+        .mv-monogram .m-char {
+            font-size: 2.2rem;
             background: var(--premium-silver);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-weight: 800;
-            font-size: 1.5rem;
-            display: block;
+            position: relative;
+            z-index: 2;
         }
-        .nav-tagline { font-size: 0.5rem; letter-spacing: 2px; color: var(--luxury-blue); font-weight: 700; }
-
-        /* ✅ BHK/Guest Visibility */
-        .villa-card-meta, .card-text, .villa-meta-item { color: #2d3436 !important; font-weight: 600 !important; }
-
-        /* ✅ Side Menu */
-        .offcanvas { background-color: #ffffff; border-radius: 0 25px 25px 0 !important; width: 320px !important; }
-        .menu-link { 
-            border: none !important; padding: 16px 25px !important; 
-            font-weight: 600; border-radius: 12px !important; margin-bottom: 5px;
-            color: #2d3436 !important; display: flex; align-items: center;
-            text-decoration: none; transition: 0.3s ease;
-        }
-        .menu-link:hover { background: #f8f9fa !important; color: var(--luxury-blue) !important; transform: translateX(8px); }
-
-        /* ✅ Footer */
-        footer { background: var(--dark-bg); color: white; padding: 80px 0 40px; text-align: center; }
-        .footer-logo-text {
-            font-size: 2.5rem;
-            background: var(--footer-silver);
+        .mv-monogram .v-char {
+            font-size: 2.2rem;
+            background: linear-gradient(180deg, #a1a1a1 0%, #444 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
+            margin-left: -12px;
+            margin-top: 8px;
+            z-index: 1;
+        }
+
+        /* Footer Large Icon Style */
+        .footer-monogram { margin-bottom: 20px; }
+        .footer-monogram .m-char, .footer-monogram .v-char { font-size: 4.5rem; }
+        .footer-monogram .v-char { margin-left: -25px; margin-top: 15px; }
+
+        /* ✅ NAVBAR */
+        .navbar { background-color: #ffffff !important; border-bottom: 1px solid #eee; padding: 12px 0; }
+        .premium-logo-text {
+            background: linear-gradient(180deg, #2d3436 0%, #000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800; font-size: 1.6rem; display: block; line-height: 1;
+        }
+        .nav-tagline { font-size: 0.55rem; letter-spacing: 3px; color: var(--luxury-blue); font-weight: 700; }
+
+        /* ✅ LOADER */
+        #loader-wrapper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .loader-text { color: white; margin-top: 20px; letter-spacing: 8px; font-size: 0.7rem; opacity: 0.8; }
+
+        /* ✅ FOOTER - PURE LUXURY */
+        footer { background: #000; color: white; padding: 100px 0 50px; text-align: center; }
+        .footer-logo-text {
+            font-size: 3rem;
+            background: var(--premium-silver);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0px;
             font-weight: 700;
         }
+        .footer-tagline { color: var(--luxury-blue); letter-spacing: 6px; font-size: 0.8rem; font-weight: 700; margin-bottom: 40px; }
         .footer-link { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem; transition: 0.3s; letter-spacing: 2px; font-weight: 600; }
         .footer-link:hover { color: #ffffff; }
 
@@ -112,37 +104,17 @@
             width: 60px; height: 60px; border-radius: 50%; display: flex; 
             align-items: center; justify-content: center; font-size: 32px; 
             color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1000;
-            transition: 0.4s;
         }
     </style>
 </head>
 <body>
 
     <div id="loader-wrapper">
-        <div class="spinner"></div>
+        <div class="mv-monogram">
+            <span class="m-char">M</span>
+            <span class="v-char">V</span>
+        </div>
         <div class="loader-text">MOREVISTAS LUXURY</div>
-    </div>
-
-    <div class="offcanvas offcanvas-start shadow-lg" tabindex="-1" id="sideMenu">
-        <div class="offcanvas-header p-4 border-bottom">
-            <div class="d-flex align-items-center">
-                <div class="mv-icon"></div>
-                <div>
-                    <span class="premium-logo-text">MoreVistas</span>
-                    <span class="nav-tagline">THE ART OF LUXURY LIVING</span>
-                </div>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body p-4">
-            <div class="list-group list-group-flush">
-                <a href="/" class="menu-link"><i class="bi bi-house-door me-3"></i> Home</a>
-                <a href="/explore" class="menu-link"><i class="bi bi-geo-alt me-3"></i> Explore Lonavala</a>
-                <a href="/list-property" class="menu-link"><i class="bi bi-plus-circle me-3"></i> List Your Property</a>
-                <a href="/legal" class="menu-link"><i class="bi bi-shield-check me-3"></i> Terms & Policies</a>
-                <a href="/contact" class="menu-link"><i class="bi bi-chat-left-dots me-3"></i> Contact Us</a>
-            </div>
-        </div>
     </div>
 
     <nav class="navbar sticky-top shadow-sm">
@@ -152,7 +124,10 @@
                     <i class="bi bi-list fs-4"></i>
                 </button>
                 <a class="navbar-brand d-flex align-items-center text-decoration-none" href="/">
-                    <div class="mv-icon"></div>
+                    <div class="mv-monogram">
+                        <span class="m-char">M</span>
+                        <span class="v-char">V</span>
+                    </div>
                     <div class="d-flex flex-column">
                         <span class="premium-logo-text">MoreVistas</span>
                         <span class="nav-tagline">THE ART OF LUXURY LIVING</span>
@@ -161,10 +136,8 @@
             </div>
             <div class="d-none d-lg-block">
                 <a href="/list-property" class="text-dark text-decoration-none fw-bold me-4">List Your Property</a>
-                <a href="tel:+918830024994" class="text-dark text-decoration-none fw-800 me-4">
-                    <i class="bi bi-telephone-fill text-info me-1"></i> +91 88300 24994
-                </a>
-                <a href="https://wa.me/918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold shadow-sm">BOOK NOW</a>
+                <a href="tel:+918830024994" class="text-dark text-decoration-none fw-bold me-4">+91 88300 24994</a>
+                <a href="https://wa.me/918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold">BOOK NOW</a>
             </div>
         </div>
     </nav>
@@ -175,9 +148,12 @@
 
     <footer>
         <div class="container">
-            <div class="mv-icon mx-auto mb-3" style="width:60px; height:60px;"></div>
+            <div class="mv-monogram footer-monogram">
+                <span class="m-char">M</span>
+                <span class="v-char">V</span>
+            </div>
             <h2 class="footer-logo-text">MoreVistas</h2>
-            <p class="text-info small fw-bold mb-4" style="letter-spacing: 4px; font-size: 0.7rem;">THE ART OF LUXURY LIVING</p>
+            <p class="footer-tagline">THE ART OF LUXURY LIVING</p>
             
             <div class="footer-links mb-5">
                 <a href="/" class="footer-link mx-3">HOME</a>
@@ -186,19 +162,8 @@
                 <a href="/contact" class="footer-link mx-3">CONTACT</a>
             </div>
 
-            <div class="mb-5">
-                <a href="https://wa.me/918830024994" class="text-white mx-3 fs-4 transition"><i class="bi bi-whatsapp"></i></a>
-                <a href="#" class="text-white mx-3 fs-4 transition"><i class="bi bi-instagram"></i></a>
-            </div>
-            
-            <div class="row align-items-center opacity-50 pt-4 border-top border-secondary">
-                <div class="col-md-6 text-md-start text-center">
-                    <p class="small mb-0">© 2026 MoreVistas Luxury Villas Lonavala.</p>
-                </div>
-                <div class="col-md-6 text-md-end text-center">
-                    <a href="/legal" class="footer-link me-3">Terms</a>
-                    <a href="/legal#privacy" class="footer-link">Privacy</a>
-                </div>
+            <div class="pt-4 border-top border-secondary opacity-50">
+                <p class="small mb-0">© 2026 MoreVistas Luxury Villas Lonavala. +91 88300 24994</p>
             </div>
         </div>
     </footer>
@@ -210,11 +175,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         window.addEventListener("load", function() {
-            const loader = document.getElementById("loader-wrapper");
             setTimeout(() => {
-                loader.style.opacity = "0";
-                setTimeout(() => { loader.style.display = "none"; }, 500);
-            }, 600);
+                document.getElementById("loader-wrapper").style.display = "none";
+            }, 800);
         });
     </script>
 </body>
