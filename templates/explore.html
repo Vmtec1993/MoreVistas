@@ -1,23 +1,143 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container py-5">
-    <h2 class="fw-bold mb-4 text-center">Tourist Attractions in Lonavala</h2>
+
+<style>
+    /* 1. Header Section Styling */
+    .explore-header {
+        padding: 60px 0 40px;
+        background: radial-gradient(circle at 50% 50%, rgba(0, 180, 216, 0.05) 0%, transparent 70%);
+    }
+    
+    .explore-title {
+        font-family: 'Marcellus', serif;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: #1a1a1a;
+        text-transform: uppercase;
+    }
+
+    /* 2. Luxury Card Design */
+    .tp-card-luxury {
+        background: #fff;
+        border: 1px solid #f0f0f0;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        position: relative;
+    }
+
+    .tp-card-luxury:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        border-color: var(--luxury-blue);
+    }
+
+    .tp-img-wrapper {
+        position: relative;
+        overflow: hidden;
+        height: 220px;
+    }
+
+    .tp-img-luxury {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .tp-card-luxury:hover .tp-img-luxury {
+        transform: scale(1.1);
+    }
+
+    /* Distance Badge */
+    .distance-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(5px);
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--luxury-blue);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .tp-body-luxury {
+        padding: 25px;
+    }
+
+    .tp-location-name {
+        font-family: 'Marcellus', serif;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #222;
+    }
+
+    .tp-description {
+        font-size: 0.85rem;
+        color: #666;
+        line-height: 1.6;
+        min-height: 40px;
+    }
+
+    /* Direction Button */
+    .btn-direction {
+        background: #000;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        transition: 0.3s;
+        width: 100%;
+        margin-top: 15px;
+        display: inline-block;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .btn-direction:hover {
+        background: var(--luxury-blue);
+        color: #fff;
+        box-shadow: 0 5px 15px rgba(0, 180, 216, 0.3);
+    }
+</style>
+
+<div class="explore-header text-center">
+    <h2 class="explore-title">Lonavala’s Treasures</h2>
+    <div style="width: 50px; height: 2px; background: var(--luxury-blue); margin: 15px auto;"></div>
+    <p class="text-muted small">Curated experiences near MoreVistas Luxury Villas</p>
+</div>
+
+<div class="container pb-5">
     <div class="row g-4">
         {% for place in tourist_places %}
-        <div class="col-md-4 col-lg-3">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <img src="{{ place.Image_URL }}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="fw-bold">{{ place.Location }}</h5>
-                    <p class="text-muted small">{{ place.Description or 'A must-visit spot near your villa.' }}</p>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <span class="small fw-bold text-primary"><i class="bi bi-geo-alt"></i> {{ place.Distance }}</span>
-                        <a href="{{ place.Map_Link }}" class="btn btn-dark btn-sm rounded-pill px-3">Direction</a>
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="tp-card-luxury h-100">
+                <div class="tp-img-wrapper">
+                    <img src="{{ place.Image_URL }}" class="tp-img-luxury" alt="{{ place.Location }}">
+                    <div class="distance-badge">
+                        <i class="bi bi-geo-alt-fill"></i> {{ place.Distance }}
                     </div>
+                </div>
+                
+                <div class="tp-body-luxury">
+                    <h5 class="tp-location-name">{{ place.Location }}</h5>
+                    <p class="tp-description">
+                        {{ place.Description or 'Explore this breathtaking spot located just a short drive from your luxury villa.' }}
+                    </p>
+                    <a href="{{ place.Map_Link }}" target="_blank" class="btn-direction">
+                        GET DIRECTIONS <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
+
 {% endblock %}
