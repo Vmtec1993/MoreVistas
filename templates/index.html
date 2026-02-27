@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
+{% if settings.get('Banner_Show') == 'TRUE' %}
 <div class="container-fluid p-0 mb-4">
     <div class="position-relative shadow-lg overflow-hidden">
         <img src="{{ settings.get('Banner_URL', 'https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg') }}" 
@@ -18,6 +19,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 <div class="container mb-4">
     <div class="bg-white p-3 rounded-4 shadow-sm border d-flex align-items-center justify-content-center">
@@ -170,4 +172,3 @@
 </script>
 
 {% endblock %}
-    
