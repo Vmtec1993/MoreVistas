@@ -58,6 +58,7 @@ def get_rows(target_sheet):
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
+            # --- Price & Discount Logic ---
             try:
                 p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
@@ -69,16 +70,30 @@ def get_rows(target_sheet):
             except:
                 item['discount_perc'] = 0
 
-            raw_rules = item.get('Rules', '')
-            if '|' in raw_rules:
-                item['Rules_List'] = [r.strip() for r in raw_rules.split('|')]
+            # --- Rules Splitting Logic (FIXED FOR PREMIUM UI) ---
+            raw_rules = str(item.get('Rules', '')).strip()
+            if raw_rules:
+                # Multiple separators handle kar rahe hain (Pipe, Bullet, NewLine)
+                if '|' in raw_rules:
+                    rules_array = raw_rules.split('|')
+                elif '•' in raw_rules:
+                    rules_array = raw_rules.split('•')
+                elif '\n' in raw_rules:
+                    rules_array = raw_rules.split('\n')
+                else:
+                    rules_array = [raw_rules]
+                
+                # Khali lines hatana aur clean karna
+                item['Rules_List'] = [r.strip() for r in rules_array if r.strip()]
             else:
-                item['Rules_List'] = [raw_rules.strip()] if raw_rules else ["ID Proof Required"]
+                item['Rules_List'] = ["ID Proof Required", "Standard Rules Apply"]
 
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
             final_list.append(item)
+            
         return final_list
-    except:
+    except Exception as e:
+        print(f"Error in get_rows: {e}")
         return []
 
 # --- Routes ---
@@ -172,7 +187,6 @@ def update_status(villa_id, status):
         except Exception as e: print(f"Update Error: {e}")
     return redirect(url_for('admin_dashboard'))
 
-# 🚀 NEW ROUTE: UPDATE ALL VILLA DETAILS (Price, Images, Description etc.)
 @app.route('/update-full-villa', methods=['POST'])
 def update_full_villa():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
@@ -181,15 +195,10 @@ def update_full_villa():
             villa_id = request.form.get('Villa_ID')
             data = sheet.get_all_values()
             headers = [h.strip() for h in data[0]]
-            
-            # Modal Form se data collect karna
             updated_fields = request.form.to_dict()
-            
-            # Row dhoondhna
             id_idx = headers.index('Villa_ID') if 'Villa_ID' in headers else 0
             for i, row in enumerate(data[1:], start=2):
                 if str(row[id_idx]).strip() == str(villa_id).strip():
-                    # Har field ko sheet ke sahi column mein update karna
                     for key, val in updated_fields.items():
                         if key in headers:
                             col_idx = headers.index(key) + 1
@@ -241,30 +250,24 @@ def contact(): return render_template('contact.html')
 def admin_logout():
     session.pop('logged_in', None)
     return redirect(url_for('index'))
+
 @app.route('/sitemap.xml', methods=['GET'])
 def sitemap():
-    """Automatic Sitemap Generate karne ke liye"""
     pages = []
-    # Static Pages
     host = request.host_url.rstrip('/')
     for rule in app.url_map.iter_rules():
         if "GET" in rule.methods and len(rule.arguments) == 0:
             pages.append([host + str(rule.rule), datetime.now().strftime('%Y-%m-%d')])
-
-    # Dynamic Villa Pages (Har villa ka link automatic add hoga)
     villas = get_rows(sheet)
     for villa in villas:
         url = host + '/villa/' + str(villa.get('Villa_ID'))
         pages.append([url, datetime.now().strftime('%Y-%m-%d')])
-
     sitemap_xml = render_template('sitemap_template.xml', pages=pages)
     response = app.make_response(sitemap_xml)
     response.headers["Content-Type"] = "application/xml"
     return response
     
 if __name__ == "__main__":
-    # Render automatic 'PORT' variable deta hai, hume use use karna hai
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-
     
