@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 <style>
     :root { --primary-blue: #0d6efd; --dark-bg: #f8f9fa; }
     body { background-color: var(--dark-bg); font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -12,6 +14,8 @@
     .form-control-pill { border-radius: 12px; padding: 8px 15px; border: 1px solid #dee2e6; font-size: 0.9rem; }
     .modal-xl { max-width: 90% !important; }
     .section-label { font-size: 0.7rem; font-weight: 800; color: #0d6efd; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+    /* Calendar Input Style */
+    .calendar-input { background-color: #fff9f9 !important; border: 1px solid #ffc1c1 !important; cursor: pointer; }
 </style>
 
 <nav class="admin-nav mb-4">
@@ -85,6 +89,24 @@
                     <div class="modal fade" id="editModal{{ villa.get('Villa_ID') }}" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-xl modal-dialog-scrollable">
                             <div class="modal-content" style="border-radius: 25px;">
+                                
+                                <div class="bg-light p-4 border-bottom rounded-top-5">
+                                    <span class="section-label text-danger mb-2">6. QUICK OFFLINE BOOKING (AUTO SOLD OUT)</span>
+                                    <form action="/update-offline-dates" method="POST" class="row g-2 align-items-center">
+                                        <input type="hidden" name="Villa_ID" value="{{ villa.get('Villa_ID') }}">
+                                        <div class="col-md-8">
+                                            <label class="small fw-bold">Select Dates from Calendar (Multiple):</label>
+                                            <input type="text" name="Sold_Dates" class="form-control form-control-pill calendar-input multi-picker" 
+                                                   placeholder="Click to select dates..." value="{{ villa.get('Sold_Dates', '') }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="d-none d-md-block">&nbsp;</label>
+                                            <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold py-2 shadow-sm">Update Booking Dates</button>
+                                        </div>
+                                        <small class="text-muted mt-1"><i class="bi bi-info-circle me-1"></i> Villa will automatically show "Sold Out" on selected dates.</small>
+                                    </form>
+                                </div>
+
                                 <form action="/update-full-villa" method="POST">
                                     <div class="modal-header border-0 p-4">
                                         <h5 class="fw-bold m-0">Editing: <span class="text-primary">{{ villa.get('Villa_Name') }}</span></h5>
@@ -232,5 +254,16 @@
     &copy; 2026 MoreVistas Admin Control Panel
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr(".multi-picker", {
+            mode: "multiple",
+            dateFormat: "Y-m-d",
+            conjunction: ", ",
+            minDate: "today"
+        });
+    });
+</script>
+
 {% endblock %}
-                    
