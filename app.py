@@ -73,7 +73,6 @@ def get_rows(target_sheet):
             # --- Rules Splitting Logic (FIXED FOR PREMIUM UI) ---
             raw_rules = str(item.get('Rules', '')).strip()
             if raw_rules:
-                # Multiple separators handle kar rahe hain (Pipe, Bullet, NewLine)
                 if '|' in raw_rules:
                     rules_array = raw_rules.split('|')
                 elif '•' in raw_rules:
@@ -83,12 +82,17 @@ def get_rows(target_sheet):
                 else:
                     rules_array = [raw_rules]
                 
-                # Khali lines hatana aur clean karna
                 item['Rules_List'] = [r.strip() for r in rules_array if r.strip()]
             else:
                 item['Rules_List'] = ["ID Proof Required", "Standard Rules Apply"]
 
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
+
+            # --- AUTO SOLD OUT LOGIC (Added 3 Lines) ---
+            booked_dates = str(item.get('Sold_Dates', '')).strip()
+            if datetime.now().strftime("%Y-%m-%d") in booked_dates:
+                item['Status'] = 'Sold Out'
+
             final_list.append(item)
             
         return final_list
@@ -110,6 +114,28 @@ def index():
                 if len(r) >= 2: settings[r[0].strip()] = r[1].strip()
         except: pass
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
+
+# --- NEW ROUTE: UPDATE OFFLINE DATES ---
+@app.route('/update-offline-dates', methods=['POST'])
+def update_offline_dates():
+    if not session.get('logged_in'): return redirect(url_for('admin_login'))
+    if sheet:
+        try:
+            villa_id = request.form.get('Villa_ID')
+            dates = request.form.get('Sold_Dates')
+            data = sheet.get_all_values()
+            headers = [h.strip() for h in data[0]]
+            id_idx = headers.index('Villa_ID') if 'Villa_ID' in headers else 0
+            date_col_idx = headers.index('Sold_Dates') + 1 if 'Sold_Dates' in headers else -1
+            if date_col_idx != -1:
+                for i, row in enumerate(data[1:], start=2):
+                    if str(row[id_idx]).strip() == str(villa_id).strip():
+                        sheet.update_cell(i, date_col_idx, dates)
+                        break
+            return redirect(url_for('admin_dashboard'))
+        except Exception as e:
+            return f"Error: {e}", 500
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/list-property')
 def list_property():
@@ -206,7 +232,6 @@ def update_full_villa():
                     break
             return redirect(url_for('admin_dashboard'))
         except Exception as e:
-            print(f"Update Error: {e}")
             return f"Error: {e}", 500
     return redirect(url_for('admin_dashboard'))
 
@@ -270,4 +295,4 @@ def sitemap():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    
+                
