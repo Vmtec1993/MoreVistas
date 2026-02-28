@@ -140,11 +140,13 @@
                             {% set r = rule.replace('•', '').strip() %}
                             <div class="modern-rule-item {% if 'Deposit' in r or 'deposit' in r %}deposit-box{% endif %}">
                                 <div class="rule-icon-box">
-                                    {% if 'Smoking' in r %}<i class="bi bi-no-backdrop"></i>
-                                    {% elif 'music' in r or '10:00' in r %}<i class="bi bi-volume-mute"></i>
-                                    {% elif 'Pool' in r %}<i class="bi bi-water"></i>
-                                    {% elif 'ID' in r %}<i class="bi bi-person-badge"></i>
-                                    {% elif 'Deposit' in r %}<i class="bi bi-cash-stack"></i>
+                                    {% if 'Smoking' in r or 'smoking' in r %}<i class="bi bi-no-backdrop"></i>
+                                    {% elif 'music' in r or '10:00' in r or '10 PM' in r %}<i class="bi bi-volume-mute"></i>
+                                    {% elif 'Pool' in r or 'pool' in r %}<i class="bi bi-water"></i>
+                                    {% elif 'ID' in r or 'id' in r %}<i class="bi bi-person-badge"></i>
+                                    {% elif 'Deposit' in r or 'deposit' in r %}<i class="bi bi-cash-stack"></i>
+                                    {% elif 'Kitchen' in r or 'cooking' in r %}<i class="bi bi-egg-fried"></i>
+                                    {% elif 'Pets' in r or 'pets' in r %}<i class="bi bi-ban"></i>
                                     {% else %}<i class="bi bi-check2-circle"></i>{% endif %}
                                 </div>
                                 <div class="rule-text-content">{{ r }}</div>
@@ -211,3 +213,4 @@
 </div>
 
 {% endblock %}
+    
