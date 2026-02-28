@@ -29,7 +29,7 @@
         .loader-logo { height: 100px; width: auto; animation: logo-glow 1.5s ease-in-out infinite; }
         @keyframes logo-glow { 0%, 100% { opacity: 0.5; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
 
-        /* ✅ 2. PREMIUM 3D HOLOGRAM TEXT (RESIZED) */
+        /* ✅ 2. PREMIUM 3D HOLOGRAM TEXT */
         .hologram-3d-text {
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 800;
@@ -59,9 +59,12 @@
         .whatsapp-side-tab { position: fixed; right: -115px; bottom: 25%; z-index: 9999; background: #25d366; color: white; padding: 12px 18px; border-radius: 30px 0 0 30px; font-weight: bold; display: flex; align-items: center; text-decoration: none; transition: all 0.4s; box-shadow: -4px 4px 15px rgba(0,0,0,0.15); }
         .whatsapp-side-tab:hover { right: 0; }
 
-        /* ✅ 5. FOOTER STYLING */
+        /* ✅ 5. FOOTER STYLING & LINKS */
         footer { background: #0a0a0a; color: white; padding: 60px 0 30px; text-align: center; }
         .footer-logo { height: 75px; width: auto; margin-bottom: 15px; }
+        .footer-link { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem; transition: 0.3s; }
+        .footer-link:hover { color: var(--hologram-gold); }
+        .footer-dot { color: rgba(255,255,255,0.2); margin: 0 10px; }
     </style>
 </head>
 <body>
@@ -80,8 +83,9 @@
             <a href="/" class="nav-link-custom"><i class="bi bi-house-door me-3"></i>Home</a>
             <a href="/explore" class="nav-link-custom"><i class="bi bi-geo-alt me-3"></i>Tourist Points</a>
             <a href="/list-property" class="nav-link-custom"><i class="bi bi-building-up me-3"></i>List Your Property</a>
-            <a href="/legal#privacy" class="nav-link-custom"><i class="bi bi-shield-check me-3"></i>Privacy Policy</a>
-            <a href="/legal#terms" class="nav-link-custom"><i class="bi bi-file-earmark-text me-3"></i>Terms & Conditions</a>
+            <a href="/contact" class="nav-link-custom"><i class="bi bi-telephone me-3"></i>Contact Us</a>
+            <a href="/legal" class="nav-link-custom"><i class="bi bi-shield-check me-3"></i>Privacy Policy</a>
+            <a href="/legal" class="nav-link-custom"><i class="bi bi-file-earmark-text me-3"></i>Terms & Conditions</a>
         </div>
     </div>
 
@@ -114,10 +118,19 @@
     <footer>
         <div class="container">
             <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" class="footer-logo">
-            <div class="mb-3">
+            <div class="mb-4">
                 <span class="hologram-3d-text" style="font-size: 1.8rem;">MoreVistas</span>
                 <span class="hologram-subtext" style="font-size: 0.6rem; letter-spacing: 5px; display: block;">LUXURY VILLAS</span>
             </div>
+
+            <div class="d-flex justify-content-center align-items-center flex-wrap mb-4">
+                <a href="/legal" class="footer-link">Terms & Conditions</a>
+                <span class="footer-dot">•</span>
+                <a href="/legal" class="footer-link">Privacy Policy</a>
+                <span class="footer-dot">•</span>
+                <a href="/contact" class="footer-link">Contact Us</a>
+            </div>
+
             <p class="small opacity-50 mt-4">© 2026 MOREVISTAS LUXURY VILLAS. ALL RIGHTS RESERVED.</p>
         </div>
     </footer>
