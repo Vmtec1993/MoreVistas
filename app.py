@@ -54,25 +54,43 @@ def get_rows(target_sheet):
         if not data or len(data) < 1: return []
         headers = [h.strip() for h in data[0]]
         final_list = []
+        today_day = datetime.now().weekday() # 0=Mon, 6=Sun
+        
         for row in data[1:]:
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
-            # --- Price & Discount Logic (Maintaining your original style) ---
+            # --- Price Cleaning Logic (FIXED) ---
+            def clean_p(key):
+                val = str(item.get(key, '0')).replace(',', '').replace('₹', '').strip()
+                return int(float(val)) if (val and val.lower() != 'nan') else 0
+
             try:
-                p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
-                op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
-                current = int(float(p_val)) if p_val and p_val.lower() != 'nan' else 0
-                original = int(float(op_val)) if op_val and op_val.lower() != 'nan' else 0
-                item['Price'] = current
-                item['Original_Price'] = original
-                item['discount_perc'] = int(((original - current) / original) * 100) if original > current > 0 else 0
+                item['Price'] = clean_p('Price')
+                item['Original_Price'] = clean_p('Original_Price')
+                item['Weekday_Price'] = clean_p('Weekday_Price')
+                item['Weekend_Price'] = clean_p('Weekend_Price')
+                
+                # Dynamic Logic within get_rows for global use
+                if today_day >= 4: # Fri, Sat, Sun
+                    item['current_display_price'] = item['Weekend_Price'] if item['Weekend_Price'] > 0 else item['Price']
+                else: # Mon-Thu
+                    item['current_display_price'] = item['Weekday_Price'] if item['Weekday_Price'] > 0 else item['Price']
+                
+                # Savings calculation
+                p = item['current_display_price']
+                op = item['Original_Price']
+                item['amount_saved'] = op - p if op > p else 0
+                item['discount_perc'] = int(((op - p) / op) * 100) if op > p > 0 else 0
             except:
+                item['current_display_price'] = item.get('Price', 0)
+                item['amount_saved'] = 0
                 item['discount_perc'] = 0
 
-            # --- Rules Splitting Logic ---
+            # --- Rules Logic ---
             raw_rules = str(item.get('Rules', '')).strip()
             if raw_rules:
+                rules_array = []
                 if '|' in raw_rules: rules_array = raw_rules.split('|')
                 elif '•' in raw_rules: rules_array = raw_rules.split('•')
                 elif '\n' in raw_rules: rules_array = raw_rules.split('\n')
@@ -95,6 +113,8 @@ def get_rows(target_sheet):
 def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
+    
+    # Original settings logic
     settings = {'Offer_Text': "Welcome to MoreVistas Lonavala", 'Banner_URL': "https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg", 'Banner_Show': 'TRUE'}
     if settings_sheet:
         try:
@@ -106,40 +126,15 @@ def index():
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
-    villas = get_rows(sheet)
+    villas = get_rows(sheet) # get_rows is now smart enough
     villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
-
-    # --- ⚡ SMART DYNAMIC PRICING LOGIC (ADDED HERE) ---
-    try:
-        today_day = datetime.now().weekday() # 0=Mon, 4=Fri, 5=Sat, 6=Sun
-        
-        # Clean prices for logic
-        weekday = str(villa.get('Weekday_Price', '0')).replace(',', '').replace('₹', '').strip()
-        weekend = str(villa.get('Weekend_Price', '0')).replace(',', '').replace('₹', '').strip()
-        base = str(villa.get('Price', '0')).replace(',', '').replace('₹', '').strip()
-        original = str(villa.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
-
-        # Switch logic: Fri-Sun = Weekend
-        if today_day >= 4:
-            current_p = weekend if (weekend and weekend != '0') else base
-        else:
-            current_p = weekday if (weekday and weekday != '0') else base
-
-        villa['current_display_price'] = int(float(current_p))
-        orig_val = int(float(original)) if (original and original != '0') else 0
-        
-        # Calculate cute saving amount
-        villa['amount_saved'] = orig_val - villa['current_display_price'] if orig_val > villa['current_display_price'] else 0
-    except:
-        villa['current_display_price'] = villa.get('Price', 0)
-        villa['amount_saved'] = 0
-    # ------------------------------------------------
 
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not imgs: imgs = [villa.get('Image_URL')]
     return render_template('villa_details.html', villa=villa, villa_images=imgs)
 
+# --- Rest of the routes (Enquiry, Admin, etc.) remain EXACTLY same as your code ---
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
     villas = get_rows(sheet)
@@ -255,9 +250,6 @@ def legal(): return render_template('legal.html')
 def list_property(): return render_template('list_property.html')
 
 if __name__ == '__main__':
-    # Render environment variable se port uthata hai, default 5000 rakhein
     port = int(os.environ.get("PORT", 5000))
-    # Important: host='0.0.0.0' hona zaroori hai Render ke liye
     app.run(host='0.0.0.0', port=port)
-
-                              
+        
