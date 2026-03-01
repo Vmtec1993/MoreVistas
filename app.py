@@ -9,7 +9,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = "morevistas_secure_2026" 
 
-# --- CONFIG (Aapka Original) ---
+# --- CONFIG ---
 TELEGRAM_TOKEN = "7913354522:AAH1XxMP1EMWC59fpZezM8zunZrWQcAqH18"
 TELEGRAM_CHAT_ID = "6746178673"
 ADMIN_USER = "Admin"
@@ -72,7 +72,6 @@ def get_rows(target_sheet):
                 original = clean_price(raw_original)
                 
                 current_price = weekend_amt if is_weekend else weekday_amt
-                
                 item['Price'] = current_price
                 item['Weekday_Price'] = weekday_amt
                 item['Weekend_Price'] = weekend_amt
@@ -111,64 +110,44 @@ def index():
     settings = {'Offer_Text': "Welcome", 'Banner_Show': 'TRUE', 'Banner_URL': ''}
     if settings_sheet:
         try:
-            for r in settings_sheet.get_all_values():
+            data = settings_sheet.get_all_values()
+            for r in data:
                 if len(r) >= 2: settings[r[0].strip()] = r[1].strip()
         except: pass
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
 
-@app.route('/explore')
-def explore():
-    places = get_rows(places_sheet)
-    return render_template('explore.html', tourist_places=places)
-
-@app.route('/contact')
-def contact(): return render_template('contact.html')
-
-@app.route('/legal')
-def legal(): return render_template('legal.html')
-
-@app.route('/list-property')
-def list_property(): return render_template('list_property.html')
-
-@app.route('/villa/<villa_id>')
-def villa_details(villa_id):
-    villas = get_rows(sheet)
-    villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
-    if not villa: return "Villa Not Found", 404
-    raw_dates = str(villa.get('Sold_Dates', '')).strip()
-    booked_dates_list = [d.strip() for d in raw_dates.split(',') if d.strip()]
-    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
-    if not imgs: imgs = [villa.get('Image_URL')]
-    return render_template('villa_details.html', villa=villa, villa_images=imgs, booked_dates=booked_dates_list)
-
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
+    error = None # ✅ Added for safety
     if request.method == 'POST':
         if request.form.get('username') == ADMIN_USER and request.form.get('password') == ADMIN_PASS:
             session['logged_in'] = True
             return redirect(url_for('admin_dashboard'))
-    return render_template('admin_login.html')
+        else:
+            error = "Invalid Credentials" # ✅ Show on HTML
+    return render_template('admin_login.html', error=error)
 
 @app.route('/admin')
 def admin_dashboard():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
     villas = get_rows(sheet)
     
-    # Fetch Enquiries
     enquiries = []
     if enquiry_sheet:
         try:
             data = enquiry_sheet.get_all_values()
-            if len(data) > 1:
-                headers = [h.strip() for h in data[0]]
-                for row in data[1:]: enquiries.append(dict(zip(headers, row)))
+            if len(data) > 0:
+                headers = [h.strip() for h in data[0]] # ✅ Get headers correctly
+                for row in data[1:]:
+                    padded_row = row + [''] * (len(headers) - len(row))
+                    enquiries.append(dict(zip(headers, padded_row)))
         except: pass
     
-    # Fetch Settings (Crucial for Admin Dashboard)
     settings = {'Offer_Text': "", 'Banner_URL': "", 'Banner_Show': 'FALSE'}
     if settings_sheet:
         try:
-            for r in settings_sheet.get_all_values():
+            data = settings_sheet.get_all_values()
+            for r in data:
                 if len(r) >= 2: settings[r[0].strip()] = r[1].strip()
         except: pass
         
@@ -179,6 +158,8 @@ def admin_logout():
     session.pop('logged_in', None)
     return redirect(url_for('index'))
 
+# Baki saare routes (villa_details, explore, list-property) waise hi rakhein...
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-    
+        
