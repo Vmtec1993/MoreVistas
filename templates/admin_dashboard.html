@@ -9,8 +9,8 @@
     .admin-nav { background: white; border-bottom: 1px solid #dee2e6; padding: 15px 0; }
     .table-container { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; }
     .status-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
-    .bg-sold { background: #ffe5e5; color: #dc3545; }
-    .bg-available { background: #e8f5e9; color: #2e7d32; }
+    .bg-sold { background: #ffe5e5 !important; color: #dc3545 !important; }
+    .bg-available { background: #e8f5e9 !important; color: #2e7d32 !important; }
     .form-control-pill { border-radius: 12px; padding: 8px 15px; border: 1px solid #dee2e6; font-size: 0.9rem; }
     .modal-xl { max-width: 90% !important; }
     .section-label { font-size: 0.7rem; font-weight: 800; color: #0d6efd; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; }
@@ -21,7 +21,8 @@
     <div class="container d-flex justify-content-between align-items-center">
         <h4 class="fw-bold m-0">More<span class="text-primary">Vistas</span> Admin</h4>
         <div class="d-flex align-items-center gap-3">
-            <a href="/admin-logout" class="btn btn-outline-danger btn-sm rounded-pill px-3">Logout</a>
+            <a href="/" class="btn btn-sm btn-outline-primary rounded-pill px-3">View Site</a>
+            <a href="/admin-logout" class="btn btn-danger btn-sm rounded-pill px-3">Logout</a>
         </div>
     </div>
 </nav>
@@ -32,20 +33,20 @@
         <form action="/update-settings" method="POST" class="row g-3 align-items-end">
             <div class="col-md-5">
                 <label class="small fw-bold text-muted mb-2">Banner Image URL</label>
-                <input type="text" name="banner_url" class="form-control form-control-pill" value="{{ settings.get('Banner_URL', '') }}">
+                <input type="text" name="banner_url" class="form-control form-control-pill" value="{{ settings.get('Banner_URL', '') if settings else '' }}">
             </div>
             <div class="col-md-3">
                 <label class="small fw-bold text-muted mb-2">Offer Badge Text</label>
-                <input type="text" name="offer_text" class="form-control form-control-pill" value="{{ settings.get('Offer_Text', '') }}">
+                <input type="text" name="offer_text" class="form-control form-control-pill" value="{{ settings.get('Offer_Text', '') if settings else '' }}">
             </div>
             <div class="col-md-2">
                 <div class="form-check form-switch mb-2">
-                    <input class="form-check-input" type="checkbox" name="banner_show" id="bannerShow" {% if settings.get('Banner_Show') == 'TRUE' %}checked{% endif %}>
+                    <input class="form-check-input" type="checkbox" name="banner_show" id="bannerShow" {% if settings and settings.get('Banner_Show') == 'TRUE' %}checked{% endif %}>
                     <label class="form-check-label small fw-bold" for="bannerShow">Show Banner</label>
                 </div>
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">Save Changes</button>
+                <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">Save</button>
             </div>
         </form>
     </div>
@@ -82,29 +83,28 @@
                     <div class="modal fade" id="editModal{{ villa.get('Villa_ID') }}" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-xl modal-dialog-scrollable">
                             <div class="modal-content" style="border-radius: 25px;">
-                                
-                                <div class="bg-light p-4 border-bottom rounded-top-5">
-                                    <span class="section-label text-danger mb-2">6. QUICK OFFLINE BOOKING (AUTO SOLD OUT)</span>
-                                    <form action="/update-offline-dates" method="POST" class="row g-2 align-items-center">
-                                        <input type="hidden" name="Villa_ID" value="{{ villa.get('Villa_ID') }}">
-                                        <div class="col-md-8">
-                                            <label class="small fw-bold">Select Dates from Calendar (Multiple):</label>
-                                            <input type="text" name="Sold_Dates" class="form-control form-control-pill calendar-input multi-picker" 
-                                                   placeholder="Click to select dates..." value="{{ villa.get('Sold_Dates', '') }}">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="d-none d-md-block">&nbsp;</label>
-                                            <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold py-2 shadow-sm">Update Booking Dates</button>
-                                        </div>
-                                    </form>
+                                <div class="modal-header border-0 p-4 pb-0">
+                                    <h5 class="fw-bold m-0">Editing: <span class="text-primary">{{ villa.get('Villa_Name') }}</span></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
-
-                                <form action="/update-full-villa" method="POST">
-                                    <div class="modal-header border-0 p-4">
-                                        <h5 class="fw-bold m-0">Editing: <span class="text-primary">{{ villa.get('Villa_Name') }}</span></h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                <div class="modal-body p-4 pt-2">
+                                    
+                                    <div class="bg-light p-3 border rounded-4 mb-4">
+                                        <span class="section-label text-danger mb-2 mt-0">QUICK OFFLINE BOOKING (AUTO SOLD OUT)</span>
+                                        <form action="/update-offline-dates" method="POST" class="row g-2 align-items-end">
+                                            <input type="hidden" name="Villa_ID" value="{{ villa.get('Villa_ID') }}">
+                                            <div class="col-md-8">
+                                                <label class="small fw-bold">Select Dates (Already Booked):</label>
+                                                <input type="text" name="Sold_Dates" class="form-control form-control-pill calendar-input multi-picker" 
+                                                       placeholder="Select dates..." value="{{ villa.get('Sold_Dates', '') }}">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold py-2 shadow-sm">Update Sold Dates</button>
+                                            </div>
+                                        </form>
                                     </div>
-                                    <div class="modal-body p-4 pt-0">
+
+                                    <form action="/update-full-villa" method="POST">
                                         <input type="hidden" name="Villa_ID" value="{{ villa.get('Villa_ID') }}">
                                         
                                         <span class="section-label">1. Primary Information</span>
@@ -126,76 +126,39 @@
                                             </div>
                                         </div>
 
-                                        <span class="section-label">2. Dynamic Pricing & Offers</span>
+                                        <span class="section-label">2. Pricing</span>
                                         <div class="row g-3">
-                                            <div class="col-md-3">
-                                                <label class="small fw-bold">Original Price (Strike-through)</label>
+                                            <div class="col-md-4">
+                                                <label class="small fw-bold">Original Price</label>
                                                 <input type="number" name="Original_Price" class="form-control form-control-pill" value="{{ villa.get('Original_Price') }}">
                                             </div>
-                                            <div class="col-md-3">
-                                                <label class="small fw-bold text-success">Weekday Price (Mon-Thu)</label>
-                                                <input type="number" name="Weekday_Price" class="form-control form-control-pill border-success" value="{{ villa.get('Weekday_Price', villa.get('Price')) }}">
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label class="small fw-bold text-danger">Weekend Price (Fri-Sun)</label>
-                                                <input type="number" name="Weekend_Price" class="form-control form-control-pill border-danger" value="{{ villa.get('Weekend_Price', villa.get('Price')) }}">
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label class="small fw-bold">Offer Text</label>
-                                                <input type="text" name="Offer" class="form-control form-control-pill" value="{{ villa.get('Offer') }}">
-                                            </div>
-                                        </div>
-
-                                        <span class="section-label">3. Capacity Details</span>
-                                        <div class="row g-3">
-                                            <div class="col-md-3">
-                                                <label class="small fw-bold">Total Guests</label>
-                                                <input type="number" name="Guests" class="form-control form-control-pill" value="{{ villa.get('Guests') }}">
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label class="small fw-bold">Bedrooms</label>
-                                                <input type="number" name="Bedrooms" class="form-control form-control-pill" value="{{ villa.get('Bedrooms') }}">
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label class="small fw-bold">Bathrooms</label>
-                                                <input type="number" name="Bathrooms" class="form-control form-control-pill" value="{{ villa.get('Bathrooms') }}">
-                                            </div>
-                                        </div>
-
-                                        <span class="section-label">4. Image Gallery</span>
-                                        <div class="row g-2 bg-light p-3 rounded-4">
-                                            <div class="col-md-12 mb-2">
-                                                <label class="small fw-bold text-primary">Main Image URL</label>
-                                                <input type="text" name="Image_URL" class="form-control form-control-pill" value="{{ villa.get('Image_URL') }}">
-                                            </div>
-                                            {% for i in range(2, 7) %}
                                             <div class="col-md-4">
-                                                <label class="x-small">Image {{i}} URL</label>
-                                                <input type="text" name="Image_URL_{{i}}" class="form-control form-control-pill" value="{{ villa.get('Image_URL_' ~ i) }}">
+                                                <label class="small fw-bold text-success">Weekday Price</label>
+                                                <input type="number" name="Weekday_Price" class="form-control form-control-pill" value="{{ villa.get('Weekday_Price') }}">
                                             </div>
-                                            {% endfor %}
+                                            <div class="col-md-4">
+                                                <label class="small fw-bold text-danger">Weekend Price</label>
+                                                <input type="number" name="Weekend_Price" class="form-control form-control-pill" value="{{ villa.get('Weekend_Price') }}">
+                                            </div>
                                         </div>
 
-                                        <span class="section-label">5. Content & Location</span>
+                                        <span class="section-label">3. Content (Use | to separate rules)</span>
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="small fw-bold">Amenities</label>
                                                 <textarea name="Amenities" class="form-control rounded-4" rows="3">{{ villa.get('Amenities') }}</textarea>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="small fw-bold">Villa Rules</label>
+                                                <label class="small fw-bold">Rules (Example: Rule 1 | Rule 2)</label>
                                                 <textarea name="Rules" class="form-control rounded-4" rows="3">{{ villa.get('Rules') }}</textarea>
                                             </div>
-                                            <div class="col-md-12">
-                                                <label class="small fw-bold">Google Maps Link</label>
-                                                <input type="text" name="Location_Link" class="form-control form-control-pill" value="{{ villa.get('Location_Link') }}">
-                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="modal-footer border-0 p-4">
-                                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-3 shadow">SAVE ALL CHANGES</button>
-                                    </div>
-                                </form>
+
+                                        <div class="mt-4">
+                                            <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-3 shadow">SAVE ALL CHANGES</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -223,11 +186,11 @@
                         <td class="small text-muted">{{ row.get('Date', 'N/A') }}</td>
                         <td><span class="fw-bold">{{ row.get('Name', 'Unknown') }}</span></td>
                         <td>
-                            <a href="https://wa.me/{{ row.get('Phone')|replace(' ', '')|replace('+', '') }}" target="_blank" class="btn btn-sm btn-light rounded-pill px-2">
-                                <i class="bi bi-whatsapp text-success me-1"></i> {{ row.get('Phone') }}
+                            <a href="https://wa.me/{{ row.get('Phone', '')|replace(' ', '')|replace('+', '') }}" target="_blank" class="btn btn-sm btn-light rounded-pill px-3">
+                                <i class="bi bi-whatsapp text-success me-1"></i> {{ row.get('Phone', 'No Phone') }}
                             </a>
                         </td>
-                        <td class="small fw-bold text-primary">{{ row.get('Message') }}</td>
+                        <td class="small fw-bold text-primary">{{ row.get('villa_name') or row.get('Villa Name') or 'N/A' }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -247,6 +210,4 @@
         });
     });
 </script>
-
 {% endblock %}
-    
