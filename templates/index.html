@@ -40,7 +40,6 @@
     .highlight-card { border: none; transition: 0.3s; background: #f8f9fa; border-radius: 20px; }
     .highlight-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
     
-    /* ✨ STYLISH DESCRIPTION FONT */
     .villa-desc-text {
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: 0.85rem;
@@ -72,7 +71,7 @@
 
                     <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(0.8);{% endif %}">
                     
-                    <div class="card-body p-4 text-start">
+                    <div class="card-body p-4 text-start d-flex flex-column">
                         <span class="villa-title-main text-uppercase">{{ villa.Villa_Name }}</span>
                         
                         <div class="d-flex gap-2 mt-2 mb-2 small fw-bold text-muted">
@@ -88,15 +87,18 @@
                         </div>
 
                         <div class="mt-auto">
-                            {% if villa.current_display_price and villa.current_display_price|int > 0 %}
+                            {# --- सुधरा हुआ प्राइस सेक्शन --- #}
+                            {% set current_p = villa.get('current_display_price', villa.get('Price', 0))|int %}
+                            
+                            {% if current_p > 0 %}
                                 <div class="d-flex align-items-center mb-1">
-                                    {% if villa.amount_saved > 0 %}
-                                    <span class="price-cut">₹{{ villa.Original_Price }}</span>
-                                    <span class="off-tag">SAVE ₹{{ villa.amount_saved }}</span>
+                                    {% if villa.get('amount_saved', 0)|int > 0 %}
+                                        <span class="price-cut">₹{{ villa.Original_Price }}</span>
+                                        <span class="off-tag">SAVE ₹{{ villa.amount_saved }}</span>
                                     {% endif %}
                                 </div>
                                 <div class="d-flex align-items-baseline">
-                                    <span class="fs-4 fw-bold text-primary">₹{{ villa.current_display_price|int }}</span>
+                                    <span class="fs-4 fw-bold text-primary">₹{{ current_p }}</span>
                                     <small class="text-muted ms-1">/night</small>
                                 </div>
                             {% else %}
@@ -123,6 +125,7 @@
     </div>
 </div>
 
+{# --- बाकी का Footer और Attractions वाला हिस्सा वैसा ही रहेगा --- #}
 <div class="container mt-5 py-5">
     <div class="bg-light rounded-5 p-4 p-md-5 shadow-sm border">
         <h3 class="fw-bold mb-5 text-center">Why Stay With <span class="text-primary">MoreVistas?</span></h3>
