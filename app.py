@@ -109,6 +109,54 @@ def index():
         except: pass
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
 
+@app.route('/villa/<villa_id>')
+def villa_details(villa_id):
+    villas = get_rows(sheet)
+    villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
+    if not villa: return "Villa Not Found", 404
+    
+    # --- CUSTOMER CALENDAR LOGIC ---
+    raw_dates = str(villa.get('Sold_Dates', '')).strip()
+    # String "2026-03-01, 2026-03-05" ko list mein badalna
+    booked_dates_list = [d.strip() for d in raw_dates.split(',') if d.strip()]
+    
+    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
+    if not imgs: imgs = [villa.get('Image_URL')]
+    
+    return render_template('villa_details.html', villa=villa, villa_images=imgs, booked_dates=booked_dates_list)
+
+@app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
+def enquiry(villa_id):
+    villas = get_rows(sheet)
+    villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
+    if request.method == 'POST':
+        name = request.form.get('name')
+        
+        # PHONE FIX: Country code logic
+        raw_phone = str(request.form.get('phone', '')).strip()
+        if len(raw_phone) == 10 and not raw_phone.startswith('+'):
+            phone = f"+91 {raw_phone}"
+        else:
+            phone = raw_phone
+        
+        check_in = request.form.get('check_in', 'N/A')
+        check_out = request.form.get('check_out', 'N/A')
+        guests = request.form.get('guests', '0')
+        message = villa.get('Villa_Name', 'Villa Booking') if villa else "Booking"
+
+        if enquiry_sheet:
+            try:
+                enquiry_sheet.append_row([
+                    datetime.now().strftime("%d-%m-%Y %H:%M"), 
+                    name, phone, check_in, check_out, guests, message
+                ])
+            except: pass
+        
+        alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {message}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *In:* {check_in} | *Out:* {check_out}\n👥 *Guests:* {guests}"
+        requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
+        return render_template('success.html', name=name)
+    return render_template('enquiry.html', villa=villa)
+
 @app.route('/update-offline-dates', methods=['POST'])
 def update_offline_dates():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
@@ -151,37 +199,6 @@ def admin_dashboard():
         except: pass
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries[::-1])
 
-@app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
-def enquiry(villa_id):
-    villas = get_rows(sheet)
-    villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
-    if request.method == 'POST':
-        name = request.form.get('name')
-        # PHONE FIX: Country code auto add
-        raw_phone = str(request.form.get('phone', '')).strip()
-        phone = f"+91 {raw_phone}" if raw_phone and not raw_phone.startswith('+') else raw_phone
-        
-        # SHEET SYNC: Match columns (Date, Name, Phone, Check-in, Check-out, Guests, Message)
-        check_in = request.form.get('check_in', 'N/A')
-        check_out = request.form.get('check_out', 'N/A')
-        guests = request.form.get('guests', '0')
-        message = villa.get('Villa_Name', 'Villa Booking') if villa else "Booking"
-
-        if enquiry_sheet:
-            try:
-                enquiry_sheet.append_row([
-                    datetime.now().strftime("%d-%m-%Y %H:%M"), 
-                    name, phone, check_in, check_out, guests, message
-                ])
-            except: pass
-        
-        alert = f"🚀 *New Enquiry!*\n🏡 *Villa:* {message}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *In:* {check_in} | *Out:* {check_out}\n👥 *Guests:* {guests}"
-        requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
-        return render_template('success.html', name=name)
-    return render_template('enquiry.html', villa=villa)
-
-# ... (Baki ke routes: update-full-villa, villa-details, sitemap same rahenge)
-
 @app.route('/update-full-villa', methods=['POST'])
 def update_full_villa():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
@@ -203,24 +220,12 @@ def update_full_villa():
         except Exception as e: return f"Error: {e}", 500
     return redirect(url_for('admin_dashboard'))
 
-@app.route('/villa/<villa_id>')
-def villa_details(villa_id):
-    villas = get_rows(sheet)
-    villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
-    if not villa: return "Villa Not Found", 404
-    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
-    if not imgs: imgs = [villa.get('Image_URL')]
-    return render_template('villa_details.html', villa=villa, villa_images=imgs)
-
 @app.route('/admin-logout')
 def admin_logout():
     session.pop('logged_in', None)
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
-    # Render PORT environment variable deta hai, agar nahi mile toh default 5000
     port = int(os.environ.get("PORT", 5000))
-    # Host '0.0.0.0' hona zaroori hai Render ke liye
     app.run(host='0.0.0.0', port=port)
-
     
