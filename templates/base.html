@@ -12,39 +12,44 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
 
     <style>
         :root { --luxury-blue: #00b4d8; --hologram-gold: #e0b15c; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; overflow-x: hidden; }
 
-        /* ✅ 1. LOADER */
+        /* ✅ 1. ORIGINAL LOADER */
         #loader-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s ease; }
         .loader-logo { height: 100px; width: auto; animation: logo-glow 1.5s ease-in-out infinite; }
         @keyframes logo-glow { 0%, 100% { opacity: 0.5; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
 
-        /* ✅ 2. HOLOGRAM TEXT */
-        .hologram-3d-text { font-weight: 800; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(135deg, #fff 0%, var(--hologram-gold) 50%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 2px 4px rgba(0,0,0,0.15); display: inline-block; }
-        .hologram-subtext { font-size: 0.45rem; color: var(--luxury-blue); letter-spacing: 3px; font-weight: 700; text-transform: uppercase; margin-top: -5px; opacity: 0.9; display: block; }
+        /* ✅ 2. ORIGINAL HOLOGRAM TEXT */
+        .hologram-3d-text { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(135deg, #fff 0%, var(--hologram-gold) 50%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 2px 4px rgba(0,0,0,0.15); display: inline-block; vertical-align: middle; }
+        .hologram-subtext { font-size: 0.45rem; color: var(--luxury-blue); letter-spacing: 3px; font-weight: 700; text-transform: uppercase; margin-top: -5px; opacity: 0.9; }
 
-        /* ✅ 3. SIDEBAR STYLING */
-        .offcanvas { background-color: #000; color: white; width: 300px !important; z-index: 1050; }
-        .nav-link-custom { color: rgba(255,255,255,0.8); font-size: 1rem; padding: 15px 25px; border-bottom: 1px solid #222; display: block; text-decoration: none; transition: 0.3s; }
-        .nav-link-custom:hover { background: #111; color: var(--luxury-blue); padding-left: 30px; }
-        .nav-link-admin { color: #ffc107 !important; font-weight: 800; border-left: 4px solid #ffc107; background: rgba(255, 193, 7, 0.05); }
-
-        /* ✅ 4. NAVBAR */
-        .navbar { padding: 0 !important; background: #fff; border-bottom: 2px solid #eee; height: 85px; }
+        /* ✅ 3. NAVBAR & SIDE MENU */
+        .navbar { padding: 0 !important; background: #fff; border-bottom: 2px solid #eee; height: 85px; overflow: hidden; }
         .nav-split-container { display: flex; width: 100%; height: 100%; align-items: center; }
-        .logo-area { background: #fff; padding: 0 20px; height: 100%; display: flex; align-items: center; }
+        .logo-area { background: #fff; padding: 0 20px; height: 100%; display: flex; align-items: center; flex-shrink: 0; }
         .brand-logo-img { height: 60px; width: auto; margin-right: 12px; }
 
-        /* ✅ 5. CONTACT BUTTONS */
+        .offcanvas { background-color: #000; color: white; width: 300px !important; }
+        .nav-link-custom { color: rgba(255,255,255,0.8); font-size: 1rem; padding: 15px 25px; border-bottom: 1px solid #222; display: block; text-decoration: none; transition: 0.3s; }
+        .nav-link-custom:hover { background: #111; color: var(--luxury-blue); padding-left: 30px; }
+        .nav-link-admin { color: #ffc107 !important; font-weight: bold; border-left: 4px solid #ffc107; }
+
+        /* ✅ 4. UPDATED FLOATING CONTACT BUTTONS */
         .floating-contact-wrap { position: fixed; right: 0; top: 65%; transform: translateY(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .side-btn { display: flex; align-items: center; padding: 12px 18px; color: white; text-decoration: none; border-radius: 40px 0 0 40px; font-weight: 800; font-size: 0.9rem; transition: 0.4s; position: relative; right: -115px; width: 160px; box-shadow: -5px 5px 15px rgba(0,0,0,0.2); }
+        .side-btn { display: flex; align-items: center; padding: 12px 18px; color: white; text-decoration: none; border-radius: 40px 0 0 40px; font-weight: 800; font-size: 0.9rem; transition: all 0.4s; position: relative; right: -115px; width: 160px; box-shadow: -5px 5px 15px rgba(0,0,0,0.2); }
         .side-btn:hover { right: 0; color: white; }
         .btn-wa { background: #25d366; } .btn-call { background: #007bff; }
+        @media (max-width: 768px) { .side-btn { width: 145px; right: -105px; } }
+
+        /* ✅ 5. FOOTER STYLING */
+        footer { background: #0a0a0a; color: white; padding: 60px 0 30px; text-align: center; }
+        .footer-logo { height: 75px; width: auto; margin-bottom: 15px; }
+        .footer-link { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem; transition: 0.3s; }
+        .footer-link:hover { color: var(--hologram-gold); }
+        .footer-dot { color: rgba(255,255,255,0.2); margin: 0 10px; }
     </style>
 </head>
 <body>
@@ -97,24 +102,33 @@
     <main>{% block content %}{% endblock %}</main>
 
     <div class="floating-contact-wrap">
-        <a href="https://wa.me/918830024994" class="side-btn btn-wa" target="_blank"><i class="bi bi-whatsapp"></i> WhatsApp</a>
-        <a href="tel:+918830024994" class="side-btn btn-call"><i class="bi bi-telephone-fill"></i> Call Now</a>
+        <a href="https://wa.me/918830024994?text=Hi%20MoreVistas,%20I'm%20interested%20in%20booking%20a%20villa." class="side-btn btn-wa" target="_blank">
+            <i class="bi bi-whatsapp"></i> WhatsApp
+        </a>
+        <a href="tel:+918830024994" class="side-btn btn-call">
+            <i class="bi bi-telephone-fill"></i> Call Now
+        </a>
     </div>
 
-    <footer style="background: #0a0a0a; color: white; padding: 60px 0 30px; text-align: center;">
+    <footer>
         <div class="container">
-            <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" style="height: 75px; margin-bottom: 15px;">
+            <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" class="footer-logo">
             <div class="mb-4">
                 <span class="hologram-3d-text" style="font-size: 1.8rem;">MoreVistas</span>
                 <span class="hologram-subtext" style="font-size: 0.6rem; letter-spacing: 5px; display: block;">LUXURY VILLAS</span>
+            </div>
+            <div class="d-flex justify-content-center align-items-center flex-wrap mb-4">
+                <a href="/legal" class="footer-link">Terms & Conditions</a>
+                <span class="footer-dot">•</span>
+                <a href="/legal" class="footer-link">Privacy Policy</a>
+                <span class="footer-dot">•</span>
+                <a href="/contact" class="footer-link">Contact Us</a>
             </div>
             <p class="small opacity-50 mt-4">© 2026 MOREVISTAS LUXURY VILLAS. ALL RIGHTS RESERVED.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    
     <script>
         window.addEventListener("load", function() {
             setTimeout(() => {
