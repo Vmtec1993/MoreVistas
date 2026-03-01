@@ -58,7 +58,7 @@ def get_rows(target_sheet):
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
-            # --- Price & Discount Logic ---
+            # --- Price & Discount Logic (Maintaining your original style) ---
             try:
                 p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
@@ -82,7 +82,6 @@ def get_rows(target_sheet):
                 item['Rules_List'] = ["ID Proof Required", "Standard Rules Apply"]
 
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
-            # Calendar ke liye Sold_Dates ko clean rakhein
             item['Sold_Dates'] = str(item.get('Sold_Dates', '')).strip()
             final_list.append(item)
         return final_list
@@ -110,6 +109,33 @@ def villa_details(villa_id):
     villas = get_rows(sheet)
     villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
+
+    # --- ⚡ SMART DYNAMIC PRICING LOGIC (ADDED HERE) ---
+    try:
+        today_day = datetime.now().weekday() # 0=Mon, 4=Fri, 5=Sat, 6=Sun
+        
+        # Clean prices for logic
+        weekday = str(villa.get('Weekday_Price', '0')).replace(',', '').replace('₹', '').strip()
+        weekend = str(villa.get('Weekend_Price', '0')).replace(',', '').replace('₹', '').strip()
+        base = str(villa.get('Price', '0')).replace(',', '').replace('₹', '').strip()
+        original = str(villa.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
+
+        # Switch logic: Fri-Sun = Weekend
+        if today_day >= 4:
+            current_p = weekend if (weekend and weekend != '0') else base
+        else:
+            current_p = weekday if (weekday and weekday != '0') else base
+
+        villa['current_display_price'] = int(float(current_p))
+        orig_val = int(float(original)) if (original and original != '0') else 0
+        
+        # Calculate cute saving amount
+        villa['amount_saved'] = orig_val - villa['current_display_price'] if orig_val > villa['current_display_price'] else 0
+    except:
+        villa['current_display_price'] = villa.get('Price', 0)
+        villa['amount_saved'] = 0
+    # ------------------------------------------------
+
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not imgs: imgs = [villa.get('Image_URL')]
     return render_template('villa_details.html', villa=villa, villa_images=imgs)
@@ -147,7 +173,7 @@ def admin_login():
 def admin_dashboard():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
     villas = get_rows(sheet)
-    enquiries = get_rows(enquiry_sheet)[-10:] # Last 10 enquiries
+    enquiries = get_rows(enquiry_sheet)[-10:] 
     settings = {}
     if settings_sheet:
         try:
@@ -171,8 +197,6 @@ def update_settings():
         show = "TRUE" if request.form.get('banner_show') else "FALSE"
         settings_sheet.update('B3', show)
     return redirect(url_for('admin_dashboard'))
-
-# --- NAYE UPDATE ROUTES (FIXED) ---
 
 @app.route('/update-offline-dates', methods=['POST'])
 def update_offline_dates():
@@ -230,8 +254,7 @@ def legal(): return render_template('legal.html')
 @app.route('/list-property')
 def list_property(): return render_template('list_property.html')
 
-# --- FINAL EXECUTION BLOCK (FIXED) ---
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-            
+                              
