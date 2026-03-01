@@ -42,6 +42,11 @@
     
     .highlight-card { border: none; transition: 0.3s; background: #f8f9fa; border-radius: 20px; }
     .highlight-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    
+    /* Pricing Badges */
+    .price-badge { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
+    .badge-weekend { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+    .badge-weekday { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
 </style>
 
 <div class="container mt-4 text-center">
@@ -63,6 +68,12 @@
                     <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(0.7) blur(1px);{% endif %}">
                     
                     <div class="card-body p-4 text-start">
+                        {% if villa.is_weekend_today %}
+                            <span class="price-badge badge-weekend"><i class="bi bi-calendar-event-fill"></i> Weekend Rate</span>
+                        {% else %}
+                            <span class="price-badge badge-weekday"><i class="bi bi-lightning-fill"></i> Weekday Special</span>
+                        {% endif %}
+                        <br>
                         <span class="villa-title-main text-uppercase">{{ villa.Villa_Name }}</span>
                         
                         <div class="mt-2 mb-3">
@@ -70,9 +81,7 @@
                                 <div class="d-flex align-items-center mb-1">
                                     {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
                                     <span class="price-cut">₹{{ villa.Original_Price }}</span>
-                                    <span class="off-tag">
-                                        {{ (((villa.Original_Price|int - villa.Price|int) / villa.Original_Price|int) * 100)|int }}% OFF
-                                    </span>
+                                    <span class="off-tag">{{ villa.discount_perc }}% OFF</span>
                                     {% endif %}
                                 </div>
                                 <div class="d-flex align-items-baseline">
