@@ -15,6 +15,10 @@
     .modal-xl { max-width: 90% !important; }
     .section-label { font-size: 0.7rem; font-weight: 800; color: #0d6efd; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; }
     .calendar-input { background-color: #fff9f9 !important; border: 1px solid #ffc1c1 !important; cursor: pointer; }
+    
+    /* ✨ New Switch Button Style */
+    .btn-switch { font-size: 0.7rem; padding: 2px 10px; border-radius: 50px; border: 1px solid #dee2e6; background: white; transition: 0.3s; }
+    .btn-switch:hover { background: #f0f0f0; }
 </style>
 
 <nav class="admin-nav mb-4">
@@ -33,15 +37,15 @@
         <form action="/update-settings" method="POST" class="row g-3 align-items-end">
             <div class="col-md-5">
                 <label class="small fw-bold text-muted mb-2">Banner Image URL</label>
-                <input type="text" name="banner_url" class="form-control form-control-pill" value="{{ settings.get('Banner_URL', '') if settings else '' }}">
+                <input type="text" name="banner_url" class="form-control form-control-pill" value="{{ settings.get('Banner_URL', '') }}">
             </div>
             <div class="col-md-3">
                 <label class="small fw-bold text-muted mb-2">Offer Badge Text</label>
-                <input type="text" name="offer_text" class="form-control form-control-pill" value="{{ settings.get('Offer_Text', '') if settings else '' }}">
+                <input type="text" name="offer_text" class="form-control form-control-pill" value="{{ settings.get('Offer_Text', '') }}">
             </div>
             <div class="col-md-2">
                 <div class="form-check form-switch mb-2">
-                    <input class="form-check-input" type="checkbox" name="banner_show" id="bannerShow" {% if settings and settings.get('Banner_Show') == 'TRUE' %}checked{% endif %}>
+                    <input class="form-check-input" type="checkbox" name="banner_show" id="bannerShow" {% if settings.get('Banner_Show') == 'TRUE' %}checked{% endif %}>
                     <label class="form-check-label small fw-bold" for="bannerShow">Show Banner</label>
                 </div>
             </div>
@@ -58,7 +62,8 @@
                 <thead>
                     <tr>
                         <th>Villa Name</th>
-                        <th>Status</th>
+                        <th>Current Status</th>
+                        <th>Quick Action</th>
                         <th>Management</th>
                     </tr>
                 </thead>
@@ -72,6 +77,15 @@
                             {% else %}
                                 <span class="badge bg-available status-badge">Available</span>
                             {% endif %}
+                        </td>
+                        <td>
+                            <form action="/quick-status-update" method="POST" style="display:inline;">
+                                <input type="hidden" name="Villa_ID" value="{{ villa.get('Villa_ID') }}">
+                                <input type="hidden" name="current_status" value="{{ villa.get('Status') }}">
+                                <button type="submit" class="btn-switch fw-bold">
+                                    <i class="bi bi-arrow-left-right text-primary me-1"></i> Switch
+                                </button>
+                            </form>
                         </td>
                         <td>
                             <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#editModal{{ villa.get('Villa_ID') }}">
@@ -96,7 +110,7 @@
                                             <div class="col-md-8">
                                                 <label class="small fw-bold">Select Dates (Already Booked):</label>
                                                 <input type="text" name="Sold_Dates" class="form-control form-control-pill calendar-input multi-picker" 
-                                                       placeholder="Select dates..." value="{{ villa.get('Sold_Dates', '') }}">
+                                                       placeholder="Pick dates for auto sold out..." value="{{ villa.get('Sold_Dates', '') }}">
                                             </div>
                                             <div class="col-md-4">
                                                 <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold py-2 shadow-sm">Update Sold Dates</button>
@@ -113,20 +127,17 @@
                                                 <label class="small fw-bold">Villa Name</label>
                                                 <input type="text" name="Villa_Name" class="form-control form-control-pill" value="{{ villa.get('Villa_Name') }}">
                                             </div>
-                                            <div class="col-md-2">
+                                            <div class="col-md-3">
                                                 <label class="small fw-bold">BHK</label>
                                                 <input type="text" name="BHK" class="form-control form-control-pill" value="{{ villa.get('BHK') }}">
                                             </div>
-                                            <div class="col-md-2">
-                                                <label class="small fw-bold">Status</label>
-                                                <select name="Status" class="form-select form-control-pill">
-                                                    <option value="Available" {% if villa.get('Status') == 'Available' %}selected{% endif %}>Available</option>
-                                                    <option value="Sold Out" {% if villa.get('Status') == 'Sold Out' %}selected{% endif %}>Sold Out</option>
-                                                </select>
+                                            <div class="col-md-3">
+                                                <label class="small fw-bold text-primary">Guests (Max Capacity)</label>
+                                                <input type="text" name="Guests" class="form-control form-control-pill" value="{{ villa.get('Guests', '') }}">
                                             </div>
                                         </div>
 
-                                        <span class="section-label">2. Pricing</span>
+                                        <span class="section-label">2. Pricing (Keep empty for "Price on Request")</span>
                                         <div class="row g-3">
                                             <div class="col-md-4">
                                                 <label class="small fw-bold">Original Price</label>
@@ -142,7 +153,7 @@
                                             </div>
                                         </div>
 
-                                        <span class="section-label">3. Content (Use | to separate rules)</span>
+                                        <span class="section-label">3. Content</span>
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="small fw-bold">Amenities</label>
@@ -173,41 +184,4 @@
         <div class="table-responsive">
             <table class="table">
                 <thead class="bg-light">
-                    <tr>
-                        <th>Date</th>
-                        <th>Customer</th>
-                        <th>Phone</th>
-                        <th>Villa</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in enquiries %}
-                    <tr>
-                        <td class="small text-muted">{{ row.get('Date', 'N/A') }}</td>
-                        <td><span class="fw-bold">{{ row.get('Name', 'Unknown') }}</span></td>
-                        <td>
-                            <a href="https://wa.me/{{ row.get('Phone', '')|replace(' ', '')|replace('+', '') }}" target="_blank" class="btn btn-sm btn-light rounded-pill px-3">
-                                <i class="bi bi-whatsapp text-success me-1"></i> {{ row.get('Phone', 'No Phone') }}
-                            </a>
-                        </td>
-                        <td class="small fw-bold text-primary">{{ row.get('villa_name') or row.get('Villa Name') or 'N/A' }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        flatpickr(".multi-picker", {
-            mode: "multiple",
-            dateFormat: "Y-m-d",
-            conjunction: ", ",
-            minDate: "today"
-        });
-    });
-</script>
-{% endblock %}
+    
