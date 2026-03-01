@@ -34,17 +34,11 @@
     .animate-pulse { animation: pulse-red 2s infinite; }
     @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     .villa-title-main { background: linear-gradient(45deg, #ff416c, #ff4b2b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 850; font-size: 1.3rem; }
-    .price-cut { text-decoration: line-through; color: #6c757d; font-size: 0.9rem; margin-right: 5px; }
+    .price-cut { text-decoration: line-through; color: #6c757d; font-size: 0.9rem; margin-right: 8px; }
     .off-tag { background: #28a745; color: white; font-size: 0.75rem; padding: 2px 10px; border-radius: 5px; font-weight: bold; }
-    .sold-out-overlay { position: absolute; top: 15px; left: 15px; background: rgba(220, 53, 69, 0.9); color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; z-index: 5; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    .sold-out-overlay { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: bold; z-index: 5; border: 1px solid rgba(255,255,255,0.3); }
     .highlight-card { border: none; transition: 0.3s; background: #f8f9fa; border-radius: 20px; }
     .highlight-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    .price-badge { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
-    .badge-weekend { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
-    .badge-weekday { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
-
-    /* NAYA: Rules Badge Styling */
-    .rule-pill { font-size: 0.65rem; background: #f1f3f5; color: #495057; border-radius: 50px; padding: 2px 10px; border: 1px solid #dee2e6; }
 </style>
 
 <div class="container mt-4 text-center">
@@ -63,15 +57,9 @@
                     <div class="sold-out-overlay text-uppercase">🚫 Sold Out</div>
                     {% endif %}
 
-                    <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(0.7) blur(1px);{% endif %}">
+                    <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(0.8);{% endif %}">
                     
                     <div class="card-body p-4 text-start">
-                        {% if villa.is_weekend_today %}
-                            <span class="price-badge badge-weekend"><i class="bi bi-calendar-event-fill"></i> Weekend Rate</span>
-                        {% else %}
-                            <span class="price-badge badge-weekday"><i class="bi bi-lightning-fill"></i> Weekday Special</span>
-                        {% endif %}
-                        <br>
                         <span class="villa-title-main text-uppercase">{{ villa.Villa_Name }}</span>
                         
                         <div class="mt-2 mb-3">
@@ -79,7 +67,9 @@
                                 <div class="d-flex align-items-center mb-1">
                                     {% if villa.Original_Price and villa.Original_Price|int > villa.Price|int %}
                                     <span class="price-cut">₹{{ villa.Original_Price }}</span>
-                                    <span class="off-tag">{{ villa.discount_perc }}% OFF</span>
+                                    <span class="off-tag">
+                                        {{ villa.discount_perc }}% OFF
+                                    </span>
                                     {% endif %}
                                 </div>
                                 <div class="d-flex align-items-baseline">
@@ -87,7 +77,7 @@
                                     <small class="text-muted ms-1">/night</small>
                                 </div>
                             {% else %}
-                                <span class="fs-5 fw-bold text-primary">Price on Request</span>
+                                <span class="fs-5 fw-bold text-info">Price on Request</span>
                             {% endif %}
                         </div>
 
@@ -96,25 +86,10 @@
                             <span><i class="bi bi-door-open me-1"></i> {{ villa.BHK }} BHK</span>
                         </div>
 
-                        <div class="mb-3">
-                            <div class="d-flex flex-wrap gap-1">
-                                {% if villa.Rules_List %}
-                                    {% for rule in villa.Rules_List[:3] %}
-                                        <span class="rule-pill text-truncate" style="max-width: 100px;">
-                                            <i class="bi bi-dot"></i> {{ rule }}
-                                        </span>
-                                    {% endfor %}
-                                    {% if villa.Rules_List|length > 3 %}
-                                        <span class="small text-muted">+{{ villa.Rules_List|length - 3 }} more</span>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                        </div>
-
                         {% if villa.Status|lower == 'sold out' %}
-                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-outline-secondary w-100 rounded-pill fw-bold">Check Future Dates</a>
+                        <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Fully Booked</button>
                         {% else %}
-                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm">View Details</a>
+                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-outline-primary w-100 rounded-pill fw-bold">View Details</a>
                         {% endif %}
                     </div>
                 </div>
@@ -128,6 +103,57 @@
     </div>
 </div>
 
+<div class="container mt-5 py-5">
+    <div class="bg-light rounded-5 p-4 p-md-5 shadow-sm border">
+        <h3 class="fw-bold mb-5 text-center">Why Stay With <span class="text-primary">MoreVistas?</span></h3>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-4 highlight-card h-100">
+                    <i class="bi bi-shield-check-fill fs-1 text-primary"></i>
+                    <h5 class="fw-bold mt-3">Verified Properties</h5>
+                    <p class="small text-muted mb-0">Every villa is hand-picked and personally verified for your comfort.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 highlight-card h-100">
+                    <i class="bi bi-cash-stack fs-1 text-success"></i>
+                    <h5 class="fw-bold mt-3">Owner Direct Pricing</h5>
+                    <p class="small text-muted mb-0">No hidden fees or commissions. Get the lowest rates guaranteed.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 highlight-card h-100">
+                    <i class="bi bi-geo-alt-fill fs-1 text-danger"></i>
+                    <h5 class="fw-bold mt-3">Local Support</h5>
+                    <p class="small text-muted mb-0">Our team is on-ground in Lonavala to assist you 24/7 during your stay.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <h3 class="fw-bold mb-4 text-center">Popular Near You 🌄</h3>
+    <div class="row g-3">
+        {% if tourist_places %}
+            {% for place in tourist_places %}
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden text-center h-100">
+                    <img src="{{ place.Image_URL }}" class="card-img-top" style="height:120px; object-fit:cover;">
+                    <div class="p-2 text-truncate">
+                        <h6 class="fw-bold mb-0" style="font-size: 0.8rem;">{{ place.Place_Name }}</h6>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-4">
+                <div class="text-muted">Lonavala attractions loading...</div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
 <script>
     async function getLonavalaWeather() {
         try {
@@ -136,7 +162,7 @@
             document.getElementById('temp').innerText = Math.round(data.main.temp);
             document.getElementById('weather-desc').innerText = data.weather[0].description;
             const iconCode = data.weather[0].icon;
-            document.getElementById('weather-icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${iconCode}.png" width="40" style="margin-top:-5px;">`;
+            document.getElementById('weather-icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${iconCode}.png" width="40">`;
         } catch (e) { 
             console.log("Weather error"); 
             document.getElementById('temp').innerText = "28"; 
