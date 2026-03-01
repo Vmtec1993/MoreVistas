@@ -54,19 +54,37 @@ def get_rows(target_sheet):
         if not data or len(data) < 1: return []
         headers = [h.strip() for h in data[0]]
         final_list = []
+        
+        # --- WEEKEND CHECK LOGIC ---
+        # 4 = Friday, 5 = Saturday, 6 = Sunday
+        is_weekend = datetime.now().weekday() in [4, 5, 6]
+        
         for row in data[1:]:
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
-            # --- Price & Discount Logic ---
+            # --- Price & Dynamic Logic ---
             try:
-                p_val = str(item.get('Price', '0')).replace(',', '').replace('₹', '').strip()
+                # Basic cleanup
+                p_weekday = str(item.get('Weekday_Price', item.get('Price', '0'))).replace(',', '').replace('₹', '').strip()
+                p_weekend = str(item.get('Weekend_Price', item.get('Price', '0'))).replace(',', '').replace('₹', '').strip()
                 op_val = str(item.get('Original_Price', '0')).replace(',', '').replace('₹', '').strip()
-                current = int(float(p_val)) if p_val and p_val.lower() != 'nan' else 0
+                
+                weekday_amt = int(float(p_weekday)) if p_weekday and p_weekday.lower() != 'nan' else 0
+                weekend_amt = int(float(p_weekend)) if p_weekend and p_weekend.lower() != 'nan' else 0
                 original = int(float(op_val)) if op_val and op_val.lower() != 'nan' else 0
-                item['Price'] = current
+                
+                # Dynamic Assignment: Aaj ke din ke hisaab se price set karna
+                current_price = weekend_amt if is_weekend else weekday_amt
+                
+                item['Price'] = current_price
+                item['Weekday_Price'] = weekday_amt
+                item['Weekend_Price'] = weekend_amt
                 item['Original_Price'] = original
-                item['discount_perc'] = int(((original - current) / original) * 100) if original > current > 0 else 0
+                item['is_weekend_today'] = is_weekend
+                
+                # Discount Logic on current price
+                item['discount_perc'] = int(((original - current_price) / original) * 100) if original > current_price > 0 else 0
             except:
                 item['discount_perc'] = 0
 
@@ -107,7 +125,8 @@ def index():
             for r in s_data:
                 if len(r) >= 2: settings[r[0].strip()] = r[1].strip()
         except: pass
-    return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
+    # current_time pass kar rahe hain HTML filters ke liye
+    return render_template('index.html', villas=villas, tourist_places=places, settings=settings, now=datetime.now())
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
@@ -115,15 +134,13 @@ def villa_details(villa_id):
     villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
     
-    # --- CUSTOMER CALENDAR LOGIC ---
     raw_dates = str(villa.get('Sold_Dates', '')).strip()
-    # String "2026-03-01, 2026-03-05" ko list mein badalna
     booked_dates_list = [d.strip() for d in raw_dates.split(',') if d.strip()]
     
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not imgs: imgs = [villa.get('Image_URL')]
     
-    return render_template('villa_details.html', villa=villa, villa_images=imgs, booked_dates=booked_dates_list)
+    return render_template('villa_details.html', villa=villa, villa_images=imgs, booked_dates=booked_dates_list, now=datetime.now())
 
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
@@ -131,8 +148,6 @@ def enquiry(villa_id):
     villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     if request.method == 'POST':
         name = request.form.get('name')
-        
-        # PHONE FIX: Country code logic
         raw_phone = str(request.form.get('phone', '')).strip()
         if len(raw_phone) == 10 and not raw_phone.startswith('+'):
             phone = f"+91 {raw_phone}"
@@ -156,26 +171,6 @@ def enquiry(villa_id):
         requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
         return render_template('success.html', name=name)
     return render_template('enquiry.html', villa=villa)
-
-@app.route('/update-offline-dates', methods=['POST'])
-def update_offline_dates():
-    if not session.get('logged_in'): return redirect(url_for('admin_login'))
-    if sheet:
-        try:
-            villa_id = request.form.get('Villa_ID')
-            dates = request.form.get('Sold_Dates')
-            data = sheet.get_all_values()
-            headers = [h.strip() for h in data[0]]
-            id_idx = headers.index('Villa_ID') if 'Villa_ID' in headers else 0
-            date_col_idx = headers.index('Sold_Dates') + 1 if 'Sold_Dates' in headers else -1
-            if date_col_idx != -1:
-                for i, row in enumerate(data[1:], start=2):
-                    if str(row[id_idx]).strip() == str(villa_id).strip():
-                        sheet.update_cell(i, date_col_idx, dates)
-                        break
-            return redirect(url_for('admin_dashboard'))
-        except Exception as e: return f"Error: {e}", 500
-    return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
