@@ -11,11 +11,18 @@
     <link rel="icon" type="image/png" href="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
     <style>
         :root { --luxury-blue: #00b4d8; --hologram-gold: #e0b15c; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; overflow-x: hidden; }
+        
+        /* ✨ UPDATED: Poori site par modern font apply kiya */
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif !important; 
+            background-color: #fcfcfc; 
+            overflow-x: hidden; 
+        }
 
         /* ✅ 1. ORIGINAL LOADER */
         #loader-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s ease; }
@@ -53,92 +60,5 @@
     </style>
 </head>
 <body>
-
-    <div id="loader-wrapper">
-        <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" class="loader-logo" alt="MoreVistas Logo">
-        <div class="text-white mt-4" style="letter-spacing: 5px; font-size: 0.65rem; opacity: 0.6;">LOADING LUXURY...</div>
-    </div>
-
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="sideMenu">
-        <div class="offcanvas-header border-bottom border-secondary">
-            <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" style="height: 50px;">
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body p-0">
-            <a href="/" class="nav-link-custom"><i class="bi bi-house-door me-3"></i>Home</a>
-            
-            {% if session.get('logged_in') %}
-                <a href="/admin" class="nav-link-custom nav-link-admin"><i class="bi bi-speedometer2 me-3"></i>Admin Dashboard</a>
-                <a href="/admin-logout" class="nav-link-custom text-danger"><i class="bi bi-box-arrow-right me-3"></i>Logout</a>
-            {% endif %}
-
-            <a href="/explore" class="nav-link-custom"><i class="bi bi-geo-alt me-3"></i>Tourist Points</a>
-            <a href="/list-property" class="nav-link-custom"><i class="bi bi-building-up me-3"></i>List Your Property</a>
-            <a href="/contact" class="nav-link-custom"><i class="bi bi-telephone me-3"></i>Contact Us</a>
-            <a href="/legal" class="nav-link-custom"><i class="bi bi-shield-check me-3"></i>Privacy Policy</a>
-        </div>
-    </div>
-
-    <nav class="navbar sticky-top shadow-sm">
-        <div class="nav-split-container">
-            <div class="logo-area">
-                <button class="btn btn-light border rounded-circle me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
-                    <i class="bi bi-list fs-4"></i>
-                </button>
-                <a href="/" class="d-flex align-items-center text-decoration-none">
-                    <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" class="brand-logo-img">
-                    <div class="d-flex flex-column">
-                        <span class="hologram-3d-text">MoreVistas</span>
-                        <span class="hologram-subtext">LUXURY REIMAGINED</span>
-                    </div>
-                </a>
-            </div>
-            <div style="flex-grow:1; text-align:right; padding-right:25px;">
-                <a href="tel:+918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold shadow-sm d-none d-md-inline-block">CALL NOW</a>
-            </div>
-        </div>
-    </nav>
-
-    <main>{% block content %}{% endblock %}</main>
-
-    <div class="floating-contact-wrap">
-        <a href="https://wa.me/918830024994?text=Hi%20MoreVistas,%20I'm%20interested%20in%20booking%20a%20villa." class="side-btn btn-wa" target="_blank">
-            <i class="bi bi-whatsapp"></i> WhatsApp
-        </a>
-        <a href="tel:+918830024994" class="side-btn btn-call">
-            <i class="bi bi-telephone-fill"></i> Call Now
-        </a>
-    </div>
-
-    <footer>
-        <div class="container">
-            <img src="https://i.postimg.cc/kXM8p6YV/1000190675-removebg-preview.png" class="footer-logo">
-            <div class="mb-4">
-                <span class="hologram-3d-text" style="font-size: 1.8rem;">MoreVistas</span>
-                <span class="hologram-subtext" style="font-size: 0.6rem; letter-spacing: 5px; display: block;">LUXURY VILLAS</span>
-            </div>
-            <div class="d-flex justify-content-center align-items-center flex-wrap mb-4">
-                <a href="/legal" class="footer-link">Terms & Conditions</a>
-                <span class="footer-dot">•</span>
-                <a href="/legal" class="footer-link">Privacy Policy</a>
-                <span class="footer-dot">•</span>
-                <a href="/contact" class="footer-link">Contact Us</a>
-            </div>
-            <p class="small opacity-50 mt-4">© 2026 MOREVISTAS LUXURY VILLAS. ALL RIGHTS RESERVED.</p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        window.addEventListener("load", function() {
-            setTimeout(() => {
-                const loader = document.getElementById("loader-wrapper");
-                if (loader) {
-                    loader.style.opacity = "0";
-                    setTimeout(() => { loader.style.display = "none"; }, 600);
-                }
-            }, 1000);
-        });
-    </script>
-</body>
-</html>
+    ...
+    
