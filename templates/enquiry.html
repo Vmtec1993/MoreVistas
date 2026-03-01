@@ -3,6 +3,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
     .flatpickr-calendar { border-radius: 15px !important; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
+    /* Input group styling for +91 lock */
+    .input-group-text { border-right: none; background: #f8f9fa; color: #495057; font-weight: bold; border-radius: 50px 0 0 50px !important; }
+    .phone-input { border-left: none !important; border-radius: 0 50px 50px 0 !important; }
 </style>
 
 <div class="container py-4">
@@ -22,14 +25,23 @@
                     
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-secondary">Phone Number</label>
-                        <input type="tel" name="phone" class="form-control rounded-pill px-4 border-light-subtle shadow-sm" placeholder="Enter mobile number" required>
+                        <div class="input-group shadow-sm rounded-pill">
+                            <span class="input-group-text px-3 border-light-subtle">+91</span>
+                            <input type="tel" name="phone" class="form-control phone-input px-3 border-light-subtle" 
+                                   placeholder="10 Digit Number" 
+                                   pattern="[0-9]{10}" 
+                                   maxlength="10" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '');" 
+                                   required>
+                        </div>
+                        <small class="text-muted ms-2" style="font-size: 0.7rem;">Enter only 10 digits without spaces.</small>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-secondary">Select Stay Dates (Check-in to Check-out)</label>
+                        <label class="form-label small fw-bold text-secondary">Select Stay Dates</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white border-light-subtle rounded-start-pill px-3"><i class="bi bi-calendar-range text-primary"></i></span>
-                            <input type="text" name="stay_dates" id="stay_dates" class="form-control rounded-end-pill px-4 border-light-subtle shadow-sm" placeholder="Click to select dates" required>
+                            <input type="text" name="stay_dates" id="stay_dates" class="form-control rounded-end-pill px-4 border-light-subtle shadow-sm" placeholder="Click to select dates" readonly required>
                         </div>
                     </div>
 
@@ -57,14 +69,23 @@
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    flatpickr("#stay_dates", {
-        mode: "range",
-        minDate: "today",
-        dateFormat: "d-m-Y",
-        showMonths: 1,
-        onClose: function(selectedDates, dateStr, instance) {
-            console.log("Selected Range: " + dateStr);
-        }
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr("#stay_dates", {
+            mode: "range",
+            minDate: "today",
+            dateFormat: "d-m-Y",
+            showMonths: 1,
+            static: true, // Mobile friendly position
+            disableMobile: "true", // Custom UI everywhere
+            inline: false, // ✅ Ensure it stays closed until clicked
+            // Formatting output for the field
+            onClose: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length < 2) {
+                    instance.clear();
+                    alert("Please select both Check-in and Check-out dates.");
+                }
+            }
+        });
     });
 </script>
 {% endblock %}
