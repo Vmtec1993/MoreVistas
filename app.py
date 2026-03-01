@@ -218,6 +218,9 @@ def admin_logout():
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
+    # Render PORT environment variable deta hai, agar nahi mile toh default 5000
     port = int(os.environ.get("PORT", 5000))
+    # Host '0.0.0.0' hona zaroori hai Render ke liye
     app.run(host='0.0.0.0', port=port)
+
     
