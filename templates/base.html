@@ -21,6 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
 
     <style>
         :root { --luxury-blue: #00b4d8; --hologram-gold: #e0b15c; }
@@ -57,7 +58,7 @@
         .nav-link-custom { color: rgba(255,255,255,0.8); font-size: 1rem; padding: 15px 25px; border-bottom: 1px solid #222; display: block; text-decoration: none; transition: 0.3s; }
         .nav-link-custom:hover { background: #111; color: var(--luxury-blue); padding-left: 30px; }
 
-        /* ✅ 4. NEW: SIDE-HIDE FLOATING CONTACT BUTTONS (Replaces old tab) */
+        /* ✅ 4. NEW: SIDE-HIDE FLOATING CONTACT BUTTONS */
         .floating-contact-wrap {
             position: fixed;
             right: 0;
@@ -80,38 +81,26 @@
             font-size: 0.9rem;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            right: -115px; /* Fully Hidden except Icon */
+            right: -115px; /* Hide except Icon */
             box-shadow: -5px 5px 15px rgba(0,0,0,0.2);
             width: 160px;
         }
 
-        /* Hover & Active States */
         .side-btn:hover, .side-btn:active {
-            right: 0; /* Slide In */
+            right: 0;
             color: white;
         }
 
-        .side-btn i {
-            font-size: 22px;
-            min-width: 30px;
-            margin-right: 10px;
-        }
-
+        .side-btn i { font-size: 22px; min-width: 30px; margin-right: 10px; }
         .btn-wa { background: #25d366; }
         .btn-call { background: #007bff; }
 
-        /* Mobile Optimization */
         @media (max-width: 768px) {
-            .floating-contact-wrap { top: 75%; } /* Lower for thumb reach */
-            .side-btn { 
-                padding: 10px 15px; 
-                width: 145px; 
-                right: -105px; 
-                font-size: 0.8rem;
-            }
+            .floating-contact-wrap { top: 75%; }
+            .side-btn { padding: 10px 15px; width: 145px; right: -105px; font-size: 0.8rem; }
         }
 
-        /* ✅ 5. FOOTER STYLING & LINKS */
+        /* ✅ 5. FOOTER STYLING */
         footer { background: #0a0a0a; color: white; padding: 60px 0 30px; text-align: center; }
         .footer-logo { height: 75px; width: auto; margin-bottom: 15px; }
         .footer-link { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem; transition: 0.3s; }
@@ -179,7 +168,6 @@
                 <span class="hologram-3d-text" style="font-size: 1.8rem;">MoreVistas</span>
                 <span class="hologram-subtext" style="font-size: 0.6rem; letter-spacing: 5px; display: block;">LUXURY VILLAS</span>
             </div>
-
             <div class="d-flex justify-content-center align-items-center flex-wrap mb-4">
                 <a href="/legal" class="footer-link">Terms & Conditions</a>
                 <span class="footer-dot">•</span>
@@ -187,7 +175,6 @@
                 <span class="footer-dot">•</span>
                 <a href="/contact" class="footer-link">Contact Us</a>
             </div>
-
             <p class="small opacity-50 mt-4">© 2026 MOREVISTAS LUXURY VILLAS. ALL RIGHTS RESERVED.</p>
         </div>
     </footer>
@@ -196,6 +183,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     
     <script>
+        // Loader logic
         window.addEventListener("load", function() {
             setTimeout(() => {
                 const loader = document.getElementById("loader-wrapper");
@@ -204,6 +192,19 @@
                     setTimeout(() => { loader.style.display = "none"; }, 600);
                 }
             }, 1000);
+        });
+
+        // ✅ Global Calendar Fix: Default mein close rahega
+        document.addEventListener('DOMContentLoaded', function() {
+            flatpickr(".datepicker", {
+                dateFormat: "d-m-Y",
+                minDate: "today",
+                inline: false, // Calendar tabhi khulega jab click karenge
+                static: true,
+                disableMobile: "true",
+                altInput: true,
+                altFormat: "F j, Y"
+            });
         });
     </script>
 </body>
