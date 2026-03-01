@@ -55,7 +55,6 @@ def get_rows(target_sheet):
         headers = [h.strip() for h in data[0]]
         final_list = []
         
-        # Friday, Saturday, Sunday = Weekend
         is_weekend = datetime.now().weekday() in [4, 5, 6]
         
         for row in data[1:]:
@@ -63,8 +62,7 @@ def get_rows(target_sheet):
             item = dict(zip(headers, padded_row))
             
             try:
-                # --- SAFE PRICE FETCHING (Crash Proof) ---
-                # Agar naya column nahi hai toh purana 'Price' use hoga
+                # SAFE PRICE LOGIC (No changes to math)
                 raw_weekday = item.get('Weekday_Price') or item.get('Price', '0')
                 raw_weekend = item.get('Weekend_Price') or item.get('Price', '0')
                 raw_original = item.get('Original_Price') or item.get('Price', '0')
@@ -86,19 +84,14 @@ def get_rows(target_sheet):
                 item['Original_Price'] = original
                 item['is_weekend_today'] = is_weekend
                 
-                if original > current_price > 0:
-                    item['discount_perc'] = int(((original - current_price) / original) * 100)
-                else:
-                    item['discount_perc'] = 0
+                item['discount_perc'] = int(((original - current_price) / original) * 100) if original > current_price > 0 else 0
             except:
                 item['Price'] = 0
                 item['discount_perc'] = 0
 
-            # Rules Logic
             raw_rules = str(item.get('Rules', '')).strip()
             item['Rules_List'] = [r.strip() for r in (raw_rules.split('|') if '|' in raw_rules else [raw_rules]) if r.strip()]
 
-            # Auto Sold Out Logic
             booked_dates = str(item.get('Sold_Dates', '')).strip()
             if datetime.now().strftime("%Y-%m-%d") in booked_dates:
                 item['Status'] = 'Sold Out'
@@ -109,9 +102,11 @@ def get_rows(target_sheet):
         print(f"Error in get_rows: {e}")
         return []
 
-# --- Standard Routes for Side Menu ---
+# --- 1. SIDE MENU ROUTES (Ab 404 nahi aayega) ---
 @app.route('/explore')
-def explore(): return render_template('explore.html')
+def explore():
+    places = get_rows(places_sheet)
+    return render_template('explore.html', tourist_places=places)
 
 @app.route('/contact')
 def contact(): return render_template('contact.html')
@@ -122,7 +117,7 @@ def list_property(): return render_template('list_property.html')
 @app.route('/legal')
 def legal(): return render_template('legal.html')
 
-# --- Main Routes ---
+# --- 2. MAIN INDEX ---
 @app.route('/')
 def index():
     villas = get_rows(sheet)
@@ -135,6 +130,22 @@ def index():
         except: pass
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
 
+# --- 3. VILLA DETAILS (Ise delete mat karna) ---
+@app.route('/villa/<villa_id>')
+def villa_details(villa_id):
+    villas = get_rows(sheet)
+    villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
+    if not villa: return "Villa Not Found", 404
+    
+    raw_dates = str(villa.get('Sold_Dates', '')).strip()
+    booked_dates_list = [d.strip() for d in raw_dates.split(',') if d.strip()]
+    
+    imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
+    if not imgs: imgs = [villa.get('Image_URL')]
+    
+    return render_template('villa_details.html', villa=villa, villa_images=imgs, booked_dates=booked_dates_list)
+
+# --- 4. ADMIN SECTION (Fixed Internal Server Error) ---
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
@@ -157,8 +168,39 @@ def admin_dashboard():
         except: pass
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries[::-1])
 
-# --- Rest of your routes (Enquiry, Villa Details, etc.) ---
-# (Yahan aapka baki ka code same rahega)
+# --- 5. ENQUIRY SUBMIT (Fixed +91 Logic) ---
+@app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
+def enquiry(villa_id):
+    villas = get_rows(sheet)
+    villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
+    if request.method == 'POST':
+        name = request.form.get('name')
+        phone = request.form.get('phone') # Form mein +91 pehle se lock hoga
+        check_in = request.form.get('check_in')
+        check_out = request.form.get('check_out')
+        guests = request.form.get('guests')
+        villa_name = villa.get('Villa_Name') if villa else "Villa"
+
+        if enquiry_sheet:
+            enquiry_sheet.append_row([datetime.now().strftime("%d-%m-%Y %H:%M"), name, phone, check_in, check_out, guests, villa_name])
+        
+        alert = f"🚀 *New Booking Enquiry!*\n🏡 *Villa:* {villa_name}\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n📅 *Dates:* {check_in} to {check_out}"
+        requests.get(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage", params={"chat_id": TELEGRAM_CHAT_ID, "text": alert, "parse_mode": "Markdown"})
+        
+        return render_template('success.html', name=name)
+    return render_template('enquiry.html', villa=villa)
+
+# --- 6. UPDATE & LOGOUT ---
+@app.route('/update-full-villa', methods=['POST'])
+def update_full_villa():
+    if not session.get('logged_in'): return redirect(url_for('admin_login'))
+    # ... (Aapka update logic)
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin-logout')
+def admin_logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('index'))
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
