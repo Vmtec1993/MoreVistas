@@ -54,16 +54,29 @@ def get_rows(target_sheet):
         if not data or len(data) < 1: return []
         headers = [h.strip() for h in data[0]]
         final_list = []
-        today_day = datetime.now().weekday() # 0=Mon, 6=Sun
+        
+        # --- ⚡ SMART DATES & TIME ---
+        today_day = datetime.now().weekday()
+        today_str = datetime.now().strftime("%Y-%m-%d") # Format for calendar matching
         
         for row in data[1:]:
             padded_row = row + [''] * (len(headers) - len(row))
             item = dict(zip(headers, padded_row))
             
-            # --- Price Cleaning Logic (FIXED) ---
+            # --- 1. Auto Sold Out Logic (Based on Calendar Dates) ---
+            sold_dates_str = str(item.get('Sold_Dates', '')).strip()
+            if today_str in sold_dates_str:
+                item['Status'] = 'Sold Out'
+
+            # --- 2. Price Cleaning (Empty instead of 0) ---
             def clean_p(key):
-                val = str(item.get(key, '0')).replace(',', '').replace('₹', '').strip()
-                return int(float(val)) if (val and val.lower() != 'nan') else 0
+                val = str(item.get(key, '')).replace(',', '').replace('₹', '').strip()
+                if not val or val.lower() == 'nan' or val == '0':
+                    return 0 # Backend calculation ke liye 0, HTML handles the display
+                try:
+                    return int(float(val))
+                except:
+                    return 0
 
             try:
                 item['Price'] = clean_p('Price')
@@ -71,21 +84,20 @@ def get_rows(target_sheet):
                 item['Weekday_Price'] = clean_p('Weekday_Price')
                 item['Weekend_Price'] = clean_p('Weekend_Price')
                 
-                # Dynamic Logic within get_rows for global use
+                # Dynamic Logic
                 if today_day >= 4: # Fri, Sat, Sun
                     item['current_display_price'] = item['Weekend_Price'] if item['Weekend_Price'] > 0 else item['Price']
-                else: # Mon-Thu
+                else:
                     item['current_display_price'] = item['Weekday_Price'] if item['Weekday_Price'] > 0 else item['Price']
                 
-                # Savings calculation
+                # Savings
                 p = item['current_display_price']
                 op = item['Original_Price']
                 item['amount_saved'] = op - p if op > p else 0
                 item['discount_perc'] = int(((op - p) / op) * 100) if op > p > 0 else 0
             except:
-                item['current_display_price'] = item.get('Price', 0)
+                item['current_display_price'] = 0
                 item['amount_saved'] = 0
-                item['discount_perc'] = 0
 
             # --- Rules Logic ---
             raw_rules = str(item.get('Rules', '')).strip()
@@ -100,7 +112,7 @@ def get_rows(target_sheet):
                 item['Rules_List'] = ["ID Proof Required", "Standard Rules Apply"]
 
             item['Villa_ID'] = str(item.get('Villa_ID', '')).strip()
-            item['Sold_Dates'] = str(item.get('Sold_Dates', '')).strip()
+            item['Sold_Dates'] = sold_dates_str
             final_list.append(item)
         return final_list
     except Exception as e:
@@ -113,9 +125,7 @@ def get_rows(target_sheet):
 def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
-    
-    # Original settings logic
-    settings = {'Offer_Text': "Welcome to MoreVistas Lonavala", 'Banner_URL': "https://i.postimg.cc/25hdTQF9/retouch-2026022511311072.jpg", 'Banner_Show': 'TRUE'}
+    settings = {'Offer_Text': "Welcome", 'Banner_URL': "", 'Banner_Show': 'FALSE'}
     if settings_sheet:
         try:
             s_data = settings_sheet.get_all_values()
@@ -126,15 +136,13 @@ def index():
 
 @app.route('/villa/<villa_id>')
 def villa_details(villa_id):
-    villas = get_rows(sheet) # get_rows is now smart enough
+    villas = get_rows(sheet)
     villa = next((v for v in villas if v.get('Villa_ID') == str(villa_id).strip()), None)
     if not villa: return "Villa Not Found", 404
-
     imgs = [villa.get(f'Image_URL_{i}') for i in range(1, 21) if villa.get(f'Image_URL_{i}')]
     if not imgs: imgs = [villa.get('Image_URL')]
     return render_template('villa_details.html', villa=villa, villa_images=imgs)
 
-# --- Rest of the routes (Enquiry, Admin, etc.) remain EXACTLY same as your code ---
 @app.route('/enquiry/<villa_id>', methods=['GET', 'POST'])
 def enquiry(villa_id):
     villas = get_rows(sheet)
@@ -161,14 +169,14 @@ def admin_login():
             session['logged_in'] = True
             return redirect(url_for('admin_dashboard'))
         else:
-            error = "Invalid Username or Password"
+            error = "Invalid Username"
     return render_template('admin_login.html', error=error)
 
 @app.route('/admin')
 def admin_dashboard():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
     villas = get_rows(sheet)
-    enquiries = get_rows(enquiry_sheet)[-10:] 
+    enquiries = get_rows(enquiry_sheet)[-10:] if enquiry_sheet else []
     settings = {}
     if settings_sheet:
         try:
@@ -214,16 +222,19 @@ def update_offline_dates():
 def update_full_villa():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
     v_id = request.form.get('Villa_ID')
+    
+    # --- Sabhi values strip karke lo ---
     updates = {
         'Villa_Name': request.form.get('Villa_Name'),
         'BHK': request.form.get('BHK'),
         'Status': request.form.get('Status'),
-        'Original_Price': request.form.get('Original_Price'),
-        'Weekday_Price': request.form.get('Weekday_Price'),
-        'Weekend_Price': request.form.get('Weekend_Price'),
+        'Original_Price': request.form.get('Original_Price', '').strip(),
+        'Weekday_Price': request.form.get('Weekday_Price', '').strip(),
+        'Weekend_Price': request.form.get('Weekend_Price', '').strip(),
         'Amenities': request.form.get('Amenities'),
         'Rules': request.form.get('Rules')
     }
+    
     if sheet:
         data = sheet.get_all_values()
         headers = data[0]
@@ -233,7 +244,26 @@ def update_full_villa():
                 for key, value in updates.items():
                     if key in headers:
                         col_idx = headers.index(key) + 1
-                        sheet.update_cell(i, col_idx, value)
+                        # ✨ AGAR EMPTY HAI TO SHEET ME EMPTY HI BHEJO
+                        sheet.update_cell(i, col_idx, value if value else "")
+                break
+    return redirect(url_for('admin_dashboard'))
+
+# --- QUICK STATUS UPDATE ROUTE ---
+@app.route('/quick-status-update', methods=['POST'])
+def quick_status_update():
+    if not session.get('logged_in'): return redirect(url_for('admin_login'))
+    v_id = request.form.get('Villa_ID')
+    curr = request.form.get('current_status')
+    new_status = "Sold Out" if curr.lower() == 'available' else "Available"
+    if sheet:
+        data = sheet.get_all_values()
+        headers = data[0]
+        id_idx = headers.index('Villa_ID')
+        st_idx = headers.index('Status')
+        for i, row in enumerate(data[1:], start=2):
+            if str(row[id_idx]).strip() == str(v_id).strip():
+                sheet.update_cell(i, st_idx + 1, new_status)
                 break
     return redirect(url_for('admin_dashboard'))
 
@@ -252,4 +282,4 @@ def list_property(): return render_template('list_property.html')
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-        
+                    
