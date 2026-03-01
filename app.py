@@ -255,6 +255,9 @@ def legal(): return render_template('legal.html')
 def list_property(): return render_template('list_property.html')
 
 if __name__ == '__main__':
+    # Render environment variable se port uthata hai, default 5000 rakhein
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    # Important: host='0.0.0.0' hona zaroori hai Render ke liye
+    app.run(host='0.0.0.0', port=port)
+
                               
