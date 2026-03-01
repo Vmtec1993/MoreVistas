@@ -57,9 +57,59 @@
         .nav-link-custom { color: rgba(255,255,255,0.8); font-size: 1rem; padding: 15px 25px; border-bottom: 1px solid #222; display: block; text-decoration: none; transition: 0.3s; }
         .nav-link-custom:hover { background: #111; color: var(--luxury-blue); padding-left: 30px; }
 
-        /* ✅ 4. WHATSAPP SIDE TAB */
-        .whatsapp-side-tab { position: fixed; right: -115px; bottom: 25%; z-index: 9999; background: #25d366; color: white; padding: 12px 18px; border-radius: 30px 0 0 30px; font-weight: bold; display: flex; align-items: center; text-decoration: none; transition: all 0.4s; box-shadow: -4px 4px 15px rgba(0,0,0,0.15); }
-        .whatsapp-side-tab:hover { right: 0; }
+        /* ✅ 4. NEW: SIDE-HIDE FLOATING CONTACT BUTTONS (Replaces old tab) */
+        .floating-contact-wrap {
+            position: fixed;
+            right: 0;
+            top: 65%;
+            transform: translateY(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .side-btn {
+            display: flex;
+            align-items: center;
+            padding: 12px 18px;
+            color: white;
+            text-decoration: none;
+            border-radius: 40px 0 0 40px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            right: -115px; /* Fully Hidden except Icon */
+            box-shadow: -5px 5px 15px rgba(0,0,0,0.2);
+            width: 160px;
+        }
+
+        /* Hover & Active States */
+        .side-btn:hover, .side-btn:active {
+            right: 0; /* Slide In */
+            color: white;
+        }
+
+        .side-btn i {
+            font-size: 22px;
+            min-width: 30px;
+            margin-right: 10px;
+        }
+
+        .btn-wa { background: #25d366; }
+        .btn-call { background: #007bff; }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .floating-contact-wrap { top: 75%; } /* Lower for thumb reach */
+            .side-btn { 
+                padding: 10px 15px; 
+                width: 145px; 
+                right: -105px; 
+                font-size: 0.8rem;
+            }
+        }
 
         /* ✅ 5. FOOTER STYLING & LINKS */
         footer { background: #0a0a0a; color: white; padding: 60px 0 30px; text-align: center; }
@@ -106,16 +156,21 @@
                 </a>
             </div>
             <div style="flex-grow:1; text-align:right; padding-right:25px;">
-                <a href="https://wa.me/918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold shadow-sm d-none d-md-inline-block">BOOK NOW</a>
+                <a href="tel:+918830024994" class="btn btn-info text-white rounded-pill px-4 fw-bold shadow-sm d-none d-md-inline-block">CALL NOW</a>
             </div>
         </div>
     </nav>
 
     <main>{% block content %}{% endblock %}</main>
 
-    <a href="https://wa.me/918830024994" class="whatsapp-side-tab">
-        <i class="bi bi-whatsapp"></i> Chat with Us
-    </a>
+    <div class="floating-contact-wrap">
+        <a href="https://wa.me/918830024994?text=Hi%20MoreVistas,%20I'm%20interested%20in%20booking%20a%20villa." class="side-btn btn-wa" target="_blank">
+            <i class="bi bi-whatsapp"></i> WhatsApp
+        </a>
+        <a href="tel:+918830024994" class="side-btn btn-call">
+            <i class="bi bi-telephone-fill"></i> Call Now
+        </a>
+    </div>
 
     <footer>
         <div class="container">
