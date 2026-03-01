@@ -239,9 +239,13 @@
                     <tr>
                         <td class="small text-muted">{{ row.get('Date', 'N/A') }}</td>
                         <td><span class="fw-bold">{{ row.get('Name', 'Unknown') }}</span></td>
-                        <td><a href="https://wa.me/91{{ row.get('Phone') }}" target="_blank" class="btn btn-sm btn-light rounded-pill px-2"><i class="bi bi-whatsapp text-success me-1"></i> {{ row.get('Phone') }}</a></td>
+                        <td>
+                            <a href="https://wa.me/{{ row.get('Phone')|replace(' ', '')|replace('+', '') }}" target="_blank" class="btn btn-sm btn-light rounded-pill px-2">
+                                <i class="bi bi-whatsapp text-success me-1"></i> {{ row.get('Phone') }}
+                            </a>
+                        </td>
                         <td><span class="badge bg-new status-badge">{{ row.get('Guests') }} Ppl</span></td>
-                        <td class="small fw-bold text-primary">{{ row.get('Villa_Name') }}</td>
+                        <td class="small fw-bold text-primary">{{ row.get('Message') }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -267,3 +271,4 @@
 </script>
 
 {% endblock %}
+    
