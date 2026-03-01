@@ -57,7 +57,7 @@ def get_rows(target_sheet):
             item = dict(zip(headers, padded_row))
             
             try:
-                # --- AAPKA ORIGINAL PRICE LOGIC ---
+                # --- AAPKA ORIGINAL PRICE LOGIC (Intact) ---
                 raw_weekday = item.get('Weekday_Price') or item.get('Price', '0')
                 raw_weekend = item.get('Weekend_Price') or item.get('Price', '0')
                 raw_original = item.get('Original_Price') or item.get('Price', '0')
@@ -116,15 +116,37 @@ def index():
         except: pass
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
 
+# ✅ VILLA DETAILS ROUTE (Missing tha, isliye button kaam nahi kar raha tha)
+@app.route('/villa/<villa_id>')
+def villa_details(villa_id):
+    villas = get_rows(sheet)
+    # ID matching with strip() to avoid space issues
+    villa = next((v for v in villas if str(v.get('Villa_ID', '')).strip() == str(villa_id).strip()), None)
+    
+    if not villa:
+        return "Villa Not Found", 404
+
+    # Extract all Image_URLs (Image_URL_2, 3, etc.)
+    imgs = [villa.get('Image_URL')]
+    for i in range(2, 21):
+        key = f'Image_URL_{i}'
+        if villa.get(key):
+            imgs.append(villa.get(key))
+
+    # Booked dates split
+    booked_dates_list = [d.strip() for d in str(villa.get('Sold_Dates', '')).split(',') if d.strip()]
+    
+    return render_template('villa_details.html', villa=villa, villa_images=imgs, booked_dates=booked_dates_list)
+
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
-    error = None # ✅ Added for safety
+    error = None
     if request.method == 'POST':
         if request.form.get('username') == ADMIN_USER and request.form.get('password') == ADMIN_PASS:
             session['logged_in'] = True
             return redirect(url_for('admin_dashboard'))
         else:
-            error = "Invalid Credentials" # ✅ Show on HTML
+            error = "Invalid Credentials"
     return render_template('admin_login.html', error=error)
 
 @app.route('/admin')
@@ -137,7 +159,7 @@ def admin_dashboard():
         try:
             data = enquiry_sheet.get_all_values()
             if len(data) > 0:
-                headers = [h.strip() for h in data[0]] # ✅ Get headers correctly
+                headers = [h.strip() for h in data[0]]
                 for row in data[1:]:
                     padded_row = row + [''] * (len(headers) - len(row))
                     enquiries.append(dict(zip(headers, padded_row)))
@@ -158,8 +180,6 @@ def admin_logout():
     session.pop('logged_in', None)
     return redirect(url_for('index'))
 
-# Baki saare routes (villa_details, explore, list-property) waise hi rakhein...
-
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-        
+    
