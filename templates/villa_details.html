@@ -28,19 +28,61 @@
         background: #fff; border-radius: 20px; padding: 20px; 
         border: 1px solid #f0f0f0; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     }
-    /* Disabled (Sold Out) Dates Style */
     .flatpickr-day.disabled { 
         background: #fee2e2 !important; color: #ef4444 !important; 
         text-decoration: line-through; border-color: transparent !important;
         opacity: 0.6;
     }
 
-    /* --- RULES SECTION FIX --- */
-    .premium-rules-container { background: #ffffff; border-radius: 20px; padding: 25px; border: 1px solid #f0f0f0; box-shadow: 0 10px 30px rgba(0,0,0,0.04); margin-top: 20px; }
-    .modern-rule-item { display: flex; align-items: flex-start; background: #fbfcfe; padding: 15px 18px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #f1f4f8; transition: 0.3s ease; }
-    .modern-rule-item:hover { transform: translateX(5px); background: #fff; border-color: #ff4757; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    .rule-icon-box { width: 30px; height: 30px; background: rgba(255, 71, 87, 0.1); color: #ff4757; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0; }
-    .rule-text-content { font-size: 0.95rem; color: #444; font-weight: 500; line-height: 1.4; }
+    /* ✅ NEW RULES SECTION CSS (Added without breaking old logic) */
+    .premium-rules-container { 
+        background: #ffffff; 
+        border-radius: 20px; 
+        padding: 20px; 
+        border: 1px solid #f1f4f8;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        margin-top: 20px;
+    }
+
+    .modern-rule-item { 
+        display: flex !important; 
+        align-items: flex-start !important; 
+        width: 100% !important; 
+        background: #fbfcfe;
+        padding: 15px 18px; 
+        border-radius: 12px; 
+        margin-bottom: 12px !important; 
+        border: 1px solid #f1f4f8; 
+        transition: 0.3s ease;
+    }
+
+    .modern-rule-item:hover { 
+        transform: translateX(5px); 
+        background: #fff; 
+        border-color: #ff4757; 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+    }
+
+    .rule-icon-box { 
+        width: 30px; 
+        height: 30px; 
+        background: rgba(255, 71, 87, 0.1); 
+        color: #ff4757; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        margin-right: 15px; 
+        flex-shrink: 0; 
+    }
+
+    .rule-text-content { 
+        flex: 1;
+        font-size: 0.95rem; 
+        color: #444; 
+        font-weight: 500; 
+        line-height: 1.5; 
+    }
 
     .offer-banner { position: absolute; top: 20px; left: 20px; z-index: 10; background: #ff4757; color: white; padding: 5px 15px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; }
 
@@ -155,12 +197,12 @@
         const disabledDates = {{ booked_dates | tojson }};
 
         flatpickr("#check_availability", {
-            inline: false, // ✅ Fix: Ab click karne par hi khulega
+            inline: false, 
             minDate: "today",
             dateFormat: "Y-m-d",
             disable: disabledDates,
             mode: "range",
-            static: true, // Mobile layout support
+            static: true, 
             altInput: true,
             altFormat: "F j, Y",
             onDayCreate: function(dObj, dStr, fp, dayElem) {
