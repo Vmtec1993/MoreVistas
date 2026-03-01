@@ -36,7 +36,10 @@
     .villa-title-main { background: linear-gradient(45deg, #ff416c, #ff4b2b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 850; font-size: 1.3rem; }
     .price-cut { text-decoration: line-through; color: #6c757d; font-size: 0.9rem; margin-right: 5px; }
     .off-tag { background: #28a745; color: white; font-size: 0.75rem; padding: 2px 10px; border-radius: 5px; font-weight: bold; }
-    .sold-out-overlay { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: bold; z-index: 5; border: 1px solid rgba(255,255,255,0.3); }
+    
+    /* Premium Sold Out Styling */
+    .sold-out-overlay { position: absolute; top: 15px; left: 15px; background: rgba(220, 53, 69, 0.9); color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; z-index: 5; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    
     .highlight-card { border: none; transition: 0.3s; background: #f8f9fa; border-radius: 20px; }
     .highlight-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
 </style>
@@ -57,7 +60,7 @@
                     <div class="sold-out-overlay text-uppercase">🚫 Sold Out</div>
                     {% endif %}
 
-                    <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(0.8);{% endif %}">
+                    <img src="{{ villa.Image_URL }}" class="card-img-top" style="height:220px; object-fit:cover; {% if villa.Status|lower == 'sold out' %}filter: grayscale(0.7) blur(1px);{% endif %}">
                     
                     <div class="card-body p-4 text-start">
                         <span class="villa-title-main text-uppercase">{{ villa.Villa_Name }}</span>
@@ -87,9 +90,9 @@
                         </div>
 
                         {% if villa.Status|lower == 'sold out' %}
-                        <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Fully Booked</button>
+                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-outline-secondary w-100 rounded-pill fw-bold">Check Future Dates</a>
                         {% else %}
-                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-outline-primary w-100 rounded-pill fw-bold">View Details</a>
+                        <a href="/villa/{{ villa.Villa_ID }}" class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm">View Details</a>
                         {% endif %}
                     </div>
                 </div>
@@ -146,10 +149,6 @@
                 </div>
             </div>
             {% endfor %}
-        {% else %}
-            <div class="col-12 text-center py-4">
-                <div class="text-muted">Lonavala attractions loading...</div>
-            </div>
         {% endif %}
     </div>
 </div>
@@ -162,7 +161,7 @@
             document.getElementById('temp').innerText = Math.round(data.main.temp);
             document.getElementById('weather-desc').innerText = data.weather[0].description;
             const iconCode = data.weather[0].icon;
-            document.getElementById('weather-icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${iconCode}.png" width="40">`;
+            document.getElementById('weather-icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${iconCode}.png" width="40" style="margin-top:-5px;">`;
         } catch (e) { 
             console.log("Weather error"); 
             document.getElementById('temp').innerText = "28"; 
