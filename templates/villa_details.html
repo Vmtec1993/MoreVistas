@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <style>
-    /* Aapka Purana CSS */
+    /* Aapka Purana CSS (Safe & Intact) */
     .villa-title-detail {
         background: linear-gradient(45deg, #ff416c, #ff4b2b);
         -webkit-background-clip: text;
@@ -23,26 +23,25 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
 
-    /* --- NEW CALENDAR STYLING --- */
+    /* --- CALENDAR STYLING --- */
     .availability-card { 
         background: #fff; border-radius: 20px; padding: 20px; 
         border: 1px solid #f0f0f0; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     }
+    /* Disabled (Sold Out) Dates Style */
     .flatpickr-day.disabled { 
         background: #fee2e2 !important; color: #ef4444 !important; 
         text-decoration: line-through; border-color: transparent !important;
+        opacity: 0.6;
     }
-    .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
-    /* Baki aapka Rules aur Pricing CSS niche continue hoga... */
+    /* --- RULES SECTION FIX --- */
     .premium-rules-container { background: #ffffff; border-radius: 20px; padding: 25px; border: 1px solid #f0f0f0; box-shadow: 0 10px 30px rgba(0,0,0,0.04); margin-top: 20px; }
-    .modern-rule-item { display: flex; align-items: center; background: #fbfcfe; padding: 15px 18px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #f1f4f8; transition: 0.3s ease; }
+    .modern-rule-item { display: flex; align-items: flex-start; background: #fbfcfe; padding: 15px 18px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #f1f4f8; transition: 0.3s ease; }
     .modern-rule-item:hover { transform: translateX(5px); background: #fff; border-color: #ff4757; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    .rule-icon-box { width: 35px; height: 35px; background: rgba(255, 71, 87, 0.1); color: #ff4757; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0; }
-    .rule-text-content { font-size: 0.95rem; color: #444; font-weight: 500; }
-    .deposit-box { background: #fff9f9; border: 1px dashed #ff4757; }
-    .detail-original-price { text-decoration: line-through; color: #adb5bd; font-size: 1.1rem; }
-    .savings-badge { background: #28a745; color: white; padding: 4px 12px; border-radius: 5px; font-size: 0.85rem; font-weight: bold; }
+    .rule-icon-box { width: 30px; height: 30px; background: rgba(255, 71, 87, 0.1); color: #ff4757; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0; }
+    .rule-text-content { font-size: 0.95rem; color: #444; font-weight: 500; line-height: 1.4; }
+
     .offer-banner { position: absolute; top: 20px; left: 20px; z-index: 10; background: #ff4757; color: white; padding: 5px 15px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; }
 
     @media (max-width: 767px) {
@@ -53,7 +52,7 @@
 
 <div class="container py-4">
     <div id="villaSlider" class="carousel slide shadow-sm position-relative mb-4" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden;">
-        {% if villa.Original_Price|int > villa.Price|int %}
+        {% if villa.Original_Price|int > villa.Price|int and villa.Price|int > 0 %}
             <div class="offer-banner">🔥 SPECIAL OFFER LIVE</div>
         {% endif %}
         <div class="carousel-inner">
@@ -77,30 +76,36 @@
 
             <div class="availability-card mb-5">
                 <h4 class="fw-bold mb-3"><i class="bi bi-calendar-range text-primary me-2"></i>Check Availability</h4>
-                <p class="small text-muted mb-3">Red dates are already booked. Select your dates to proceed.</p>
-                <div class="d-flex gap-3 mb-3 small fw-bold">
-                    <span><span class="status-dot bg-success"></span> Available</span>
-                    <span><span class="status-dot bg-danger"></span> Sold Out</span>
+                <div class="input-group mb-3">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar3 text-primary"></i></span>
+                    <input type="text" id="check_availability" class="form-control border-start-0 shadow-none bg-white" placeholder="Click to view available dates" readonly>
                 </div>
-                <div id="inline-calendar"></div>
+                <div class="d-flex gap-3 small fw-bold">
+                    <span><span style="height:10px; width:10px; background:#ef4444; display:inline-block; border-radius:50%;"></span> Booked</span>
+                    <span><span style="height:10px; width:10px; background:#22c55e; display:inline-block; border-radius:50%;"></span> Available</span>
+                </div>
             </div>
 
             <div class="description-section mb-5">
                 <h4 class="fw-bold mb-3">✨ Experience Private Pool Luxury</h4>
                 <p class="text-secondary" style="line-height: 1.7; font-size: 1.05rem;">
-                    Welcome to <b>{{ villa.Villa_Name }}</b> — a beautifully designed escape...
+                    Welcome to <b>{{ villa.Villa_Name }}</b> — a beautifully designed escape perfect for family and friends.
                 </p>
             </div>
 
             <div class="rules-section mb-5">
                 <h4 class="fw-bold mb-4"><i class="bi bi-shield-check text-primary me-2"></i>Guest Guidelines</h4>
                 <div class="premium-rules-container">
-                    {% for rule in villa.Rules_List %}
-                        <div class="modern-rule-item">
-                            <div class="rule-icon-box"><i class="bi bi-check2-circle"></i></div>
-                            <div class="rule-text-content">{{ rule }}</div>
-                        </div>
-                    {% endfor %}
+                    {% if villa.Rules_List %}
+                        {% for rule in villa.Rules_List %}
+                            <div class="modern-rule-item">
+                                <div class="rule-icon-box"><i class="bi bi-check2"></i></div>
+                                <div class="rule-text-content">{{ rule }}</div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted small">Standard house rules apply.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -109,9 +114,14 @@
             <div class="card border-0 shadow-lg rounded-4 p-4 sticky-top" style="top: 100px; z-index: 10;">
                 <h5 class="fw-bold mb-3">Pricing & Booking</h5>
                 <div class="mb-3">
-                    <span class="fs-1 fw-bold text-primary">₹{{ villa.Price|int }}</span>
-                    <span class="text-muted ms-2">/ night</span>
+                    {% if villa.Price|int == 0 %}
+                        <span class="fs-2 fw-bold text-dark">Price on Request</span>
+                    {% else %}
+                        <span class="fs-1 fw-bold text-primary">₹{{ villa.Price|int }}</span>
+                        <span class="text-muted ms-2">/ night</span>
+                    {% endif %}
                 </div>
+                
                 <div class="d-grid gap-3 mt-4">
                     <a href="https://wa.me/918830024994?text=Hi,%20I%20am%20interested%20in%20booking%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill py-3 fw-bold shadow-sm">
                         <i class="bi bi-whatsapp me-2"></i>BOOK ON WHATSAPP
@@ -126,7 +136,13 @@
 </div>
 
 <div class="mobile-booking-bar d-md-none">
-    <div style="flex: 1;"><div class="fw-bold fs-4 text-primary">₹{{ villa.Price|int }}</div></div>
+    <div style="flex: 1;">
+        {% if villa.Price|int == 0 %}
+            <div class="fw-bold fs-5 text-dark">Price on Request</div>
+        {% else %}
+            <div class="fw-bold fs-4 text-primary">₹{{ villa.Price|int }}</div>
+        {% endif %}
+    </div>
     <div style="display: flex; gap: 10px;">
         <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-bold"><i class="bi bi-pencil-square"></i></a>
         <a href="https://wa.me/918830024994?text=I%20want%20to%20book%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow"><i class="bi bi-whatsapp"></i> BOOK</a>
@@ -136,20 +152,20 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Python se aayi hui Sold_Dates list
         const disabledDates = {{ booked_dates | tojson }};
 
-        flatpickr("#inline-calendar", {
-            inline: true,
+        flatpickr("#check_availability", {
+            inline: false, // ✅ Fix: Ab click karne par hi khulega
             minDate: "today",
             dateFormat: "Y-m-d",
-            disable: disabledDates, // Blocked dates red ho jayengi
+            disable: disabledDates,
             mode: "range",
-            showMonths: window.innerWidth > 768 ? 2 : 1, // Laptop pe 2 mahine dikhenge
+            static: true, // Mobile layout support
+            altInput: true,
+            altFormat: "F j, Y",
             onDayCreate: function(dObj, dStr, fp, dayElem) {
-                // Agar date disabled hai toh styling add karein
                 if (dayElem.classList.contains('disabled')) {
-                    dayElem.title = "Already Booked";
+                    dayElem.title = "Sold Out";
                 }
             }
         });
