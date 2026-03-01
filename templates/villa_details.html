@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <style>
-    /* Aapka Purana CSS (Safe & Intact) */
+    /* Aapka Original CSS */
     .villa-title-detail {
         background: linear-gradient(45deg, #ff416c, #ff4b2b);
         -webkit-background-clip: text;
@@ -15,74 +15,32 @@
     @media (max-width: 768px) { .carousel-item img { height: 280px; } .villa-title-detail { font-size: 1.8rem; } }
 
     .highlight-badge-card { 
-        background: #ffffff; 
-        border: 1px solid #eee; 
-        border-radius: 15px; 
-        padding: 12px; 
-        text-align: center; 
-        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        background: #ffffff; border: 1px solid #eee; border-radius: 15px; 
+        padding: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
 
-    /* --- CALENDAR STYLING --- */
+    /* Availability styling */
     .availability-card { 
         background: #fff; border-radius: 20px; padding: 20px; 
         border: 1px solid #f0f0f0; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     }
     .flatpickr-day.disabled { 
         background: #fee2e2 !important; color: #ef4444 !important; 
-        text-decoration: line-through; border-color: transparent !important;
-        opacity: 0.6;
+        text-decoration: line-through; opacity: 0.6;
     }
 
-    /* ✅ NEW RULES SECTION CSS (Added without breaking old logic) */
-    .premium-rules-container { 
-        background: #ffffff; 
-        border-radius: 20px; 
-        padding: 20px; 
-        border: 1px solid #f1f4f8;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-        margin-top: 20px;
-    }
-
+    /* ✅ RULES FIX: Line-by-Line Modern Styling */
+    .premium-rules-container { margin-top: 15px; }
     .modern-rule-item { 
-        display: flex !important; 
-        align-items: flex-start !important; 
-        width: 100% !important; 
-        background: #fbfcfe;
-        padding: 15px 18px; 
-        border-radius: 12px; 
-        margin-bottom: 12px !important; 
-        border: 1px solid #f1f4f8; 
-        transition: 0.3s ease;
+        display: flex !important; align-items: flex-start !important; 
+        background: #f8f9fa; padding: 12px 15px; border-radius: 12px; 
+        margin-bottom: 10px !important; border-left: 4px solid #ff4757;
     }
+    .rule-icon-box { color: #ff4757; margin-right: 12px; font-size: 1.1rem; }
+    .rule-text-content { font-size: 0.95rem; color: #333; font-weight: 500; }
 
-    .modern-rule-item:hover { 
-        transform: translateX(5px); 
-        background: #fff; 
-        border-color: #ff4757; 
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
-    }
-
-    .rule-icon-box { 
-        width: 30px; 
-        height: 30px; 
-        background: rgba(255, 71, 87, 0.1); 
-        color: #ff4757; 
-        border-radius: 50%; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        margin-right: 15px; 
-        flex-shrink: 0; 
-    }
-
-    .rule-text-content { 
-        flex: 1;
-        font-size: 0.95rem; 
-        color: #444; 
-        font-weight: 500; 
-        line-height: 1.5; 
-    }
+    /* ✅ PRICE ON REQUEST BLUE FIX */
+    .text-request-blue { color: #0d6efd !important; font-weight: 800 !important; }
 
     .offer-banner { position: absolute; top: 20px; left: 20px; z-index: 10; background: #ff4757; color: white; padding: 5px 15px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; }
 
@@ -122,31 +80,20 @@
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar3 text-primary"></i></span>
                     <input type="text" id="check_availability" class="form-control border-start-0 shadow-none bg-white" placeholder="Click to view available dates" readonly>
                 </div>
-                <div class="d-flex gap-3 small fw-bold">
-                    <span><span style="height:10px; width:10px; background:#ef4444; display:inline-block; border-radius:50%;"></span> Booked</span>
-                    <span><span style="height:10px; width:10px; background:#22c55e; display:inline-block; border-radius:50%;"></span> Available</span>
-                </div>
-            </div>
-
-            <div class="description-section mb-5">
-                <h4 class="fw-bold mb-3">✨ Experience Private Pool Luxury</h4>
-                <p class="text-secondary" style="line-height: 1.7; font-size: 1.05rem;">
-                    Welcome to <b>{{ villa.Villa_Name }}</b> — a beautifully designed escape perfect for family and friends.
-                </p>
             </div>
 
             <div class="rules-section mb-5">
-                <h4 class="fw-bold mb-4"><i class="bi bi-shield-check text-primary me-2"></i>Guest Guidelines</h4>
+                <h4 class="fw-bold mb-3"><i class="bi bi-shield-check text-primary me-2"></i>Guest Guidelines</h4>
                 <div class="premium-rules-container">
                     {% if villa.Rules_List %}
                         {% for rule in villa.Rules_List %}
                             <div class="modern-rule-item">
-                                <div class="rule-icon-box"><i class="bi bi-check2"></i></div>
+                                <div class="rule-icon-box"><i class="bi bi-info-circle-fill"></i></div>
                                 <div class="rule-text-content">{{ rule }}</div>
                             </div>
                         {% endfor %}
                     {% else %}
-                        <p class="text-muted small">Standard house rules apply.</p>
+                        <p class="text-muted">Standard house rules apply.</p>
                     {% endif %}
                 </div>
             </div>
@@ -157,7 +104,7 @@
                 <h5 class="fw-bold mb-3">Pricing & Booking</h5>
                 <div class="mb-3">
                     {% if villa.Price|int == 0 %}
-                        <span class="fs-2 fw-bold text-dark">Price on Request</span>
+                        <span class="fs-2 text-request-blue">Price on Request</span>
                     {% else %}
                         <span class="fs-1 fw-bold text-primary">₹{{ villa.Price|int }}</span>
                         <span class="text-muted ms-2">/ night</span>
@@ -180,13 +127,12 @@
 <div class="mobile-booking-bar d-md-none">
     <div style="flex: 1;">
         {% if villa.Price|int == 0 %}
-            <div class="fw-bold fs-5 text-dark">Price on Request</div>
+            <div class="fw-bold fs-5 text-request-blue">Price on Request</div>
         {% else %}
             <div class="fw-bold fs-4 text-primary">₹{{ villa.Price|int }}</div>
         {% endif %}
     </div>
     <div style="display: flex; gap: 10px;">
-        <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-bold"><i class="bi bi-pencil-square"></i></a>
         <a href="https://wa.me/918830024994?text=I%20want%20to%20book%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow"><i class="bi bi-whatsapp"></i> BOOK</a>
     </div>
 </div>
@@ -195,21 +141,13 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const disabledDates = {{ booked_dates | tojson }};
-
         flatpickr("#check_availability", {
-            inline: false, 
             minDate: "today",
             dateFormat: "Y-m-d",
             disable: disabledDates,
-            mode: "range",
-            static: true, 
+            static: true,
             altInput: true,
-            altFormat: "F j, Y",
-            onDayCreate: function(dObj, dStr, fp, dayElem) {
-                if (dayElem.classList.contains('disabled')) {
-                    dayElem.title = "Sold Out";
-                }
-            }
+            altFormat: "F j, Y"
         });
     });
 </script>
