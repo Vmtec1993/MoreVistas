@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <style>
-    /* Aapka Original CSS */
+    /* Sabhi Styles intact hain */
     .villa-title-detail {
         background: linear-gradient(45deg, #ff416c, #ff4b2b);
         -webkit-background-clip: text;
@@ -19,7 +19,6 @@
         padding: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
 
-    /* Availability styling */
     .availability-card { 
         background: #fff; border-radius: 20px; padding: 20px; 
         border: 1px solid #f0f0f0; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -29,7 +28,6 @@
         text-decoration: line-through; opacity: 0.6;
     }
 
-    /* ✅ RULES FIX: Line-by-Line Modern Styling */
     .premium-rules-container { margin-top: 15px; }
     .modern-rule-item { 
         display: flex !important; align-items: flex-start !important; 
@@ -39,7 +37,6 @@
     .rule-icon-box { color: #ff4757; margin-right: 12px; font-size: 1.1rem; }
     .rule-text-content { font-size: 0.95rem; color: #333; font-weight: 500; }
 
-    /* ✅ PRICE ON REQUEST BLUE FIX */
     .text-request-blue { color: #0d6efd !important; font-weight: 800 !important; }
 
     .offer-banner { position: absolute; top: 20px; left: 20px; z-index: 10; background: #ff4757; color: white; padding: 5px 15px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; }
@@ -65,13 +62,18 @@
 
     <div class="row">
         <div class="col-md-8">
-            <h1 class="villa-title-detail mb-1">{{ villa.Villa_Name }}</h1>
+            <h1 class="villa-title-detail mb-1 text-uppercase">{{ villa.Villa_Name }}</h1>
             <p class="text-muted mb-4"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, Maharashtra</p>
 
             <div class="row g-3 mb-5">
                 <div class="col-4"><div class="highlight-badge-card"><i class="bi bi-people fs-3 text-primary"></i><div class="fw-bold small mt-1">{{ villa.Guests }} Guests</div></div></div>
                 <div class="col-4"><div class="highlight-badge-card"><i class="bi bi-door-open fs-3 text-primary"></i><div class="fw-bold small mt-1">{{ villa.BHK }} BHK</div></div></div>
                 <div class="col-4"><div class="highlight-badge-card"><i class="bi bi-water fs-3 text-primary"></i><div class="fw-bold small mt-1">Private Pool</div></div></div>
+            </div>
+
+            <div class="mb-5">
+                <h4 class="fw-bold mb-3">About this Villa</h4>
+                <p class="text-secondary" style="line-height: 1.8;">{{ villa.Description or "Experience a luxurious stay at this beautiful property in Lonavala." }}</p>
             </div>
 
             <div class="availability-card mb-5">
