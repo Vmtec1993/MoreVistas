@@ -153,5 +153,129 @@
                         {% for rule in villa.Rules_List %}
                             {% if rule.strip() %}
                             {% set r = rule.replace('•', '').strip() %}
-                            <div class="modern-rule-item {% if 'Deposit' in
-                              
+                            <div class="modern-rule-item {% if 'Deposit' in r or 'deposit' in r %}deposit-box{% endif %}">
+                                <div class="rule-icon-box">
+                                    {% if 'Smoking' in r or 'smoking' in r %}<i class="bi bi-no-backdrop"></i>
+                                    {% elif 'music' in r or '10:00' in r or '10 PM' in r %}<i class="bi bi-volume-mute"></i>
+                                    {% elif 'Pool' in r or 'pool' in r %}<i class="bi bi-water"></i>
+                                    {% elif 'ID' in r or 'id' in r %}<i class="bi bi-person-badge"></i>
+                                    {% elif 'Deposit' in r or 'deposit' in r %}<i class="bi bi-cash-stack"></i>
+                                    {% elif 'Kitchen' in r or 'cooking' in r %}<i class="bi bi-egg-fried"></i>
+                                    {% elif 'Pets' in r or 'pets' in r %}<i class="bi bi-ban"></i>
+                                    {% else %}<i class="bi bi-check2-circle"></i>{% endif %}
+                                </div>
+                                <div class="rule-text-content">{{ r }}</div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="modern-rule-item">Standard rules apply.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-lg rounded-4 p-4 sticky-top" style="top: 100px; z-index: 10;">
+                <h5 class="fw-bold mb-3">Pricing & Booking</h5>
+                
+                <div class="mb-3">
+                    {# --- UPDATED PRICE LOGIC --- #}
+                    {% if villa.current_display_price|int > 0 %}
+                        {% if villa.amount_saved|int > 0 %}
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="detail-original-price me-2">₹{{ villa.Original_Price }}</span>
+                                <span class="cute-save-badge">✨ Save ₹{{ villa.amount_saved }}</span>
+                            </div>
+                        {% endif %}
+                        <div class="d-flex align-items-baseline">
+                            <span class="fs-1 fw-bold text-primary">₹{{ villa.current_display_price|int }}</span>
+                            <span class="text-muted ms-2">/ night</span>
+                        </div>
+                    {% else %}
+                        {# Price Request Style #}
+                        <div class="py-2">
+                            <span class="fs-2 fw-bold text-primary text-uppercase">Price on Request</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-grid gap-2 mb-3">
+                    <button class="btn btn-outline-dark rounded-pill fw-bold" id="btnCheckAvail">
+                        <i class="bi bi-calendar3 me-2"></i>CHECK AVAILABILITY
+                    </button>
+                </div>
+
+                {# --- CALENDAR CONTAINER --- #}
+                <div id="calendar-container" style="display:none; background: #fdfdfd; padding: 15px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px;" class="text-center">
+                    <small class="fw-bold mb-2 d-block text-muted">Availability Status</small>
+                    <div id="availability-calendar" class="mx-auto"></div>
+                    <div class="d-flex justify-content-center gap-3 mt-2" style="font-size: 0.75rem;">
+                        <span><i class="bi bi-circle-fill text-danger"></i> Sold</span>
+                        <span><i class="bi bi-circle-fill text-success"></i> Free</span>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-3">
+                    <a href="https://wa.me/918830024994?text=Hi,%20I%20am%20interested%20in%20booking%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill py-3 fw-bold shadow-sm">
+                        <i class="bi bi-whatsapp me-2"></i>BOOK ON WHATSAPP
+                    </a>
+                    <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill py-3 fw-bold">
+                        <i class="bi bi-envelope-paper me-2"></i>FILL ENQUIRY FORM
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# --- MOBILE BAR (ओरिजिनल लॉजिक के साथ) --- #}
+<div class="mobile-booking-bar d-md-none">
+    <div style="flex: 1;">
+        {% if villa.current_display_price|int > 0 %}
+            <div class="fw-bold fs-4 text-primary">₹{{ villa.current_display_price|int }}</div>
+            {% if villa.amount_saved > 0 %}
+                <small class="text-success fw-bold">Saved ₹{{ villa.amount_saved }}!</small>
+            {% else %}
+                <small class="text-muted">per night</small>
+            {% endif %}
+        {% else %}
+            <div class="fw-bold fs-5 text-primary">Price on Request</div>
+        {% endif %}
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-bold"><i class="bi bi-pencil-square"></i></a>
+        <a href="https://wa.me/918830024994?text=I%20want%20to%20book%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow"><i class="bi bi-whatsapp"></i> BOOK</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.getElementById('btnCheckAvail').addEventListener('click', function() {
+        var container = document.getElementById('calendar-container');
+        if (container.style.display === 'none') {
+            container.style.display = 'block';
+            flatpickr("#availability-calendar", {
+                inline: true,
+                minDate: "today",
+                disable: [
+                    {% if villa.Sold_Dates %}
+                        {% for d in villa.Sold_Dates.split(',') %} "{{ d.strip() }}", {% endfor %}
+                    {% endif %}
+                ],
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    if (dayElem.classList.contains("flatpickr-disabled")) {
+                        dayElem.style.backgroundColor = "#ff4757"; dayElem.style.color = "white";
+                    } else if (!dayElem.classList.contains("prevMonthDay") && !dayElem.classList.contains("nextMonthDay")) {
+                        dayElem.style.backgroundColor = "#2ed573"; dayElem.style.color = "white";
+                    }
+                }
+            });
+            container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            container.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}
+    
