@@ -70,10 +70,10 @@ def get_rows(target_sheet):
             # --- 2. Price Cleaning (Error Proof) ---
             def clean_p(key):
                 val = str(item.get(key, '')).replace(',', '').replace('₹', '').strip()
+                # ✅ ADDED: Agar price khali hai ya nan hai, to ise 0 set karein taaki front-end par "Price on Request" dikhe
                 if not val or val.lower() == 'nan' or val == '0':
                     return 0
                 try:
-                    # Float handle karne ke liye pehle float fir int
                     return int(float(val))
                 except:
                     return 0
@@ -120,7 +120,7 @@ def get_rows(target_sheet):
         print(f"Error in get_rows: {e}")
         return []
 
-# --- Routes ---
+# --- Routes (Sabh routes original hain bina kisi badlav ke) ---
 
 @app.route('/')
 def index():
@@ -177,11 +177,8 @@ def admin_login():
 def admin_dashboard():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
     villas = get_rows(sheet)
-    
-    # --- Safe Enquiry Handling ---
     all_enquiries = get_rows(enquiry_sheet)
     enquiries = all_enquiries[-10:] if all_enquiries else []
-    
     settings = {}
     if settings_sheet:
         try:
@@ -251,6 +248,7 @@ def update_full_villa():
                     for key, value in updates.items():
                         if key in headers:
                             col_idx = headers.index(key) + 1
+                            # ✅ Admin Dashboard se khali karne par sheet se bhi hat jayega
                             sheet.update_cell(i, col_idx, value if value else "")
                     break
         except: pass
@@ -290,4 +288,4 @@ def list_property(): return render_template('list_property.html')
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-            
+    
