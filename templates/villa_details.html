@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{# --- CSS SECTION (आपका ओरिजिनल स्टाइल) --- #}
+{# --- CSS SECTION (आपका ओरिजinal स्टाइल + Amenities Style) --- #}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
     /* Premium Typography & Colors */
@@ -21,6 +21,20 @@
         padding: 12px; 
         text-align: center; 
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+
+    /* ✅ Amenities Styling (New) */
+    .amenity-detail-item {
+        background: #fff;
+        border: 1px solid #f0f0f0;
+        padding: 12px 15px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
 
     .premium-rules-container {
@@ -88,7 +102,7 @@
 </style>
 
 <div class="container py-4">
-    {# --- IMAGE SLIDER (ओरिजिनल लॉजिक) --- #}
+    {# --- IMAGE SLIDER --- #}
     <div id="villaSlider" class="carousel slide shadow-sm position-relative mb-4" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden;">
         {% if villa.amount_saved|int > 0 %}
             <div class="offer-banner">🔥 SPECIAL OFFER LIVE</div>
@@ -115,7 +129,7 @@
             <h1 class="villa-title-detail mb-1">{{ villa.Villa_Name }}</h1>
             <p class="text-muted mb-4"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, Maharashtra</p>
 
-            {# --- HIGHLIGHTS (ओरिजिनल) --- #}
+            {# --- HIGHLIGHTS --- #}
             <div class="row g-3 mb-5">
                 <div class="col-4 text-center">
                     <div class="highlight-badge-card">
@@ -137,7 +151,7 @@
                 </div>
             </div>
 
-            <div class="description-section mb-5">
+            <div class="description-section mb-4">
                 <h4 class="fw-bold mb-3">✨ Experience Private Pool Luxury</h4>
                 <p class="text-secondary" style="line-height: 1.7; font-size: 1.05rem;">
                     Welcome to <b>{{ villa.Villa_Name }}</b> — a beautifully designed escape crafted for peaceful mountain getaways. 
@@ -145,7 +159,25 @@
                 </p>
             </div>
 
-            {# --- RULES SECTION (आपका स्मार्ट लॉजिक) --- #}
+            {# --- ✅ AMENITIES SECTION (New Added) --- #}
+            <div class="amenities-section mb-5">
+                <h4 class="fw-bold mb-4"><i class="bi bi-stars text-primary me-2"></i>What this villa offers</h4>
+                <div class="row g-3">
+                    {% if villa.Amenities %}
+                        {% for amen in villa.Amenities.split('|') %}
+                        <div class="col-6 col-md-4">
+                            <div class="amenity-detail-item">
+                                <i class="bi bi-patch-check-fill text-success"></i> {{ amen.strip() }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12"><p class="text-muted">Standard luxury amenities included.</p></div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# --- RULES SECTION --- #}
             <div class="rules-section mb-5">
                 <h4 class="fw-bold mb-4"><i class="bi bi-shield-check text-primary me-2"></i>Guest Guidelines</h4>
                 <div class="premium-rules-container">
@@ -180,7 +212,6 @@
                 <h5 class="fw-bold mb-3">Pricing & Booking</h5>
                 
                 <div class="mb-3">
-                    {# --- UPDATED PRICE LOGIC --- #}
                     {% if villa.current_display_price|int > 0 %}
                         {% if villa.amount_saved|int > 0 %}
                             <div class="d-flex align-items-center mb-1">
@@ -193,7 +224,6 @@
                             <span class="text-muted ms-2">/ night</span>
                         </div>
                     {% else %}
-                        {# Price Request Style #}
                         <div class="py-2">
                             <span class="fs-2 fw-bold text-primary text-uppercase">Price on Request</span>
                         </div>
@@ -206,7 +236,6 @@
                     </button>
                 </div>
 
-                {# --- CALENDAR CONTAINER --- #}
                 <div id="calendar-container" style="display:none; background: #fdfdfd; padding: 15px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px;" class="text-center">
                     <small class="fw-bold mb-2 d-block text-muted">Availability Status</small>
                     <div id="availability-calendar" class="mx-auto"></div>
@@ -229,7 +258,7 @@
     </div>
 </div>
 
-{# --- MOBILE BAR (ओरिजिनल लॉजिक के साथ) --- #}
+{# --- MOBILE BAR --- #}
 <div class="mobile-booking-bar d-md-none">
     <div style="flex: 1;">
         {% if villa.current_display_price|int > 0 %}
@@ -278,4 +307,4 @@
     });
 </script>
 {% endblock %}
-    
+                
