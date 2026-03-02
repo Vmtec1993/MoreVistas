@@ -40,6 +40,9 @@
     .highlight-card { border: none; transition: 0.3s; background: #f8f9fa; border-radius: 20px; }
     .highlight-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
     
+    /* --- ✅ Amenities Tag Style (New) --- */
+    .amenity-tag { background: #f1f3f5; color: #495057; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; margin-right: 4px; display: inline-block; border: 1px solid #dee2e6; }
+
     .villa-desc-text {
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: 0.85rem;
@@ -80,6 +83,15 @@
                             <span><i class="bi bi-door-open text-primary"></i> {{ villa.BHK }} BHK</span>
                         </div>
 
+                        {# --- ✅ सुधरा हुआ Amenities Section --- #}
+                        <div class="mb-2">
+                            {% if villa.Amenities %}
+                                {% for amen in villa.Amenities.split('|')[:3] %}
+                                    <span class="amenity-tag"># {{ amen.strip() }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
                         <div class="mb-3">
                             <p class="villa-desc-text">
                                 Spend your day relaxing by your private pool and enjoy the cool mountain air of Lonavala at {{ villa.Villa_Name }}...
@@ -87,7 +99,6 @@
                         </div>
 
                         <div class="mt-auto">
-                            {# --- सुधरा हुआ प्राइस सेक्शन --- #}
                             {% set current_p = villa.get('current_display_price', villa.get('Price', 0))|int %}
                             
                             {% if current_p > 0 %}
@@ -125,36 +136,7 @@
     </div>
 </div>
 
-{# --- बाकी का Footer और Attractions वाला हिस्सा वैसा ही रहेगा --- #}
-<div class="container mt-5 py-5">
-    <div class="bg-light rounded-5 p-4 p-md-5 shadow-sm border">
-        <h3 class="fw-bold mb-5 text-center">Why Stay With <span class="text-primary">MoreVistas?</span></h3>
-        <div class="row g-4 text-center">
-            <div class="col-md-4">
-                <div class="p-4 highlight-card h-100">
-                    <i class="bi bi-shield-check-fill fs-1 text-primary"></i>
-                    <h5 class="fw-bold mt-3">Verified Properties</h5>
-                    <p class="small text-muted mb-0">Every villa is hand-picked and personally verified for your comfort.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="p-4 highlight-card h-100">
-                    <i class="bi bi-cash-stack fs-1 text-success"></i>
-                    <h5 class="fw-bold mt-3">Owner Direct Pricing</h5>
-                    <p class="small text-muted mb-0">No hidden fees or commissions. Get the lowest rates guaranteed.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="p-4 highlight-card h-100">
-                    <i class="bi bi-geo-alt-fill fs-1 text-danger"></i>
-                    <h5 class="fw-bold mt-3">Local Support</h5>
-                    <p class="small text-muted mb-0">Our team is on-ground in Lonavala to assist you 24/7 during your stay.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+{# --- Attractions Section --- #}
 <div class="container py-5">
     <h3 class="fw-bold mb-4 text-center">Popular Near You 🌄</h3>
     <div class="row g-3">
