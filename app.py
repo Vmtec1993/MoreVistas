@@ -70,7 +70,6 @@ def get_rows(target_sheet):
             # --- 2. Price Cleaning (Error Proof) ---
             def clean_p(key):
                 val = str(item.get(key, '')).replace(',', '').replace('₹', '').strip()
-                # ✅ ADDED: Agar price khali hai ya nan hai, to ise 0 set karein taaki front-end par "Price on Request" dikhe
                 if not val or val.lower() == 'nan' or val == '0':
                     return 0
                 try:
@@ -120,7 +119,7 @@ def get_rows(target_sheet):
         print(f"Error in get_rows: {e}")
         return []
 
-# --- Routes (Sabh routes original hain bina kisi badlav ke) ---
+# --- Routes ---
 
 @app.route('/')
 def index():
@@ -193,16 +192,20 @@ def admin_logout():
     session.pop('logged_in', None)
     return redirect(url_for('index'))
 
+# ✅ UPDATED: Settings logic to force cell update
 @app.route('/update-settings', methods=['POST'])
 def update_settings():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
     if settings_sheet:
         try:
-            settings_sheet.update('B1', request.form.get('banner_url'))
-            settings_sheet.update('B2', request.form.get('offer_text'))
+            # Direct cell update (Stable Method)
+            settings_sheet.update_acell('B1', request.form.get('banner_url'))
+            settings_sheet.update_acell('B2', request.form.get('offer_text'))
             show = "TRUE" if request.form.get('banner_show') else "FALSE"
-            settings_sheet.update('B3', show)
-        except: pass
+            settings_sheet.update_acell('B3', show)
+            print("✅ Dashboard: Sheet settings updated successfully")
+        except Exception as e:
+            print(f"❌ Dashboard Update Error: {e}")
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/update-offline-dates', methods=['POST'])
@@ -248,7 +251,6 @@ def update_full_villa():
                     for key, value in updates.items():
                         if key in headers:
                             col_idx = headers.index(key) + 1
-                            # ✅ Admin Dashboard se khali karne par sheet se bhi hat jayega
                             sheet.update_cell(i, col_idx, value if value else "")
                     break
         except: pass
@@ -288,4 +290,4 @@ def list_property(): return render_template('list_property.html')
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    
+        
