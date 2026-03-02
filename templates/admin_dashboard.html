@@ -1,280 +1,130 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{# --- CSS SECTION (आपका ओरिजिनल स्टाइल) --- #}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 <style>
-    /* Premium Typography & Colors */
-    .villa-title-detail {
-        background: linear-gradient(45deg, #ff416c, #ff4b2b);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 850; font-size: 2.2rem;
-    }
-    .carousel-item img { height: 500px; object-fit: cover; border-radius: 20px; }
-    @media (max-width: 768px) { .carousel-item img { height: 280px; } .villa-title-detail { font-size: 1.8rem; } }
-
-    .highlight-badge-card { 
-        background: #ffffff; 
-        border: 1px solid #eee; 
-        border-radius: 15px; 
-        padding: 12px; 
-        text-align: center; 
-        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-    }
-
-    .premium-rules-container {
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 25px;
-        border: 1px solid #f0f0f0;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-        margin-top: 20px;
-    }
-    .modern-rule-item {
-        display: flex;
-        align-items: center;
-        background: #fbfcfe;
-        padding: 15px 18px;
-        border-radius: 12px;
-        margin-bottom: 12px;
-        border: 1px solid #f1f4f8;
-        transition: 0.3s ease;
-    }
-    .modern-rule-item:hover {
-        transform: translateX(5px);
-        background: #fff;
-        border-color: #ff4757;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    }
-    .rule-icon-box {
-        width: 35px; height: 35px;
-        background: rgba(255, 71, 87, 0.1);
-        color: #ff4757;
-        border-radius: 8px;
-        display: flex; align-items: center; justify-content: center;
-        margin-right: 15px; flex-shrink: 0;
-    }
-    .rule-text-content { font-size: 0.95rem; color: #444; font-weight: 500; }
-    
-    .deposit-box { background: #fff9f9; border: 1px dashed #ff4757; }
-    .detail-original-price { text-decoration: line-through; color: #adb5bd; font-size: 1.1rem; }
-    
-    .cute-save-badge { 
-        background: #2ed573; 
-        color: white; 
-        padding: 4px 12px; 
-        border-radius: 50px; 
-        font-size: 0.8rem; 
-        font-weight: bold;
-        animation: pulse 2s infinite;
-    }
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
-    .offer-banner { position: absolute; top: 20px; left: 20px; z-index: 10; background: #ff4757; color: white; padding: 5px 15px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; }
-
-    @media (max-width: 767px) {
-        .mobile-booking-bar {
-            position: fixed; bottom: 0; left: 0; right: 0; background: white;
-            padding: 10px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-            z-index: 1000; display: flex; justify-content: space-between; align-items: center;
-        }
-        body { padding-bottom: 70px; }
-    }
-
-    .flatpickr-calendar { box-shadow: none !important; border: none !important; margin: 0 auto; width: 100% !important; }
-    .flatpickr-day.flatpickr-disabled { opacity: 1 !important; cursor: not-allowed; }
-    .flatpickr-day { border-radius: 50% !important; margin: 2px; }
+    :root { --primary-blue: #0d6efd; --dark-bg: #f8f9fa; }
+    body { background-color: var(--dark-bg); font-family: 'Plus Jakarta Sans', sans-serif; }
+    .admin-nav { background: white; border-bottom: 1px solid #dee2e6; padding: 15px 0; }
+    .table-container { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; }
+    .status-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
+    .bg-sold { background: #ffe5e5 !important; color: #dc3545 !important; }
+    .bg-available { background: #e8f5e9 !important; color: #2e7d32 !important; }
+    .form-control-pill { border-radius: 12px; padding: 8px 15px; border: 1px solid #dee2e6; font-size: 0.9rem; }
+    .modal-xl { max-width: 90% !important; }
+    .section-label { font-size: 0.7rem; font-weight: 800; color: #0d6efd; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; }
 </style>
 
-<div class="container py-4">
-    {# --- IMAGE SLIDER (ओरिजिनल लॉजिक) --- #}
-    <div id="villaSlider" class="carousel slide shadow-sm position-relative mb-4" data-bs-ride="carousel" style="border-radius: 20px; overflow: hidden;">
-        {% if villa.amount_saved|int > 0 %}
-            <div class="offer-banner">🔥 SPECIAL OFFER LIVE</div>
-        {% endif %}
-        
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="{{ villa.Image_URL }}" class="d-block w-100" alt="Main Image">
-            </div>
-            {% for img in villa_images %}
-                {% if img != villa.Image_URL %}
-                <div class="carousel-item">
-                    <img src="{{ img }}" class="d-block w-100" alt="Gallery">
-                </div>
-                {% endif %}
-            {% endfor %}
+<nav class="admin-nav mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold m-0">More<span class="text-primary">Vistas</span> Admin</h4>
+        <div class="d-flex align-items-center gap-3">
+            <a href="/" class="btn btn-sm btn-outline-primary rounded-pill px-3">View Site</a>
+            <a href="/admin-logout" class="btn btn-danger btn-sm rounded-pill px-3">Logout</a>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#villaSlider" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-        <button class="carousel-control-next" type="button" data-bs-target="#villaSlider" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="table-container border-start border-primary border-5">
+        <h5 class="fw-bold mb-4"><i class="bi bi-megaphone-fill text-primary me-2"></i>Offer Banner Control</h5>
+        <form action="/update-settings" method="POST" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="small fw-bold mb-2">Banner Image URL</label>
+                <input type="text" name="banner_url" class="form-control form-control-pill" value="{{ settings.get('Banner_URL', '') }}">
+            </div>
+            <div class="col-md-3">
+                <label class="small fw-bold mb-2">Offer Badge Text</label>
+                <input type="text" name="offer_text" class="form-control form-control-pill" value="{{ settings.get('Offer_Text', '') }}">
+            </div>
+            <div class="col-md-2">
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" name="banner_show" id="bannerShow" {% if settings.get('Banner_Show') == 'TRUE' %}checked{% endif %}>
+                    <label class="form-check-label small fw-bold" for="bannerShow">Show Banner</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2">Save</button>
+            </div>
+        </form>
     </div>
 
-    <div class="row">
-        <div class="col-md-8">
-            <h1 class="villa-title-detail mb-1">{{ villa.Villa_Name }}</h1>
-            <p class="text-muted mb-4"><i class="bi bi-geo-alt-fill text-danger"></i> Lonavala, Maharashtra</p>
-
-            {# --- HIGHLIGHTS (ओरिजिनल) --- #}
-            <div class="row g-3 mb-5">
-                <div class="col-4 text-center">
-                    <div class="highlight-badge-card">
-                        <i class="bi bi-people fs-3 text-primary"></i>
-                        <div class="fw-bold small mt-1">{{ villa.Guests }} Guests</div>
-                    </div>
-                </div>
-                <div class="col-4 text-center">
-                    <div class="highlight-badge-card">
-                        <i class="bi bi-door-open fs-3 text-primary"></i>
-                        <div class="fw-bold small mt-1">{{ villa.BHK }} BHK</div>
-                    </div>
-                </div>
-                <div class="col-4 text-center">
-                    <div class="highlight-badge-card">
-                        <i class="bi bi-water fs-3 text-primary"></i>
-                        <div class="fw-bold small mt-1">Private Pool</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="description-section mb-5">
-                <h4 class="fw-bold mb-3">✨ Experience Private Pool Luxury</h4>
-                <p class="text-secondary" style="line-height: 1.7; font-size: 1.05rem;">
-                    Welcome to <b>{{ villa.Villa_Name }}</b> — a beautifully designed escape crafted for peaceful mountain getaways. 
-                    Spend your day relaxing by your private pool and enjoy the cool mountain air of Lonavala.
-                </p>
-            </div>
-
-            {# --- RULES SECTION (आपका स्मार्ट लॉजिक) --- #}
-            <div class="rules-section mb-5">
-                <h4 class="fw-bold mb-4"><i class="bi bi-shield-check text-primary me-2"></i>Guest Guidelines</h4>
-                <div class="premium-rules-container">
-                    {% if villa.Rules_List %}
-                        {% for rule in villa.Rules_List %}
-                            {% if rule.strip() %}
-                            {% set r = rule.replace('•', '').strip() %}
-                            <div class="modern-rule-item {% if 'Deposit' in r or 'deposit' in r %}deposit-box{% endif %}">
-                                <div class="rule-icon-box">
-                                    {% if 'Smoking' in r or 'smoking' in r %}<i class="bi bi-no-backdrop"></i>
-                                    {% elif 'music' in r or '10:00' in r or '10 PM' in r %}<i class="bi bi-volume-mute"></i>
-                                    {% elif 'Pool' in r or 'pool' in r %}<i class="bi bi-water"></i>
-                                    {% elif 'ID' in r or 'id' in r %}<i class="bi bi-person-badge"></i>
-                                    {% elif 'Deposit' in r or 'deposit' in r %}<i class="bi bi-cash-stack"></i>
-                                    {% elif 'Kitchen' in r or 'cooking' in r %}<i class="bi bi-egg-fried"></i>
-                                    {% elif 'Pets' in r or 'pets' in r %}<i class="bi bi-ban"></i>
-                                    {% else %}<i class="bi bi-check2-circle"></i>{% endif %}
-                                </div>
-                                <div class="rule-text-content">{{ r }}</div>
-                            </div>
+    <div class="table-container">
+        <h5 class="fw-bold mb-4"><i class="bi bi-gear-fill me-2"></i>Villa Inventory Control</h5>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Villa Name</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for villa in villas %}
+                    <tr>
+                        <td><span class="fw-bold">{{ villa.Villa_Name }}</span></td>
+                        <td>
+                            {% if villa.Status == 'Sold Out' %}
+                                <span class="badge bg-sold status-badge">Sold Out</span>
+                            {% else %}
+                                <span class="badge bg-available status-badge">Available</span>
                             {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        <div class="modern-rule-item">Standard rules apply.</div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+                        </td>
+                        <td>
+                            <form action="/quick-status-update" method="POST">
+                                <input type="hidden" name="Villa_ID" value="{{ villa.Villa_ID }}">
+                                <input type="hidden" name="current_status" value="{{ villa.Status }}">
+                                <button type="submit" class="btn btn-sm btn-outline-dark rounded-pill">Switch</button>
+                            </form>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#editModal{{ villa.Villa_ID }}">Edit</button>
+                        </td>
+                    </tr>
 
-        <div class="col-md-4">
-            <div class="card border-0 shadow-lg rounded-4 p-4 sticky-top" style="top: 100px; z-index: 10;">
-                <h5 class="fw-bold mb-3">Pricing & Booking</h5>
-                
-                <div class="mb-3">
-                    {# --- UPDATED PRICE LOGIC --- #}
-                    {% if villa.current_display_price|int > 0 %}
-                        {% if villa.amount_saved|int > 0 %}
-                            <div class="d-flex align-items-center mb-1">
-                                <span class="detail-original-price me-2">₹{{ villa.Original_Price }}</span>
-                                <span class="cute-save-badge">✨ Save ₹{{ villa.amount_saved }}</span>
+                    <div class="modal fade" id="editModal{{ villa.Villa_ID }}" tabindex="-1">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content" style="border-radius: 20px;">
+                                <div class="modal-body p-4">
+                                    <form action="/update-full-villa" method="POST">
+                                        <input type="hidden" name="Villa_ID" value="{{ villa.Villa_ID }}">
+                                        <h5 class="fw-bold mb-3">Editing: {{ villa.Villa_Name }}</h5>
+                                        
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="small fw-bold">Villa Name</label>
+                                                <input type="text" name="Villa_Name" class="form-control" value="{{ villa.Villa_Name }}">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="small fw-bold">BHK</label>
+                                                <input type="text" name="BHK" class="form-control" value="{{ villa.BHK }}">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="small fw-bold">Status</label>
+                                                <select name="Status" class="form-select">
+                                                    <option value="Available" {% if villa.Status == 'Available' %}selected{% endif %}>Available</option>
+                                                    <option value="Sold Out" {% if villa.Status == 'Sold Out' %}selected{% endif %}>Sold Out</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4">
+                                            <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold">SAVE CHANGES</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
-                        {% endif %}
-                        <div class="d-flex align-items-baseline">
-                            <span class="fs-1 fw-bold text-primary">₹{{ villa.current_display_price|int }}</span>
-                            <span class="text-muted ms-2">/ night</span>
                         </div>
-                    {% else %}
-                        {# Price Request Style #}
-                        <div class="py-2">
-                            <span class="fs-2 fw-bold text-primary text-uppercase">Price on Request</span>
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="d-grid gap-2 mb-3">
-                    <button class="btn btn-outline-dark rounded-pill fw-bold" id="btnCheckAvail">
-                        <i class="bi bi-calendar3 me-2"></i>CHECK AVAILABILITY
-                    </button>
-                </div>
-
-                {# --- CALENDAR CONTAINER --- #}
-                <div id="calendar-container" style="display:none; background: #fdfdfd; padding: 15px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px;" class="text-center">
-                    <small class="fw-bold mb-2 d-block text-muted">Availability Status</small>
-                    <div id="availability-calendar" class="mx-auto"></div>
-                    <div class="d-flex justify-content-center gap-3 mt-2" style="font-size: 0.75rem;">
-                        <span><i class="bi bi-circle-fill text-danger"></i> Sold</span>
-                        <span><i class="bi bi-circle-fill text-success"></i> Free</span>
                     </div>
-                </div>
-
-                <div class="d-grid gap-3">
-                    <a href="https://wa.me/918830024994?text=Hi,%20I%20am%20interested%20in%20booking%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill py-3 fw-bold shadow-sm">
-                        <i class="bi bi-whatsapp me-2"></i>BOOK ON WHATSAPP
-                    </a>
-                    <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill py-3 fw-bold">
-                        <i class="bi bi-envelope-paper me-2"></i>FILL ENQUIRY FORM
-                    </a>
-                </div>
-            </div>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </div>
-</div>
-
-{# --- MOBILE BAR (ओरिजिनल लॉजिक के साथ) --- #}
-<div class="mobile-booking-bar d-md-none">
-    <div style="flex: 1;">
-        {% if villa.current_display_price|int > 0 %}
-            <div class="fw-bold fs-4 text-primary">₹{{ villa.current_display_price|int }}</div>
-            {% if villa.amount_saved > 0 %}
-                <small class="text-success fw-bold">Saved ₹{{ villa.amount_saved }}!</small>
-            {% else %}
-                <small class="text-muted">per night</small>
-            {% endif %}
-        {% else %}
-            <div class="fw-bold fs-5 text-primary">Price on Request</div>
-        {% endif %}
-    </div>
-    <div style="display: flex; gap: 10px;">
-        <a href="/enquiry/{{ villa.Villa_ID }}" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-bold"><i class="bi bi-pencil-square"></i></a>
-        <a href="https://wa.me/918830024994?text=I%20want%20to%20book%20{{ villa.Villa_Name|urlencode }}" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow"><i class="bi bi-whatsapp"></i> BOOK</a>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-    document.getElementById('btnCheckAvail').addEventListener('click', function() {
-        var container = document.getElementById('calendar-container');
-        if (container.style.display === 'none') {
-            container.style.display = 'block';
-            flatpickr("#availability-calendar", {
-                inline: true,
-                minDate: "today",
-                disable: [
-                    {% if villa.Sold_Dates %}
-                        {% for d in villa.Sold_Dates.split(',') %} "{{ d.strip() }}", {% endfor %}
-                    {% endif %}
-                ],
-                onDayCreate: function(dObj, dStr, fp, dayElem) {
-                    if (dayElem.classList.contains("flatpickr-disabled")) {
-                        dayElem.style.backgroundColor = "#ff4757"; dayElem.style.color = "white";
-                    } else if (!dayElem.classList.contains("prevMonthDay") && !dayElem.classList.contains("nextMonthDay")) {
-                        dayElem.style.backgroundColor = "#2ed573"; dayElem.style.color = "white";
-                    }
-                }
-            });
-            container.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-            container.style.display = 'none';
-        }
-    });
-</script>
 {% endblock %}
