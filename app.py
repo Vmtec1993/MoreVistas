@@ -291,6 +291,9 @@ def legal(): return render_template('legal.html')
 def list_property(): return render_template('list_property.html')
 
 if __name__ == '__main__':
+    # Render को 'PORT' वेरिएबल की जरूरत होती है
     port = int(os.environ.get("PORT", 5000))
+    # host='0.0.0.0' होना बहुत जरूरी है ताकि बाहरी रिक्वेस्ट आ सकें
     app.run(host='0.0.0.0', port=port)
+
     
