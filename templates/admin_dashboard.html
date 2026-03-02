@@ -14,6 +14,7 @@
     .form-control-pill { border-radius: 12px; padding: 8px 15px; border: 1px solid #dee2e6; font-size: 0.9rem; }
     .modal-xl { max-width: 90% !important; }
     .section-label { font-size: 0.7rem; font-weight: 800; color: #0d6efd; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; display: block; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+    .calendar-input { background-color: #fff9f9 !important; border: 1px solid #ffc1c1 !important; cursor: pointer; }
 </style>
 
 <nav class="admin-nav mb-4">
@@ -27,29 +28,31 @@
 </nav>
 
 <div class="container">
+    {# --- OFFER BANNER SECTION --- #}
     <div class="table-container border-start border-primary border-5">
         <h5 class="fw-bold mb-4"><i class="bi bi-megaphone-fill text-primary me-2"></i>Offer Banner Control</h5>
         <form action="/update-settings" method="POST" class="row g-3 align-items-end">
             <div class="col-md-5">
-                <label class="small fw-bold mb-2">Banner Image URL</label>
-                <input type="text" name="banner_url" class="form-control form-control-pill" value="{{ settings.get('Banner_URL', '') }}">
+                <label class="small fw-bold text-muted mb-2">Banner Image URL</label>
+                <input type="text" name="banner_url" class="form-control form-control-pill" value="{{ settings.get('Banner_URL', '') if settings else '' }}">
             </div>
             <div class="col-md-3">
-                <label class="small fw-bold mb-2">Offer Badge Text</label>
-                <input type="text" name="offer_text" class="form-control form-control-pill" value="{{ settings.get('Offer_Text', '') }}">
+                <label class="small fw-bold text-muted mb-2">Offer Badge Text</label>
+                <input type="text" name="offer_text" class="form-control form-control-pill" value="{{ settings.get('Offer_Text', '') if settings else '' }}">
             </div>
             <div class="col-md-2">
                 <div class="form-check form-switch mb-2">
-                    <input class="form-check-input" type="checkbox" name="banner_show" id="bannerShow" {% if settings.get('Banner_Show') == 'TRUE' %}checked{% endif %}>
+                    <input class="form-check-input" type="checkbox" name="banner_show" id="bannerShow" {% if settings and settings.get('Banner_Show') == 'TRUE' %}checked{% endif %}>
                     <label class="form-check-label small fw-bold" for="bannerShow">Show Banner</label>
                 </div>
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2">Save</button>
+                <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">Save</button>
             </div>
         </form>
     </div>
 
+    {# --- VILLA INVENTORY SECTION --- #}
     <div class="table-container">
         <h5 class="fw-bold mb-4"><i class="bi bi-gear-fill me-2"></i>Villa Inventory Control</h5>
         <div class="table-responsive">
@@ -57,62 +60,118 @@
                 <thead>
                     <tr>
                         <th>Villa Name</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                        <th>Edit</th>
+                        <th>Current Status</th>
+                        <th>Quick Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for villa in villas %}
                     <tr>
-                        <td><span class="fw-bold">{{ villa.Villa_Name }}</span></td>
+                        <td><span class="fw-bold text-dark">{{ villa.get('Villa_Name') }}</span></td>
                         <td>
-                            {% if villa.Status == 'Sold Out' %}
+                            {% if villa.get('Status') == 'Sold Out' %}
                                 <span class="badge bg-sold status-badge">Sold Out</span>
                             {% else %}
                                 <span class="badge bg-available status-badge">Available</span>
                             {% endif %}
                         </td>
                         <td>
-                            <form action="/quick-status-update" method="POST">
-                                <input type="hidden" name="Villa_ID" value="{{ villa.Villa_ID }}">
-                                <input type="hidden" name="current_status" value="{{ villa.Status }}">
-                                <button type="submit" class="btn btn-sm btn-outline-dark rounded-pill">Switch</button>
-                            </form>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#editModal{{ villa.Villa_ID }}">Edit</button>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#editModal{{ villa.get('Villa_ID') }}">
+                                    <i class="bi bi-pencil-square me-1"></i> Edit Details
+                                </button>
+                                
+                                {# --- QUICK MANUAL STATUS UPDATE LOGIC --- #}
+                                {% if villa.get('Status') == 'Sold Out' %}
+                                    <a href="/update-status/{{ villa.get('Villa_ID') }}/Available" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                        <i class="bi bi-check-circle me-1"></i> Mark Available
+                                    </a>
+                                {% else %}
+                                    <a href="/update-status/{{ villa.get('Villa_ID') }}/Sold Out" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                        <i class="bi bi-x-circle me-1"></i> Mark Sold Out
+                                    </a>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
 
-                    <div class="modal fade" id="editModal{{ villa.Villa_ID }}" tabindex="-1">
-                        <div class="modal-dialog modal-xl">
-                            <div class="modal-content" style="border-radius: 20px;">
-                                <div class="modal-body p-4">
+                    {# --- MODAL SECTION (Keep as original) --- #}
+                    <div class="modal fade" id="editModal{{ villa.get('Villa_ID') }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content" style="border-radius: 25px;">
+                                <div class="modal-header border-0 p-4 pb-0">
+                                    <h5 class="fw-bold m-0">Editing: <span class="text-primary">{{ villa.get('Villa_Name') }}</span></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body p-4 pt-2">
+                                    
+                                    <div class="bg-light p-3 border rounded-4 mb-4">
+                                        <span class="section-label text-danger mb-2 mt-0">QUICK OFFLINE BOOKING (AUTO SOLD OUT)</span>
+                                        <form action="/update-offline-dates" method="POST" class="row g-2 align-items-end">
+                                            <input type="hidden" name="Villa_ID" value="{{ villa.get('Villa_ID') }}">
+                                            <div class="col-md-8">
+                                                <label class="small fw-bold">Select Dates (Already Booked):</label>
+                                                <input type="text" name="Sold_Dates" class="form-control form-control-pill calendar-input multi-picker" 
+                                                       placeholder="Select dates..." value="{{ villa.get('Sold_Dates', '') }}">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold py-2 shadow-sm">Update Sold Dates</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
                                     <form action="/update-full-villa" method="POST">
-                                        <input type="hidden" name="Villa_ID" value="{{ villa.Villa_ID }}">
-                                        <h5 class="fw-bold mb-3">Editing: {{ villa.Villa_Name }}</h5>
+                                        <input type="hidden" name="Villa_ID" value="{{ villa.get('Villa_ID') }}">
                                         
+                                        <span class="section-label">1. Primary Information</span>
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="small fw-bold">Villa Name</label>
-                                                <input type="text" name="Villa_Name" class="form-control" value="{{ villa.Villa_Name }}">
+                                                <input type="text" name="Villa_Name" class="form-control form-control-pill" value="{{ villa.get('Villa_Name') }}">
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <label class="small fw-bold">BHK</label>
-                                                <input type="text" name="BHK" class="form-control" value="{{ villa.BHK }}">
+                                                <input type="text" name="BHK" class="form-control form-control-pill" value="{{ villa.get('BHK') }}">
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <label class="small fw-bold">Status</label>
-                                                <select name="Status" class="form-select">
-                                                    <option value="Available" {% if villa.Status == 'Available' %}selected{% endif %}>Available</option>
-                                                    <option value="Sold Out" {% if villa.Status == 'Sold Out' %}selected{% endif %}>Sold Out</option>
+                                                <select name="Status" class="form-select form-control-pill">
+                                                    <option value="Available" {% if villa.get('Status') == 'Available' %}selected{% endif %}>Available</option>
+                                                    <option value="Sold Out" {% if villa.get('Status') == 'Sold Out' %}selected{% endif %}>Sold Out</option>
                                                 </select>
                                             </div>
                                         </div>
-                                        
+
+                                        <span class="section-label">2. Pricing</span>
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="small fw-bold">Original Price</label>
+                                                <input type="number" name="Original_Price" class="form-control form-control-pill" value="{{ villa.get('Original_Price') }}">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="small fw-bold text-success">Weekday Price</label>
+                                                <input type="number" name="Weekday_Price" class="form-control form-control-pill" value="{{ villa.get('Weekday_Price') }}">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="small fw-bold text-danger">Weekend Price</label>
+                                                <input type="number" name="Weekend_Price" class="form-control form-control-pill" value="{{ villa.get('Weekend_Price') }}">
+                                            </div>
+                                        </div>
+
+                                        <span class="section-label">3. Content</span>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="small fw-bold">Amenities</label>
+                                                <textarea name="Amenities" class="form-control rounded-4" rows="3">{{ villa.get('Amenities') }}</textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="small fw-bold">Rules</label>
+                                                <textarea name="Rules" class="form-control rounded-4" rows="3">{{ villa.get('Rules') }}</textarea>
+                                            </div>
+                                        </div>
+
                                         <div class="mt-4">
-                                            <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold">SAVE CHANGES</button>
+                                            <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-3 shadow">SAVE ALL CHANGES</button>
                                         </div>
                                     </form>
                                 </div>
@@ -124,7 +183,48 @@
             </table>
         </div>
     </div>
+
+    {# --- ENQUIRIES SECTION --- #}
+    <div class="table-container">
+        <h5 class="fw-bold mb-4"><i class="bi bi-chat-left-dots-fill me-2"></i>Recent Enquiries</h5>
+        <div class="table-responsive">
+            <table class="table">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Villa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in enquiries %}
+                    <tr>
+                        <td class="small text-muted">{{ row.get('Date', 'N/A') }}</td>
+                        <td><span class="fw-bold">{{ row.get('Name', 'Unknown') }}</span></td>
+                        <td>
+                            <a href="https://wa.me/{{ row.get('Phone', '')|replace(' ', '')|replace('+', '') }}" target="_blank" class="btn btn-sm btn-light rounded-pill px-3">
+                                <i class="bi bi-whatsapp text-success me-1"></i> {{ row.get('Phone', 'No Phone') }}
+                            </a>
+                        </td>
+                        <td class="small fw-bold text-primary">{{ row.get('villa_name') or row.get('Villa Name') or 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr(".multi-picker", {
+            mode: "multiple",
+            dateFormat: "Y-m-d",
+            conjunction: ", ",
+            minDate: "today"
+        });
+    });
+</script>
 {% endblock %}
