@@ -125,12 +125,14 @@ def get_rows(target_sheet):
 def index():
     villas = get_rows(sheet)
     places = get_rows(places_sheet)
+    # Default settings
     settings = {'Offer_Text': "Welcome", 'Banner_URL': "", 'Banner_Show': 'FALSE'}
     if settings_sheet:
         try:
-            s_data = settings_sheet.get_all_values()
-            for r in s_data:
-                if len(r) >= 2: settings[r[0].strip()] = r[1].strip()
+            # ✅ Improved Reading: Fixed Cell Targeting (B1, B2, B3)
+            settings['Banner_URL'] = settings_sheet.acell('B1').value or ""
+            settings['Offer_Text'] = settings_sheet.acell('B2').value or ""
+            settings['Banner_Show'] = settings_sheet.acell('B3').value or "FALSE"
         except: pass
     return render_template('index.html', villas=villas, tourist_places=places, settings=settings)
 
@@ -178,12 +180,14 @@ def admin_dashboard():
     villas = get_rows(sheet)
     all_enquiries = get_rows(enquiry_sheet)
     enquiries = all_enquiries[-10:] if all_enquiries else []
-    settings = {}
+    
+    settings = {'Offer_Text': "", 'Banner_URL': "", 'Banner_Show': 'FALSE'}
     if settings_sheet:
         try:
-            s_data = settings_sheet.get_all_values()
-            for r in s_data:
-                if len(r) >= 2: settings[r[0].strip()] = r[1].strip()
+            # ✅ Improved Reading: Admin side sync with B1, B2, B3
+            settings['Banner_URL'] = settings_sheet.acell('B1').value or ""
+            settings['Offer_Text'] = settings_sheet.acell('B2').value or ""
+            settings['Banner_Show'] = settings_sheet.acell('B3').value or "FALSE"
         except: pass
     return render_template('admin_dashboard.html', villas=villas, enquiries=enquiries, settings=settings)
 
@@ -192,13 +196,12 @@ def admin_logout():
     session.pop('logged_in', None)
     return redirect(url_for('index'))
 
-# ✅ UPDATED: Settings logic to force cell update
 @app.route('/update-settings', methods=['POST'])
 def update_settings():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
     if settings_sheet:
         try:
-            # Direct cell update (Stable Method)
+            # ✅ Using update_acell to target specific cells and avoid shifting
             settings_sheet.update_acell('B1', request.form.get('banner_url'))
             settings_sheet.update_acell('B2', request.form.get('offer_text'))
             show = "TRUE" if request.form.get('banner_show') else "FALSE"
@@ -290,4 +293,4 @@ def list_property(): return render_template('list_property.html')
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-        
+    
