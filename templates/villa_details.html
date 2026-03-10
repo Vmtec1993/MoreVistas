@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{# --- CSS SECTION (आपका ओरिजinal स्टाइल + Amenities Style) --- #}
+{# --- CSS SECTION (Original + Enhanced Amenities Style) --- #}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
     /* Premium Typography & Colors */
@@ -23,18 +23,31 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
 
-    /* ✅ Amenities Styling (New) */
+    /* ✅ UPGRADED Amenities Styling */
     .amenity-detail-item {
-        background: #fff;
+        background: #ffffff;
         border: 1px solid #f0f0f0;
-        padding: 12px 15px;
-        border-radius: 12px;
+        padding: 15px;
+        border-radius: 15px;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 10px;
-        font-weight: 500;
-        font-size: 0.95rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        text-align: center;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: 0.3s;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        height: 100%;
+        color: #444;
+    }
+    .amenity-detail-item:hover {
+        border-color: #ff4757;
+        transform: translateY(-3px);
+    }
+    .amenity-icon-box {
+        font-size: 1.8rem;
+        color: #ff4757; /* Luxury Red-Pink Theme */
     }
 
     .premium-rules-container {
@@ -159,15 +172,29 @@
                 </p>
             </div>
 
-            {# --- ✅ AMENITIES SECTION (New Added) --- #}
+            {# --- ✅ UPDATED AMENITIES SECTION WITH ICON LOGIC --- #}
             <div class="amenities-section mb-5">
                 <h4 class="fw-bold mb-4"><i class="bi bi-stars text-primary me-2"></i>What this villa offers</h4>
                 <div class="row g-3">
                     {% if villa.Amenities %}
                         {% for amen in villa.Amenities.split('|') %}
-                        <div class="col-6 col-md-4">
+                        {% set item = amen.strip()|lower %}
+                        <div class="col-4 col-md-3">
                             <div class="amenity-detail-item">
-                                <i class="bi bi-patch-check-fill text-success"></i> {{ amen.strip() }}
+                                <div class="amenity-icon-box">
+                                    {% if 'pool' in item %}<i class="bi bi-water"></i>
+                                    {% elif 'wifi' in item or 'internet' in item %}<i class="bi bi-wifi"></i>
+                                    {% elif 'ac' in item or 'air conditioning' in item %}<i class="bi bi-snow"></i>
+                                    {% elif 'tv' in item or 'television' in item %}<i class="bi bi-tv"></i>
+                                    {% elif 'kitchen' in item or 'cook' in item %}<i class="bi bi-egg-fried"></i>
+                                    {% elif 'parking' in item %}<i class="bi bi-p-circle"></i>
+                                    {% elif 'geyser' in item or 'hot water' in item %}<i class="bi bi-thermometer-half"></i>
+                                    {% elif 'fridge' in item or 'refrigerator' in item %}<i class="bi bi-box-seam"></i>
+                                    {% elif 'music' in item or 'speaker' in item %}<i class="bi bi-music-note-beamed"></i>
+                                    {% elif 'power' in item or 'inverter' in item %}<i class="bi bi-lightning-charge"></i>
+                                    {% else %}<i class="bi bi-check-circle"></i>{% endif %}
+                                </div>
+                                <span class="amenity-text">{{ amen.strip() }}</span>
                             </div>
                         </div>
                         {% endfor %}
@@ -307,4 +334,3 @@
     });
 </script>
 {% endblock %}
-                
